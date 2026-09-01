@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fefccb3ebb03d8040b433bbdcf541b97, type: 3}
+  m_Name: WaterTileType
+  m_EditorClassIdentifier: Assembly-CSharp::TileTypeData
+  tileName: Water
+  icon: {fileID: 0}
+  movementCost: 1
+  isWalkable: 0
+  blocksLineOfSight: 0
+  defenseBonus: 0
+  previewColor: {r: 0.3160377, g: 0.8872532, b: 1, a: 1}
