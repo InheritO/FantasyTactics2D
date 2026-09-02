@@ -6,6 +6,7 @@ public class UnitSelectionController : MonoBehaviour
     [Header("References")]
     public GridManager gridManager;
     public MovementRangeVisualizer rangeVisualizer;
+    public TurnManager turnManager;
     public BattlePhaseManager phaseManager;
 
     private UnitBase selectedUnit;
@@ -17,6 +18,7 @@ public class UnitSelectionController : MonoBehaviour
     {
         rangeVisualizer.Setup(gridManager);
     }
+
 
     void Update()
     {
@@ -58,7 +60,22 @@ public class UnitSelectionController : MonoBehaviour
         if (tile.OccupyingUnit == null)
             return;
 
-        SelectUnit(tile.OccupyingUnit);
+        UnitBase unit = tile.OccupyingUnit;
+
+        // 현재 턴의 세력이 아니거나, 이미 행동한 유닛이면 선택 불가
+        if (unit.Faction != turnManager.CurrentFaction)
+        {
+            Debug.Log("현재 턴의 세력이 아닙니다.");
+            return;
+        }
+
+        if (unit.HasActedThisTurn)
+        {
+            Debug.Log("이미 이번 턴에 행동한 유닛입니다.");
+            return;
+        }
+
+        SelectUnit(unit);
     }
 
     private void HandleClickWhileUnitSelected(TileInstance clickedTile, Vector2Int clickedCoord)
@@ -69,18 +86,30 @@ public class UnitSelectionController : MonoBehaviour
             return;
         }
 
-        if (clickedTile.OccupyingUnit != null)
+        UnitBase targetUnit = clickedTile.OccupyingUnit;
+
+        if (targetUnit != null)
         {
-            DeselectUnit();
-            SelectUnit(clickedTile.OccupyingUnit);
+            // 다른 세력 유닛이면 공격 시도, 같은 세력이면 선택 대상 변경
+            if (targetUnit.Faction != selectedUnit.Faction)
+            {
+                TryAttackTarget(targetUnit);
+            }
+            else
+            {
+                DeselectUnit();
+                TrySelectUnit(clickedTile);
+            }
             return;
         }
 
-        // 이동 가능 범위 안에 있는 타일인지 확인
+        // 빈 타일 클릭 -> 이동 시도 (기존과 동일)
         if (currentReachableTiles != null && currentReachableTiles.ContainsKey(clickedCoord))
         {
             bool moved = selectedUnit.TryMoveTo(clickedCoord);
-            if (!moved)
+            if (moved)
+                selectedUnit.MarkAsActed();
+            else
                 Debug.Log($"이동 실패: {clickedCoord}");
         }
         else
@@ -90,6 +119,24 @@ public class UnitSelectionController : MonoBehaviour
 
         DeselectUnit();
     }
+
+    private void TryAttackTarget(UnitBase target)
+    {
+        bool attacked = selectedUnit.TryAttack(target);
+
+        if (attacked)
+        {
+            Debug.Log($"{selectedUnit.name}이(가) {target.name}을(를) 공격했습니다.");
+            selectedUnit.MarkAsActed();
+        }
+        else
+        {
+            Debug.Log("공격 사거리 밖입니다.");
+        }
+
+        DeselectUnit();
+    }
+
 
     private void SelectUnit(UnitBase unit)
     {

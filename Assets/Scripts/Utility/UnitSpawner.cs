@@ -6,7 +6,8 @@ using UnityEngine;
 /// </summary>
 public static class UnitSpawner
 {
-    public static UnitBase Spawn(UnitBase unitPrefab, Vector2Int coord, FactionData faction, GridManager gridManager)
+    public static UnitBase Spawn(UnitBase unitPrefab, Vector2Int coord, FactionData faction,
+         GridManager gridManager, BattleOutcomeManager outcomeManager)
     {
         TileInstance tile = gridManager.GetTile(coord);
 
@@ -19,6 +20,11 @@ public static class UnitSpawner
         UnitBase unit = Object.Instantiate(unitPrefab);
         unit.SetFaction(faction);
         unit.PlaceOnGrid(coord, gridManager);
+
+        if (!faction.isPlayerControlled)
+            unit.AIBehavior = new AggressiveMoveTowardEnemy();
+
+        outcomeManager.RegisterUnit(unit); // 추가: 사망 이벤트 구독
 
         return unit;
     }

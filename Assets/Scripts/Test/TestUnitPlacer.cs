@@ -1,4 +1,5 @@
 using UnityEngine;
+using NaughtyAttributes;
 
 /// <summary>
 /// 테스트 목적으로 클릭한 위치에 자유롭게 유닛을 배치하는 도구.
@@ -10,6 +11,8 @@ public class TestUnitPlacer : MonoBehaviour
     [Header("References")]
     public GridManager gridManager;
     public BattlePhaseManager phaseManager;
+    public BattleOutcomeManager outcomeManager;
+    [HorizontalLine]
     public TestUnit testUnitPrefab;
     public FactionData[] factions; // 인스펙터에서 2개 이상 자유롭게 등록 가능
 
@@ -17,7 +20,8 @@ public class TestUnitPlacer : MonoBehaviour
 
     void Update()
     {
-        if (phaseManager.CurrentPhase != BattlePhase.Placement) return;
+        if (phaseManager.CurrentPhase != BattlePhase.Placement)
+            return;
 
         if (Input.GetKeyDown(KeyCode.Tab))
         {
@@ -51,6 +55,6 @@ public class TestUnitPlacer : MonoBehaviour
         Vector2Int coord = gridManager.WorldToGrid(mouseWorldPos);
 
         FactionData selectedFaction = factions[currentFactionIndex];
-        UnitSpawner.Spawn(testUnitPrefab, coord, selectedFaction, gridManager);
+        UnitSpawner.Spawn(testUnitPrefab, coord, selectedFaction, gridManager, outcomeManager);
     }
 }
