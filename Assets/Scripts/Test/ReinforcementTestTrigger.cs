@@ -10,6 +10,7 @@ public class ReinforcementTestTrigger : MonoBehaviour
     public BattlePhaseManager phaseManager;
     public TurnManager turnManager;
     public TestUnit testUnitPrefab;
+    public BattleOutcomeManager outcomeManager;
 
     public FactionData reinforcementFaction;
     public Vector2Int spawnCoord;
@@ -22,7 +23,7 @@ public class ReinforcementTestTrigger : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.R))
         {
-            UnitSpawner.Spawn(testUnitPrefab, spawnCoord, reinforcementFaction, gridManager);
+            UnitSpawner.Spawn(testUnitPrefab, spawnCoord, reinforcementFaction, gridManager, outcomeManager);
             turnManager.AddFaction(reinforcementFaction, insertAsNextTurn);
         }
     }

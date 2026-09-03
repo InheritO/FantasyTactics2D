@@ -21,6 +21,7 @@ public class BattleOutcomeManager : MonoBehaviour
     private void HandleUnitDied(UnitBase deadUnit)
     {
         FactionData faction = deadUnit.Faction;
+
         if (faction == null || defeatedFactions.Contains(faction))
             return;
 
@@ -37,7 +38,11 @@ public class BattleOutcomeManager : MonoBehaviour
 
         turnManager.RemoveFaction(faction);
 
-        CheckBattleEnd();
+        if (turnManager.RemainingFactionCount <= 1)
+        {
+            Debug.Log("전투 종료.");
+            OnBattleEnded?.Invoke();
+        }
     }
 
     private void CheckBattleEnd()

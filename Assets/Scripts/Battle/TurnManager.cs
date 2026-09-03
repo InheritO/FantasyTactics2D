@@ -16,7 +16,7 @@ public class TurnManager : MonoBehaviour
 
     public event Action<FactionData> OnTurnStarted;
 
-    
+    public int RemainingFactionCount => turnOrder.Count;
 
     public void InitializeTurnOrder()
     {
@@ -41,7 +41,7 @@ public class TurnManager : MonoBehaviour
 
     public void EndTurn()
     {
-        if (turnOrder.Count == 0) return;
+        if (turnOrder.Count <= 1) return;
 
         currentIndex = (currentIndex + 1) % turnOrder.Count;
         StartTurnFor(turnOrder[currentIndex]);

@@ -119,6 +119,51 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &207065232
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 207065234}
+  - component: {fileID: 207065233}
+  m_Layer: 0
+  m_Name: OutcomeManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &207065233
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 207065232}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea0d45bfac5308a478c82ab8930d3ffe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BattleOutcomeManager
+  turnManager: {fileID: 825007393}
+--- !u!4 &207065234
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 207065232}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.00979, y: 0.02555, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &332952175
 GameObject:
   m_ObjectHideFlags: 0
@@ -150,6 +195,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TestUnitPlacer
   gridManager: {fileID: 669441030}
   phaseManager: {fileID: 1230799407}
+  outcomeManager: {fileID: 207065233}
   testUnitPrefab: {fileID: 3106636929674444334, guid: b76194a7e2a4e1d41988bef829f02342, type: 3}
   factions:
   - {fileID: 11400000, guid: d9e1619d3ddb1f7429c0ae6d39910911, type: 2}
@@ -657,6 +703,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BattlePhaseManager
   turnManager: {fileID: 825007393}
+  outcomeManager: {fileID: 207065233}
 --- !u!4 &1230799408
 Transform:
   m_ObjectHideFlags: 0
@@ -843,6 +890,7 @@ MonoBehaviour:
   phaseManager: {fileID: 1230799407}
   turnManager: {fileID: 825007393}
   testUnitPrefab: {fileID: 3106636929674444334, guid: b76194a7e2a4e1d41988bef829f02342, type: 3}
+  outcomeManager: {fileID: 0}
   reinforcementFaction: {fileID: 11400000, guid: d81836a19f0559140a9f1cfc10520737, type: 2}
   spawnCoord: {x: 0, y: 0}
   insertAsNextTurn: 1
@@ -917,6 +965,7 @@ SceneRoots:
   - {fileID: 1524777793}
   - {fileID: 1230799408}
   - {fileID: 825007394}
+  - {fileID: 207065234}
   - {fileID: 1419503734}
   - {fileID: 483852270}
   - {fileID: 1495129749}

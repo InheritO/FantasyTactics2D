@@ -1,10 +1,8 @@
 using UnityEngine;
-using NaughtyAttributes;
 
 /// <summary>
-/// 테스트 목적으로 클릭한 위치에 자유롭게 유닛을 배치하는 도구.
-/// Tab 키로 세력을 순환 선택하고, 마우스 클릭으로 스폰한다.
-/// 실제 게임의 전투 시작 배치 로직이 만들어지면 이 스크립트는 제거해도 된다.
+/// 테스트 목적으로 세력, 무기, 방어구를 순환 선택하고 클릭한 위치에 배치하는 도구.
+/// Tab: 세력 전환, Q: 무기 전환, E: 방어구 전환, 우클릭: 배치
 /// </summary>
 public class TestUnitPlacer : MonoBehaviour
 {
@@ -12,11 +10,12 @@ public class TestUnitPlacer : MonoBehaviour
     public GridManager gridManager;
     public BattlePhaseManager phaseManager;
     public BattleOutcomeManager outcomeManager;
-    [HorizontalLine]
     public TestUnit testUnitPrefab;
-    public FactionData[] factions; // 인스펙터에서 2개 이상 자유롭게 등록 가능
+    public FactionData[] factions;
 
     private int currentFactionIndex = 0;
+    private int currentWeaponIndex = -1; // -1 = 비무장
+    private int currentArmorIndex = -1;  // -1 = 비무장
 
     void Update()
     {
@@ -24,14 +23,16 @@ public class TestUnitPlacer : MonoBehaviour
             return;
 
         if (Input.GetKeyDown(KeyCode.Tab))
-        {
             CycleFaction();
-        }
 
-        if (Input.GetMouseButtonDown(1)) // 우클릭으로 배치 (좌클릭은 선택/이동과 겹치므로)
-        {
+        if (Input.GetKeyDown(KeyCode.Q))
+            CycleWeapon();
+
+        if (Input.GetKeyDown(KeyCode.E))
+            CycleArmor();
+
+        if (Input.GetMouseButtonDown(1))
             PlaceUnitAtMouse();
-        }
     }
 
     private void CycleFaction()
@@ -39,7 +40,45 @@ public class TestUnitPlacer : MonoBehaviour
         if (factions.Length == 0) return;
 
         currentFactionIndex = (currentFactionIndex + 1) % factions.Length;
+        currentWeaponIndex = -1; // 세력이 바뀌면 장비 풀이 달라지니 초기화
+        currentArmorIndex = -1;
+
         Debug.Log($"현재 배치 세력: {factions[currentFactionIndex].factionName}");
+    }
+
+    private void CycleWeapon()
+    {
+        RaceData race = factions[currentFactionIndex].race;
+        if (race == null || race.availableWeapons.Length == 0)
+        {
+            Debug.Log("이 종족은 사용 가능한 무기가 없습니다.");
+            return;
+        }
+
+        // -1(비무장)부터 시작해서 순환
+        currentWeaponIndex++;
+        if (currentWeaponIndex >= race.availableWeapons.Length)
+            currentWeaponIndex = -1;
+
+        string weaponName = currentWeaponIndex == -1 ? "비무장" : race.availableWeapons[currentWeaponIndex].weaponName;
+        Debug.Log($"현재 무기: {weaponName}");
+    }
+
+    private void CycleArmor()
+    {
+        RaceData race = factions[currentFactionIndex].race;
+        if (race == null || race.availableArmors.Length == 0)
+        {
+            Debug.Log("이 종족은 사용 가능한 방어구가 없습니다.");
+            return;
+        }
+
+        currentArmorIndex++;
+        if (currentArmorIndex >= race.availableArmors.Length)
+            currentArmorIndex = -1;
+
+        string armorName = currentArmorIndex == -1 ? "비무장" : race.availableArmors[currentArmorIndex].armorName;
+        Debug.Log($"현재 방어구: {armorName}");
     }
 
     private void PlaceUnitAtMouse()
@@ -55,6 +94,17 @@ public class TestUnitPlacer : MonoBehaviour
         Vector2Int coord = gridManager.WorldToGrid(mouseWorldPos);
 
         FactionData selectedFaction = factions[currentFactionIndex];
-        UnitSpawner.Spawn(testUnitPrefab, coord, selectedFaction, gridManager, outcomeManager);
+        UnitBase unit = UnitSpawner.Spawn(testUnitPrefab, coord, selectedFaction, gridManager, outcomeManager);
+
+        if (unit == null)
+            return;
+
+        RaceData race = selectedFaction.race;
+
+        if (race != null && currentWeaponIndex >= 0 && currentWeaponIndex < race.availableWeapons.Length)
+            unit.EquipWeapon(race.availableWeapons[currentWeaponIndex]);
+
+        if (race != null && currentArmorIndex >= 0 && currentArmorIndex < race.availableArmors.Length)
+            unit.EquipArmor(race.availableArmors[currentArmorIndex]);
     }
 }

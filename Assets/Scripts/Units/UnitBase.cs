@@ -1,45 +1,65 @@
 using UnityEngine;
 using System;
+using NaughtyAttributes;
 
 /// <summary>
 /// 모든 유닛(캐릭터)의 기반이 되는 추상 클래스.
-/// 그리드 좌표, 체력, 이동력 등 공통 속성과 기본 이동 로직을 담는다.
-/// 실제 게임에 등장하는 유닛은 이 클래스를 상속받아 구현한다.
+/// 종족 기본 스탯(Base 접두사)은 절대 직접 변경되지 않으며,
+/// 장비로 인한 보정은 계산 프로퍼티(MoveRange, AttackPower 등)를 통해서만 반영된다.
 /// </summary>
 public abstract class UnitBase : MonoBehaviour
 {
+    public event Action<UnitBase, int> OnDamaged;
+    public event Action<UnitBase> OnDied;
+
     [Header("Grid Position")]
     public Vector2Int GridCoord { get; private set; }
 
     [Header("Faction")]
     public FactionData Faction { get; private set; }
-
-    [Header("Stats")]
-    public int MaxHealth = 10;
-    public int CurrentHealth { get; protected set; }
-    public int MoveRange = 3;
-    public int AttackRange = 1;
-    public int AttackPower = 3;
-
-    public event Action<UnitBase, int> OnDamaged;
-    public event Action<UnitBase> OnDied;
+    public RaceData Race { get; private set; }
 
 
-    public bool HasActedThisTurn { get; private set; } = false;
 
-    public IUnitAIBehavior AIBehavior { get; set; }
-
+    [Header("Capabilities")]
     public bool CanMove { get; protected set; } = true;
     public bool CanAttack { get; protected set; } = true;
 
+    [field:SerializeField]
+    public int CurrentHealth { get; protected set; }
+    public bool HasActedThisTurn { get; private set; } = false;
+    public IUnitAIBehavior AIBehavior { get; set; }
+
+    [field: SerializeField]
+    public WeaponData EquippedWeapon { get; private set; }
+    [field: SerializeField]
+    public ArmorData EquippedArmor { get; private set; }
+
     protected GridManager gridManager;
     protected SpriteRenderer spriteRenderer;
+    private static Sprite defaultSquareSprite;
+
+    // ---- 계산 스탯 (종족 기본치 + 장비 보정) ----
+
+    public int MaxHealth => Race != null ? Race.maxHealth : 1;
+    public int MoveRange => Race != null
+        ? Mathf.Max(0, Race.baseMoveRange - (EquippedArmor?.moveRangePenalty ?? 0))
+        : 0;
+    public int MeleeSkill => Race != null ? Race.baseMeleeSkill : 0;
+    public int RangedSkill => Race != null ? Race.baseRangedSkill : 0;
+    public int Strength => Race != null ? Race.baseStrength : 0;
+    public int Agility => Race != null ? Race.baseAgility : 0;
+    public int Defense => (Race != null ? Race.baseConstitution : 0) + (EquippedArmor?.defenseBonus ?? 0);
+
+    public int BaseAttackRange = 1; // 종족이 아닌 유닛 개체 특성으로 남겨둠 (필요시 이것도 Race로 옮길 수 있음)
+    public int AttackRange =>
+        (EquippedWeapon != null && EquippedWeapon.attackRangeOverride >= 0)
+            ? EquippedWeapon.attackRangeOverride
+            : BaseAttackRange;
 
     protected virtual void Awake()
     {
-        CurrentHealth = MaxHealth;
         spriteRenderer = GetComponent<SpriteRenderer>();
-
         if (spriteRenderer == null)
             spriteRenderer = gameObject.AddComponent<SpriteRenderer>();
 
@@ -47,14 +67,35 @@ public abstract class UnitBase : MonoBehaviour
             spriteRenderer.sprite = GetDefaultSquareSprite();
     }
 
+    private static Sprite GetDefaultSquareSprite()
+    {
+        if (defaultSquareSprite == null)
+        {
+            Texture2D texture = new Texture2D(1, 1);
+            texture.SetPixel(0, 0, Color.white);
+            texture.Apply();
+            defaultSquareSprite = Sprite.Create(texture, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1f);
+        }
+        return defaultSquareSprite;
+    }
+
+
     // 세력 지정 (스폰 시 호출)
     public virtual void SetFaction(FactionData faction)
     {
         Faction = faction;
+        Race = faction.race;
+
+        CurrentHealth = MaxHealth; // Race가 확정된 시점에 체력 초기화
 
         if (spriteRenderer != null && faction != null)
             spriteRenderer.color = faction.factionColor;
     }
+
+    //장비
+    public void EquipWeapon(WeaponData weapon) => EquippedWeapon = weapon;
+    public void EquipArmor(ArmorData armor) => EquippedArmor = armor;
+
     // 유닛을 특정 그리드 좌표에 배치 (최초 배치, 순간이동 등에 사용)
     public virtual void PlaceOnGrid(Vector2Int coord, GridManager grid)
     {
@@ -96,9 +137,6 @@ public abstract class UnitBase : MonoBehaviour
     // 대상이 공격 사거리 안에 있는지 확인
     public bool IsInAttackRange(UnitBase target)
     {
-        if (!CanMove)
-            return false;
-
         if (target == null || gridManager == null)
             return false;
 
@@ -116,16 +154,26 @@ public abstract class UnitBase : MonoBehaviour
         if (!IsInAttackRange(target))
             return false;
 
-        target.TakeDamage(AttackPower);
+        CombatResult result = CombatResolver.Resolve(this, target);
+
+        if (result.IsHit)
+            target.TakeDamage(result.DamageDealt);
+        else
+            Debug.Log($"{name}의 공격이 빗나갔습니다.");
+
         return true;
     }
+
+    // amount는 CombatResolver에서 이미 방어력이 반영된 최종 데미지
     public virtual void TakeDamage(int amount)
     {
         CurrentHealth = Mathf.Max(0, CurrentHealth - amount);
+        OnDamaged?.Invoke(this, amount);
 
         if (CurrentHealth <= 0)
             Die();
     }
+
 
     protected virtual void Die()
     {
@@ -133,25 +181,14 @@ public abstract class UnitBase : MonoBehaviour
         if (tile != null && tile.OccupyingUnit == this)
             tile.OccupyingUnit = null;
 
+        OnDied?.Invoke(this);
+
         Destroy(gameObject);
     }
 
-    // 자식 클래스가 반드시 구현해야 하는, 유닛 고유의 행동 (공격, 스킬 등)
-    public abstract void PerformAction();
 
-    private static Sprite defaultSquareSprite;
 
-    private static Sprite GetDefaultSquareSprite()
-    {
-        if (defaultSquareSprite == null)
-        {
-            Texture2D texture = new Texture2D(1, 1);
-            texture.SetPixel(0, 0, Color.white);
-            texture.Apply();
-            defaultSquareSprite = Sprite.Create(texture, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1f);
-        }
-        return defaultSquareSprite;
-    }
+    // ---- 턴 상태 ----
 
     public void ResetTurnState()
     {
@@ -162,4 +199,6 @@ public abstract class UnitBase : MonoBehaviour
     {
         HasActedThisTurn = true;
     }
+
+
 }

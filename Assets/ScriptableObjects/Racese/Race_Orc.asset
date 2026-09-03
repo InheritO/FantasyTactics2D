@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34fc3285dab79364db2e6c2f5478dca1, type: 3}
+  m_Name: Race_Orc
+  m_EditorClassIdentifier: Assembly-CSharp::RaceData
+  raceName: Orc
+  maxHealth: 10
+  baseMoveRange: 3
+  baseMeleeSkill: 3
+  baseRangedSkill: 3
+  baseStrength: 3
+  baseConstitution: 3
+  baseAgility: 3
+  availableWeapons:
+  - {fileID: 11400000, guid: da7a84c917a20e54da48616e1c89448e, type: 2}
+  availableArmors:
+  - {fileID: 11400000, guid: ccdb04e36ff92ff469a552a9678132e3, type: 2}
+  - {fileID: 11400000, guid: fe93229c0386ab7478e7a7f29f1851bb, type: 2}
+  - {fileID: 11400000, guid: 5e907f84f06e98f48aea036b98e33bc7, type: 2}
