@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System.Collections.Generic;
 
 public class UnitSelectionController : MonoBehaviour
@@ -64,16 +64,16 @@ public class UnitSelectionController : MonoBehaviour
 
         UnitBase unit = tile.OccupyingUnit;
 
-        // ÇöÀç ÅÏÀÇ ¼¼·ÂÀÌ ¾Æ´Ï°Å³ª, ÀÌ¹Ì Çàµ¿ÇÑ À¯´ÖÀÌ¸é ¼±ÅÃ ºÒ°¡
+        // í˜„ì¬ í„´ì˜ ì„¸ë ¥ì´ ì•„ë‹ˆê±°ë‚˜, ì´ë¯¸ í–‰ë™í•œ ìœ ë‹›ì´ë©´ ì„ íƒ ë¶ˆê°€
         if (unit.Faction != turnManager.CurrentFaction)
         {
-            Debug.Log("ÇöÀç ÅÏÀÇ ¼¼·ÂÀÌ ¾Æ´Õ´Ï´Ù.");
+            Debug.Log("í˜„ì¬ í„´ì˜ ì„¸ë ¥ì´ ì•„ë‹™ë‹ˆë‹¤.");
             return;
         }
 
-        if (unit.HasActedThisTurn)
+        if (!unit.CanStillAct)
         {
-            Debug.Log("ÀÌ¹Ì ÀÌ¹ø ÅÏ¿¡ Çàµ¿ÇÑ À¯´ÖÀÔ´Ï´Ù.");
+            Debug.Log("ì´ë¯¸ ì´ë²ˆ í„´ì— í–‰ë™í•œ ìœ ë‹›ì…ë‹ˆë‹¤.");
             return;
         }
 
@@ -92,7 +92,7 @@ public class UnitSelectionController : MonoBehaviour
 
         if (targetUnit != null)
         {
-            // ´Ù¸¥ ¼¼·Â À¯´ÖÀÌ¸é °ø°İ ½Ãµµ, °°Àº ¼¼·ÂÀÌ¸é ¼±ÅÃ ´ë»ó º¯°æ
+            // ë‹¤ë¥¸ ì„¸ë ¥ ìœ ë‹›ì´ë©´ ê³µê²© ì‹œë„, ê°™ì€ ì„¸ë ¥ì´ë©´ ì„ íƒ ëŒ€ìƒ ë³€ê²½
             if (targetUnit.Faction != selectedUnit.Faction)
             {
                 TryAttackTarget(targetUnit);
@@ -105,40 +105,59 @@ public class UnitSelectionController : MonoBehaviour
             return;
         }
 
-        // ºó Å¸ÀÏ Å¬¸¯ -> ÀÌµ¿ ½Ãµµ (±âÁ¸°ú µ¿ÀÏ)
+        // ë¹ˆ íƒ€ì¼ í´ë¦­ -> ì´ë™ ì‹œë„ (ê¸°ì¡´ê³¼ ë™ì¼)
         if (currentReachableTiles != null && currentReachableTiles.ContainsKey(clickedCoord))
         {
             bool moved = selectedUnit.TryMoveTo(clickedCoord);
-            if (moved)
-                selectedUnit.MarkAsActed();
-            else
-                Debug.Log($"ÀÌµ¿ ½ÇÆĞ: {clickedCoord}");
+            if (!moved)
+                Debug.Log($"ì´ë™ ì‹¤íŒ¨: {clickedCoord}");
         }
         else
         {
-            Debug.Log($"ÀÌµ¿ ¹üÀ§ ¹ÛÀÔ´Ï´Ù: {clickedCoord}");
+            Debug.Log($"ì´ë™ ë²”ìœ„ ë°–ì…ë‹ˆë‹¤: {clickedCoord}");
         }
 
-        DeselectUnit();
+        RefreshSelectionDisplay();
     }
 
     private void TryAttackTarget(UnitBase target)
     {
         bool attacked = selectedUnit.TryAttack(target);
 
-        if (attacked)
+        if (!attacked)
+            Debug.Log("ê³µê²©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤ (ì‚¬ê±°ë¦¬ ë°–ì´ê±°ë‚˜ ì´ë¯¸ í–‰ë™í•¨).");
+
+        DeselectUnit(); // ê³µê²©ì€ í•­ìƒ ì´ë™ê¹Œì§€ ë´‰ì¸ë˜ë¯€ë¡œ ë¬´ì¡°ê±´ ì„ íƒ í•´ì œ
+    }
+
+    private void RefreshSelection()
+    {
+        currentReachableTiles = MovementRangeCalculator.CalculateReachableTiles(
+            gridManager, selectedUnit.GridCoord, selectedUnit.MoveRange);
+
+        rangeVisualizer.ShowRange(currentReachableTiles);
+    }
+
+    private void RefreshSelectionDisplay()
+    {
+        if (!selectedUnit.CanStillAct)
         {
-            Debug.Log($"{selectedUnit.name}ÀÌ(°¡) {target.name}À»(¸¦) °ø°İÇß½À´Ï´Ù.");
-            selectedUnit.MarkAsActed();
+            DeselectUnit();
+            return;
+        }
+
+        if (selectedUnit.HasMoved)
+        {
+            // ì´ë™ì€ ëë‚¬ê³  ê³µê²©ë§Œ ë‚¨ì•˜ìœ¼ë©´, ë” ì´ìƒ "ì´ë™ ê°€ëŠ¥ ë²”ìœ„"ë¥¼ ë³´ì—¬ì£¼ì§€ ì•ŠìŒ
+            rangeVisualizer.ClearRange();
+            currentReachableTiles = null;
         }
         else
         {
-            Debug.Log("°ø°İ »ç°Å¸® ¹ÛÀÔ´Ï´Ù.");
+            // ì•„ì§ ì´ë™ ì „ì´ë©´ (ì´ ë¶„ê¸°ëŠ” ì‚¬ì‹¤ ì§€ê¸ˆ íë¦„ìƒ ê±°ì˜ ì•ˆ ì˜´)
+            RefreshSelection();
         }
-
-        DeselectUnit();
     }
-
 
     private void SelectUnit(UnitBase unit)
     {
@@ -172,15 +191,15 @@ public class UnitSelectionController : MonoBehaviour
     }
 
 
-    //ÀüÅõ ½Ã½ºÅÛ °íµµÈ­ + UI ÁØºñµÉ ¶§±îÁö »ç¿ëÇÒ ·Î±× ¹¶ÅÊÀÌ
+    //ì „íˆ¬ ì‹œìŠ¤í…œ ê³ ë„í™” + UI ì¤€ë¹„ë  ë•Œê¹Œì§€ ì‚¬ìš©í•  ë¡œê·¸ ë­‰íƒ±ì´
     private void LogUnitStatus(UnitBase unit)
     {
-        string mainHand = unit.MainHandWeapon != null ? unit.MainHandWeapon.weaponName : "¾øÀ½";
-        string offHand = unit.OffHandWeapon != null ? unit.OffHandWeapon.weaponName : "¾øÀ½";
-        string shield = unit.EquippedShield != null ? unit.EquippedShield.shieldName : "¾øÀ½";
-        string armor = unit.EquippedArmor != null ? unit.EquippedArmor.armorName : "¾øÀ½";
+        string mainHand = unit.MainHandWeapon != null ? unit.MainHandWeapon.weaponName : "ì—†ìŒ";
+        string offHand = unit.OffHandWeapon != null ? unit.OffHandWeapon.weaponName : "ì—†ìŒ";
+        string shield = unit.EquippedShield != null ? unit.EquippedShield.shieldName : "ì—†ìŒ";
+        string armor = unit.EquippedArmor != null ? unit.EquippedArmor.armorName : "ì—†ìŒ";
 
-        Debug.Log($"[{unit.name}] ÁÖ¹«±â: {mainHand} | º¸Á¶¹«±â: {offHand} | ¹æÆĞ: {shield} | ¹æ¾î±¸: {armor}\n" +
-                  $"ÀÌµ¿·Â: {unit.MoveRange} | »ç°Å¸®: {unit.AttackRange} | ¹æ¾î·Â: {unit.Defense}(¸ËÁı{unit.ConstitutionDefense}+Àåºñ{unit.ArmorDefense})");
+        Debug.Log($"[{unit.name}] ì£¼ë¬´ê¸°: {mainHand} | ë³´ì¡°ë¬´ê¸°: {offHand} | ë°©íŒ¨: {shield} | ë°©ì–´êµ¬: {armor}\n" +
+                  $"ì´ë™ë ¥: {unit.MoveRange} | ì‚¬ê±°ë¦¬: {unit.AttackRange} | ë°©ì–´ë ¥: {unit.Defense}(ë§·ì§‘{unit.ConstitutionDefense}+ì¥ë¹„{unit.ArmorDefense})");
     }
 }

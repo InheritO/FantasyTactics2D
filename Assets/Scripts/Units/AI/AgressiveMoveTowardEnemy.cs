@@ -10,9 +10,9 @@ public class AggressiveMoveTowardEnemy : IUnitAIBehavior
     public void TakeTurn(UnitBase unit, GridManager gridManager, FactionData myFaction, List<UnitBase> enemyUnits)
     {
         UnitBase nearestEnemy = enemyUnits
-               .Where(u => u != null)
-               .OrderBy(u => gridManager.GetDistance(unit.GridCoord, u.GridCoord))
-               .FirstOrDefault();
+            .Where(u => u != null)
+            .OrderBy(u => gridManager.GetDistance(unit.GridCoord, u.GridCoord))
+            .FirstOrDefault();
 
         if (nearestEnemy == null)
             return;

@@ -28,7 +28,6 @@ public abstract class UnitBase : MonoBehaviour
 
     [field:SerializeField]
     public int CurrentHealth { get; protected set; }
-    public bool HasActedThisTurn { get; private set; } = false;
     public IUnitAIBehavior AIBehavior { get; set; }
 
     /// <summary>
@@ -68,6 +67,14 @@ public abstract class UnitBase : MonoBehaviour
         (MainHandWeapon != null && MainHandWeapon.attackRangeOverride >= 0)
             ? MainHandWeapon.attackRangeOverride
             : BaseAttackRange;
+
+    // 행동 관련
+    public bool HasMoved { get; private set; }
+    public bool HasAttacked { get; private set; }
+
+    // 지금 이 유닛이 뭔가 더 할 수 있는지 (이동 or 공격 중 하나라도 안 했으면 true)
+    public bool CanStillAct => !HasMoved || !HasAttacked;
+
 
     protected virtual void Awake()
     {
@@ -173,6 +180,8 @@ public abstract class UnitBase : MonoBehaviour
             yield return new ExtraAttackAbility(OffHandWeapon);
     }
 
+
+
     // 유닛을 특정 그리드 좌표에 배치 (최초 배치, 순간이동 등에 사용)
     public virtual void PlaceOnGrid(Vector2Int coord, GridManager grid)
     {
@@ -190,10 +199,11 @@ public abstract class UnitBase : MonoBehaviour
             newTile.OccupyingUnit = this;
     }
 
+
     // 인접한 한 칸으로 이동 시도 (이동 가능하면 true 반환)
     public virtual bool TryMoveTo(Vector2Int targetCoord)
     {
-        if (!CanMove)
+        if (!CanMove || HasMoved)
             return false;
 
         TileInstance targetTile = gridManager.GetTile(targetCoord);
@@ -208,6 +218,7 @@ public abstract class UnitBase : MonoBehaviour
         transform.position = gridManager.GridToWorld(targetCoord);
         targetTile.OccupyingUnit = this;
 
+        HasMoved = true;
         return true;
     }
 
@@ -225,7 +236,7 @@ public abstract class UnitBase : MonoBehaviour
     // 대상을 공격 시도 (사거리 밖이면 실패)
     public virtual bool TryAttack(UnitBase target)
     {
-        if (!CanAttack)
+        if (!CanAttack || HasAttacked)
             return false;
 
         if (!IsInAttackRange(target))
@@ -243,6 +254,11 @@ public abstract class UnitBase : MonoBehaviour
             else
                 Debug.Log($"{name}의 공격이 빗나갔습니다.");
         }
+
+        HasAttacked = true;
+
+        // 기본 규칙: 공격 후에는 이동도 막음 (이동-공격 순서만 허용) 
+        HasMoved = true;
 
         return true;
     }
@@ -275,12 +291,8 @@ public abstract class UnitBase : MonoBehaviour
 
     public void ResetTurnState()
     {
-        HasActedThisTurn = false;
-    }
-
-    public void MarkAsActed()
-    {
-        HasActedThisTurn = true;
+        HasMoved = false;
+        HasAttacked = false;
     }
 
 

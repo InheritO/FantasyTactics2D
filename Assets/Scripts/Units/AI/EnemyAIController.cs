@@ -45,7 +45,7 @@ public class EnemyAIController : MonoBehaviour
 
         foreach (var unit in myUnits)
         {
-            if (unit == null || unit.HasActedThisTurn)
+            if (unit == null || !unit.CanStillAct)
             {
                 Debug.Log($"[AI] {unit?.name ?? "null"} 스킵됨 (null 이거나 이미 행동함)");
                 continue;
@@ -54,7 +54,6 @@ public class EnemyAIController : MonoBehaviour
             Debug.Log($"[AI] {unit.name} 처리 중. AIBehavior 있음: {unit.AIBehavior != null}");
 
             unit.AIBehavior?.TakeTurn(unit, gridManager, faction, enemyUnits);
-            unit.MarkAsActed();
 
             yield return new WaitForSeconds(delayBetweenUnits);
         }
