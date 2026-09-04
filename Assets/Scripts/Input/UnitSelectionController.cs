@@ -14,6 +14,8 @@ public class UnitSelectionController : MonoBehaviour
     private Color originalColor;
     private Dictionary<Vector2Int, int> currentReachableTiles;
 
+    public UnitBase SelectedUnit => selectedUnit;
+
     void Start()
     {
         rangeVisualizer.Setup(gridManager);
@@ -149,6 +151,8 @@ public class UnitSelectionController : MonoBehaviour
             selectedUnitRenderer.color = Color.yellow;
         }
 
+        LogUnitStatus(unit);
+
         currentReachableTiles = MovementRangeCalculator.CalculateReachableTiles(
             gridManager, unit.GridCoord, unit.MoveRange);
 
@@ -165,5 +169,18 @@ public class UnitSelectionController : MonoBehaviour
         currentReachableTiles = null;
 
         rangeVisualizer.ClearRange();
+    }
+
+
+    //전투 시스템 고도화 + UI 준비될 때까지 사용할 로그 뭉탱이
+    private void LogUnitStatus(UnitBase unit)
+    {
+        string mainHand = unit.MainHandWeapon != null ? unit.MainHandWeapon.weaponName : "없음";
+        string offHand = unit.OffHandWeapon != null ? unit.OffHandWeapon.weaponName : "없음";
+        string shield = unit.EquippedShield != null ? unit.EquippedShield.shieldName : "없음";
+        string armor = unit.EquippedArmor != null ? unit.EquippedArmor.armorName : "없음";
+
+        Debug.Log($"[{unit.name}] 주무기: {mainHand} | 보조무기: {offHand} | 방패: {shield} | 방어구: {armor}\n" +
+                  $"이동력: {unit.MoveRange} | 사거리: {unit.AttackRange} | 방어력: {unit.Defense}(맷집{unit.ConstitutionDefense}+장비{unit.ArmorDefense})");
     }
 }

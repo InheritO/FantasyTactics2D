@@ -1,18 +1,49 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public enum DamageScaling
 {
-    Strength,   // Èû¿¡ ºñ·Ê (°Ë, Ã¢, È°, ÅõÃ´¹«±â)
-    Fixed       // Èû°ú ¹«°ü, ¹«±â ÀÚÃ¼ À§·ÂÀÌ °ğ µ¥¹ÌÁö (¼®±Ã, ÃÑ)
+    Strength,   // í˜ì— ë¹„ë¡€ (ê²€, ì°½, í™œ, íˆ¬ì²™ë¬´ê¸°)
+    Fixed       // í˜ê³¼ ë¬´ê´€, ë¬´ê¸° ìì²´ ìœ„ë ¥ì´ ê³§ ë°ë¯¸ì§€ (ì„ê¶, ì´)
+}
+
+public enum WeaponHandedness
+{
+    OneHanded, // í•œ ì† ë¬´ê¸° (ì† 1ê°œ ì°¨ì§€)
+    TwoHanded  // ì–‘ì† ë¬´ê¸° (ì† 2ê°œ ì°¨ì§€)
+}
+
+public enum WeaponSlotType
+{
+    MainHandOnly,   // ê²€, ì°½, í™œ, ëŒ€ê²€ ë“± â€” ì£¼ì†ì—ë§Œ ì¥ì°© ê°€ëŠ¥
+    OffHandCapable  // ë‹¨ê²€ì²˜ëŸ¼ ê°€ë³ê³  ë³´ì¡° ìŠ¬ë¡¯ì—ë„ ë“¤ì–´ê°ˆ ìˆ˜ ìˆëŠ” ë¬´ê¸°
 }
 
 [CreateAssetMenu(fileName = "NewWeapon", menuName = "Strategy/Equipment/Weapon")]
 public class WeaponData : ScriptableObject
 {
     public string weaponName;
+    public Sprite icon;
+
+
+    [Header("Handedness")]
+    public WeaponHandedness handedness = WeaponHandedness.OneHanded;
+    public WeaponSlotType slotType = WeaponSlotType.MainHandOnly;
+
+    [Header("Range")]
     public bool isRanged;
-    public int basePower;              // ¹«±â ÀÚÃ¼ÀÇ ±âº» À§·Â
-    public DamageScaling damageScaling; // Èû ¹İ¿µ ¿©ºÎ
-    public int attackRangeOverride = -1;
+    public int attackRangeOverride = -1; // -1ì´ë©´ ìœ ë‹› ê¸°ë³¸ ì‚¬ê±°ë¦¬ ìœ ì§€
+
+    [Header("Damage")]
+    public int basePower;
+    public DamageScaling damageScaling = DamageScaling.Strength;
+
+    [Header("Armor Interaction")]
+    public int armorPenetration; // ìƒëŒ€ ë°©ì–´êµ¬ ë³´ë„ˆìŠ¤ë¥¼ ê¹ëŠ” ìˆ˜ì¹˜ (ë§·ì§‘ì—ëŠ” ì˜í–¥ ì—†ìŒ)
+
+    [Header("Accuracy")]
+    public int accuracyBonus; // ëª…ì¤‘ë¥  ë³´ì • (ê¸°ê³„ì‹ ë¬´ê¸° ë“±ì— ìœ ìš©)
+
+    [Header("Display")]
+    [TextArea] public string description;
 
 }

@@ -102,7 +102,7 @@ public class TestUnitPlacer : MonoBehaviour
         RaceData race = selectedFaction.race;
 
         if (race != null && currentWeaponIndex >= 0 && currentWeaponIndex < race.availableWeapons.Length)
-            unit.EquipWeapon(race.availableWeapons[currentWeaponIndex]);
+            unit.EquipMainHandWeapon(race.availableWeapons[currentWeaponIndex]);
 
         if (race != null && currentArmorIndex >= 0 && currentArmorIndex < race.availableArmors.Length)
             unit.EquipArmor(race.availableArmors[currentArmorIndex]);

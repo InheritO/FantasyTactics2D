@@ -2,7 +2,7 @@
 /// <summary>
 /// 한 번의 공격 판정 결과. 실제 적용 전, 계산된 정보만 담는다.
 /// </summary>
-public class CombatResult
+public struct CombatResult
 {
     public bool IsHit;
     public int DamageDealt;

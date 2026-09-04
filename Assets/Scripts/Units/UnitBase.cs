@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using System.Collections.Generic;
 using NaughtyAttributes;
 
 /// <summary>
@@ -30,8 +31,14 @@ public abstract class UnitBase : MonoBehaviour
     public bool HasActedThisTurn { get; private set; } = false;
     public IUnitAIBehavior AIBehavior { get; set; }
 
+    /// <summary>
+    /// 장비 슬롯
+    /// </summary>
     [field: SerializeField]
-    public WeaponData EquippedWeapon { get; private set; }
+    public WeaponData MainHandWeapon { get; private set; }
+    public WeaponData OffHandWeapon { get; private set; } // 두 번째 한손무기일 수도 있음
+    public ShieldData EquippedShield { get; private set; }
+
     [field: SerializeField]
     public ArmorData EquippedArmor { get; private set; }
 
@@ -49,12 +56,17 @@ public abstract class UnitBase : MonoBehaviour
     public int RangedSkill => Race != null ? Race.baseRangedSkill : 0;
     public int Strength => Race != null ? Race.baseStrength : 0;
     public int Agility => Race != null ? Race.baseAgility : 0;
-    public int Defense => (Race != null ? Race.baseConstitution : 0) + (EquippedArmor?.defenseBonus ?? 0);
 
-    public int BaseAttackRange = 1; // 종족이 아닌 유닛 개체 특성으로 남겨둠 (필요시 이것도 Race로 옮길 수 있음)
+
+    // Defense를 두 요소로 분리: 관통력이 ArmorDefense에만 영향을 주기 위함
+    public int ConstitutionDefense => Race != null ? Race.baseConstitution : 0;
+    public int ArmorDefense => (EquippedArmor?.defenseBonus ?? 0) + (EquippedShield?.defenseBonus ?? 0);
+    public int Defense => ConstitutionDefense + ArmorDefense; // 관통력 미반영 총 방어력 (UI 표시 등에 사용)
+
+    public int BaseAttackRange = 1;
     public int AttackRange =>
-        (EquippedWeapon != null && EquippedWeapon.attackRangeOverride >= 0)
-            ? EquippedWeapon.attackRangeOverride
+        (MainHandWeapon != null && MainHandWeapon.attackRangeOverride >= 0)
+            ? MainHandWeapon.attackRangeOverride
             : BaseAttackRange;
 
     protected virtual void Awake()
@@ -93,8 +105,73 @@ public abstract class UnitBase : MonoBehaviour
     }
 
     //장비
-    public void EquipWeapon(WeaponData weapon) => EquippedWeapon = weapon;
+
+    public bool EquipMainHandWeapon(WeaponData weapon)
+    {
+        if (weapon == null)
+        {
+            MainHandWeapon = null;
+            return true;
+        }
+
+        MainHandWeapon = weapon;
+
+        if (weapon.handedness == WeaponHandedness.TwoHanded)
+        {
+            // 양손 무기는 보조 슬롯을 전부 비움
+            OffHandWeapon = null;
+            EquippedShield = null;
+        }
+
+        return true;
+    }
+
+    public bool EquipOffHandWeapon(WeaponData weapon)
+    {
+        if (weapon != null && weapon.handedness == WeaponHandedness.TwoHanded)
+        {
+            Debug.Log("양손 무기는 보조 슬롯에 장착할 수 없습니다.");
+            return false;
+        }
+
+        if (MainHandWeapon != null && MainHandWeapon.handedness == WeaponHandedness.TwoHanded)
+        {
+            Debug.Log("양손 무기를 장착 중이라 보조 무기를 장착할 수 없습니다.");
+            return false;
+        }
+
+        OffHandWeapon = weapon;
+
+        if (weapon != null)
+            EquippedShield = null; // 보조무기와 방패는 같은 슬롯을 두고 경쟁
+
+        return true;
+    }
+
+    public bool EquipShield(ShieldData shield)
+    {
+        if (MainHandWeapon != null && MainHandWeapon.handedness == WeaponHandedness.TwoHanded)
+        {
+            Debug.Log("양손 무기를 장착 중이라 방패를 장착할 수 없습니다.");
+            return false;
+        }
+
+        EquippedShield = shield;
+
+        if (shield != null)
+            OffHandWeapon = null;
+
+        return true;
+    }
+
     public void EquipArmor(ArmorData armor) => EquippedArmor = armor;
+
+    // 무기 어빌리티
+    public IEnumerable<IWeaponAbility> GetActiveAbilities()
+    {
+        if (OffHandWeapon != null)
+            yield return new ExtraAttackAbility(OffHandWeapon);
+    }
 
     // 유닛을 특정 그리드 좌표에 배치 (최초 배치, 순간이동 등에 사용)
     public virtual void PlaceOnGrid(Vector2Int coord, GridManager grid)
@@ -154,12 +231,18 @@ public abstract class UnitBase : MonoBehaviour
         if (!IsInAttackRange(target))
             return false;
 
-        CombatResult result = CombatResolver.Resolve(this, target);
+        List<CombatResult> results = CombatResolver.ResolveFullAttack(this, target);
 
-        if (result.IsHit)
-            target.TakeDamage(result.DamageDealt);
-        else
-            Debug.Log($"{name}의 공격이 빗나갔습니다.");
+        foreach (var result in results)
+        {
+            if (target == null || target.CurrentHealth <= 0)
+                break;
+
+            if (result.IsHit)
+                target.TakeDamage(result.DamageDealt);
+            else
+                Debug.Log($"{name}의 공격이 빗나갔습니다.");
+        }
 
         return true;
     }
