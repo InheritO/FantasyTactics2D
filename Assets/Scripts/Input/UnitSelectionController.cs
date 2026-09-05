@@ -170,12 +170,7 @@ public class UnitSelectionController : MonoBehaviour
             selectedUnitRenderer.color = Color.yellow;
         }
 
-        LogUnitStatus(unit);
-
-        currentReachableTiles = MovementRangeCalculator.CalculateReachableTiles(
-            gridManager, unit.GridCoord, unit.MoveRange);
-
-        rangeVisualizer.ShowRange(currentReachableTiles);
+        RefreshSelectionDisplay();
     }
 
     private void DeselectUnit()

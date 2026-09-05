@@ -10,8 +10,6 @@ using NaughtyAttributes;
 /// </summary>
 public abstract class UnitBase : MonoBehaviour
 {
-    public event Action<UnitBase, int> OnDamaged;
-    public event Action<UnitBase> OnDied;
 
     [Header("Grid Position")]
     public Vector2Int GridCoord { get; private set; }
@@ -75,6 +73,15 @@ public abstract class UnitBase : MonoBehaviour
     // 지금 이 유닛이 뭔가 더 할 수 있는지 (이동 or 공격 중 하나라도 안 했으면 true)
     public bool CanStillAct => !HasMoved || !HasAttacked;
 
+    //이벤트
+
+    public event Action<UnitBase, int> OnDamaged;
+    public event Action<UnitBase> OnDied;
+    public event Action<UnitBase, Vector2Int, Vector2Int> OnMoved;
+    public event Action<UnitBase, UnitBase> OnAttackPerformed;
+    public event Action<UnitBase, UnitBase, CombatResult> OnAttackResult;
+    public event Action<UnitBase> OnActionsExhausted;
+    public event Action<UnitBase> OnTurnReset;
 
     protected virtual void Awake()
     {
@@ -219,6 +226,11 @@ public abstract class UnitBase : MonoBehaviour
         targetTile.OccupyingUnit = this;
 
         HasMoved = true;
+
+
+        if (!CanStillAct)
+            OnActionsExhausted?.Invoke(this);
+
         return true;
     }
 
@@ -249,6 +261,8 @@ public abstract class UnitBase : MonoBehaviour
             if (target == null || target.CurrentHealth <= 0)
                 break;
 
+            OnAttackResult?.Invoke(this, target, result);
+
             if (result.IsHit)
                 target.TakeDamage(result.DamageDealt);
             else
@@ -259,6 +273,7 @@ public abstract class UnitBase : MonoBehaviour
 
         // 기본 규칙: 공격 후에는 이동도 막음 (이동-공격 순서만 허용) 
         HasMoved = true;
+        OnActionsExhausted?.Invoke(this);
 
         return true;
     }

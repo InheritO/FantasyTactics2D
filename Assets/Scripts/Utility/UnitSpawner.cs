@@ -7,7 +7,7 @@ using UnityEngine;
 public static class UnitSpawner
 {
     public static UnitBase Spawn(UnitBase unitPrefab, Vector2Int coord, FactionData faction,
-         GridManager gridManager, BattleOutcomeManager outcomeManager)
+         GridManager gridManager, BattleOutcomeManager outcomeManager, CombatLogger combatLogger)
     {
         TileInstance tile = gridManager.GetTile(coord);
 
@@ -25,6 +25,10 @@ public static class UnitSpawner
             unit.AIBehavior = new AggressiveMoveTowardEnemy();
 
         outcomeManager.RegisterUnit(unit); // 추가: 사망 이벤트 구독
+        combatLogger.RegisterUnit(unit);
+
+        UnitActionVisual visual = unit.gameObject.AddComponent<UnitActionVisual>();
+        visual.Initialize(unit, faction.factionColor);
 
         return unit;
     }
