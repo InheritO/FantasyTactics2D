@@ -12,9 +12,15 @@ public class BattleOutcomeManager : MonoBehaviour
 
     private HashSet<FactionData> defeatedFactions = new HashSet<FactionData>();
 
-    // À¯´ÖÀÌ ½ºÆùµÉ ¶§¸¶´Ù(È¤Àº ÀüÅõ ½ÃÀÛ ½Ã ÇÑ ¹ø) ÀÌ ÇÔ¼ö·Î »ç¸Á ÀÌº¥Æ®¸¦ ±¸µ¶½ÃÄÑ¾ß ÇÔ
+    // ìœ ë‹›ì´ ìŠ¤í°ë  ë•Œë§ˆë‹¤(í˜¹ì€ ì „íˆ¬ ì‹œì‘ ì‹œ í•œ ë²ˆ) ì´ í•¨ìˆ˜ë¡œ ì‚¬ë§ ì´ë²¤íŠ¸ë¥¼ êµ¬ë…ì‹œì¼œì•¼ í•¨
     public void RegisterUnit(UnitBase unit)
     {
+        if (unit == null)
+        {
+            Debug.LogWarning("RegisterUnitì— null ìœ ë‹›ì´ ì „ë‹¬ë˜ì—ˆìŠµë‹ˆë‹¤.");
+            return;
+        }
+
         unit.OnDied += HandleUnitDied;
     }
 
@@ -25,7 +31,7 @@ public class BattleOutcomeManager : MonoBehaviour
         if (faction == null || defeatedFactions.Contains(faction))
             return;
 
-        // ÀÌ ¼¼·ÂÀÇ »ì¾ÆÀÖ´Â À¯´ÖÀÌ ´õ ÀÖ´ÂÁö È®ÀÎ (Á×´Â À¯´Ö ÀÚ½ÅÀº ¾ÆÁ÷ Destroy ÀüÀÌ¶ó Á¦¿ÜÇÏ°í ¼À)
+        // ì´ ì„¸ë ¥ì˜ ì‚´ì•„ìˆëŠ” ìœ ë‹›ì´ ë” ìˆëŠ”ì§€ í™•ì¸ (ì£½ëŠ” ìœ ë‹› ìì‹ ì€ ì•„ì§ Destroy ì „ì´ë¼ ì œì™¸í•˜ê³  ì…ˆ)
         bool hasSurvivors = FindObjectsByType<UnitBase>()
             .Any(u => u != deadUnit && u.Faction == faction);
 
@@ -33,30 +39,16 @@ public class BattleOutcomeManager : MonoBehaviour
             return;
 
         defeatedFactions.Add(faction);
-        Debug.Log($"{faction.factionName} Àü¸ê.");
+        Debug.Log($"{faction.factionName} ì „ë©¸.");
         OnFactionDefeated?.Invoke(faction);
 
         turnManager.RemoveFaction(faction);
 
         if (turnManager.RemainingFactionCount <= 1)
         {
-            Debug.Log("ÀüÅõ Á¾·á.");
+            Debug.Log("ì „íˆ¬ ì¢…ë£Œ.");
             OnBattleEnded?.Invoke();
         }
     }
 
-    private void CheckBattleEnd()
-    {
-        int aliveFactionCount = FindObjectsByType<UnitBase>()
-            .Select(u => u.Faction)
-            .Where(f => f != null)
-            .Distinct()
-            .Count();
-
-        if (aliveFactionCount <= 1)
-        {
-            Debug.Log("ÀüÅõ Á¾·á.");
-            OnBattleEnded?.Invoke();
-        }
-    }
 }

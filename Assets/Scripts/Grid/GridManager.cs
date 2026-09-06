@@ -3,7 +3,7 @@ using NaughtyAttributes;
 
 public class GridManager : MonoBehaviour
 {
-    [Header("Visualizer Reference (¼±ÅÃ)")]
+    [Header("Visualizer Reference (ì„ íƒ)")]
     public TileVisualizer tileVisualizer;
 
     [Header("Grid Settings")]
@@ -16,7 +16,7 @@ public class GridManager : MonoBehaviour
     public bool useRandomSeed = true;
     public int seed = 0;
 
-    [Header("Tile Types (³ëÀÌÁî °ª ¿À¸§Â÷¼øÀ¸·Î ¹èÄ¡)")]
+    [Header("Tile Types (ë…¸ì´ì¦ˆ ê°’ ì˜¤ë¦„ì°¨ìˆœìœ¼ë¡œ ë°°ì¹˜)")]
     public NoiseTileMapping[] tileMappings;
 
     private MapGenerator mapGenerator;

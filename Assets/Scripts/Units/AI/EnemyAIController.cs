@@ -5,7 +5,7 @@ using System.Linq;
 
 
 /// <summary>
-/// ÇÃ·¹ÀÌ¾î°¡ ¾Æ´Ñ ¼¼·ÂÀÇ ÅÏÀ» ÀÚµ¿À¸·Î Ã³¸®ÇÑ´Ù.
+/// í”Œë ˆì´ì–´ê°€ ì•„ë‹Œ ì„¸ë ¥ì˜ í„´ì„ ìë™ìœ¼ë¡œ ì²˜ë¦¬í•œë‹¤.
 /// </summary>
 public class EnemyAIController : MonoBehaviour
 {
@@ -27,10 +27,16 @@ public class EnemyAIController : MonoBehaviour
 
     private void HandleTurnStarted(FactionData faction)
     {
+        if (faction == null)
+        {
+            Debug.LogWarning("HandleTurnStartedì— null ì„¸ë ¥ì´ ì „ë‹¬ë˜ì—ˆìŠµë‹ˆë‹¤.");
+            return;
+        }
+
         if (faction.isPlayerControlled)
             return;
 
-        Debug.Log($"{faction.name} has Turn.");
+        Debug.Log($"[AI] {faction.factionName}ì˜ í„´ì…ë‹ˆë‹¤.");
         StartCoroutine(RunAITurn(faction));
     }
 
@@ -41,24 +47,24 @@ public class EnemyAIController : MonoBehaviour
         List<UnitBase> myUnits = allUnits.Where(u => u.Faction == faction).ToList();
         List<UnitBase> enemyUnits = allUnits.Where(u => u.Faction != faction && u.Faction != null).ToList();
 
-        Debug.Log($"[AI] {faction.factionName} ÅÏ. ³» À¯´Ö: {myUnits.Count}, Àû À¯´Ö: {enemyUnits.Count}");
+        Debug.Log($"[AI] {faction.factionName} í„´. ë‚´ ìœ ë‹›: {myUnits.Count}, ì  ìœ ë‹›: {enemyUnits.Count}");
 
         foreach (var unit in myUnits)
         {
             if (unit == null || !unit.CanStillAct)
             {
-                Debug.Log($"[AI] {unit?.name ?? "null"} ½ºÅµµÊ (null ÀÌ°Å³ª ÀÌ¹Ì Çàµ¿ÇÔ)");
+                Debug.Log($"[AI] {unit?.name ?? "null"} ìŠ¤í‚µë¨ (null ì´ê±°ë‚˜ ì´ë¯¸ í–‰ë™í•¨)");
                 continue;
             }
 
-            Debug.Log($"[AI] {unit.name} Ã³¸® Áß. AIBehavior ÀÖÀ½: {unit.AIBehavior != null}");
+            Debug.Log($"[AI] {unit.name} ì²˜ë¦¬ ì¤‘. AIBehavior ìˆìŒ: {unit.AIBehavior != null}");
 
             unit.AIBehavior?.TakeTurn(unit, gridManager, faction, enemyUnits);
 
             yield return new WaitForSeconds(delayBetweenUnits);
         }
 
-        Debug.Log("[AI] ÅÏ Á¾·á, EndTurn È£Ãâ");
+        Debug.Log("[AI] í„´ ì¢…ë£Œ, EndTurn í˜¸ì¶œ");
         turnManager.EndTurn();
     }
 }

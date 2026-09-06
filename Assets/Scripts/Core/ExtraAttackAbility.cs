@@ -1,8 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// º¸Á¶¹«±â(off-hand)·Î ÀÎÇÑ Ãß°¡ °ø°İ. ½Ö°ËÃ³·³ µÎ ¹øÂ° ¹«±â¸¦ µç °æ¿ì ¹ßµ¿ÇÑ´Ù.
-/// ¿ø·¡ °ø°İº¸´Ù´Â ¾àÈ­µÈ È®·ü/À§·ÂÀ¸·Î Àû¿ëÇÑ´Ù.
+/// ë³´ì¡°ë¬´ê¸°(off-hand)ë¡œ ì¸í•œ ì¶”ê°€ ê³µê²©. ìŒê²€ì²˜ëŸ¼ ë‘ ë²ˆì§¸ ë¬´ê¸°ë¥¼ ë“  ê²½ìš° ë°œë™í•œë‹¤.
+/// ì›ë˜ ê³µê²©ë³´ë‹¤ëŠ” ì•½í™”ëœ í™•ë¥ /ìœ„ë ¥ìœ¼ë¡œ ì ìš©í•œë‹¤.
 /// </summary>
 public class ExtraAttackAbility : IWeaponAbility
 {
@@ -17,7 +17,7 @@ public class ExtraAttackAbility : IWeaponAbility
 
     public CombatResult? TryTrigger(UnitBase attacker, UnitBase defender)
     {
-        // º¸Á¶¹«±â Àü¿ë ¸íÁß ÆÇÁ¤ (±âº» ¸íÁß·ü¿¡ Æä³ÎÆ¼ Àû¿ë)
+        // ë³´ì¡°ë¬´ê¸° ì „ìš© ëª…ì¤‘ íŒì • (ê¸°ë³¸ ëª…ì¤‘ë¥ ì— í˜ë„í‹° ì ìš©)
         int baseChance = CombatResolver.CalculateHitChance(attacker, defender, offHandWeapon);
         int adjustedChance = Mathf.RoundToInt(baseChance * accuracyMultiplier);
 

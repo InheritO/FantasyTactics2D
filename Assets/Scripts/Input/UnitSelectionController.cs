@@ -64,6 +64,12 @@ public class UnitSelectionController : MonoBehaviour
 
         UnitBase unit = tile.OccupyingUnit;
 
+        if (turnManager.CurrentFaction == null)
+        {
+            Debug.LogWarning("아직 턴이 시작되지 않아 유닛을 선택할 수 없습니다.");
+            return;
+        }
+
         // 현재 턴의 세력이 아니거나, 이미 행동한 유닛이면 선택 불가
         if (unit.Faction != turnManager.CurrentFaction)
         {
@@ -154,7 +160,7 @@ public class UnitSelectionController : MonoBehaviour
         }
         else
         {
-            // 아직 이동 전이면 (이 분기는 사실 지금 흐름상 거의 안 옴)
+            // 아직 이동 전 (유닛을 막 선택한 직후 매번 여기로 들어옴)
             RefreshSelection();
         }
     }
@@ -170,6 +176,7 @@ public class UnitSelectionController : MonoBehaviour
             selectedUnitRenderer.color = Color.yellow;
         }
 
+        LogUnitStatus(unit);
         RefreshSelectionDisplay();
     }
 

@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// À¯´ÖÀÇ ÀÌµ¿·ÂÀ» ±âÁØÀ¸·Î µµ´Þ °¡´ÉÇÑ Å¸ÀÏµéÀ» °è»êÇÑ´Ù.
-/// Å¸ÀÏ¸¶´Ù ÀÌµ¿ ºñ¿ëÀÌ ´Ù¸£¹Ç·Î ´Ü¼ø BFS°¡ ¾Æ´Ñ ºñ¿ë ±â¹Ý Å½»ö(´ÙÀÍ½ºÆ®¶ó ¹æ½Ä)À» »ç¿ëÇÑ´Ù.
+/// ìœ ë‹›ì˜ ì´ë™ë ¥ì„ ê¸°ì¤€ìœ¼ë¡œ ë„ë‹¬ ê°€ëŠ¥í•œ íƒ€ì¼ë“¤ì„ ê³„ì‚°í•œë‹¤.
+/// íƒ€ì¼ë§ˆë‹¤ ì´ë™ ë¹„ìš©ì´ ë‹¤ë¥´ë¯€ë¡œ ë‹¨ìˆœ BFSê°€ ì•„ë‹Œ ë¹„ìš© ê¸°ë°˜ íƒìƒ‰(ë‹¤ìµìŠ¤íŠ¸ë¼ ë°©ì‹)ì„ ì‚¬ìš©í•œë‹¤.
 /// </summary>
 public class MovementRangeCalculator
 {
@@ -12,15 +12,15 @@ public class MovementRangeCalculator
         Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right
     };
 
-    // ½ÃÀÛ ÁÂÇ¥¿¡¼­ maxMoveRange ÀÌ³»¿¡ µµ´Þ °¡´ÉÇÑ Å¸ÀÏ°ú, ±× Å¸ÀÏ±îÁöÀÇ ÃÖ¼Ò ÀÌµ¿ ºñ¿ëÀ» ¹ÝÈ¯
+    // ì‹œìž‘ ì¢Œí‘œì—ì„œ maxMoveRange ì´ë‚´ì— ë„ë‹¬ ê°€ëŠ¥í•œ íƒ€ì¼ê³¼, ê·¸ íƒ€ì¼ê¹Œì§€ì˜ ìµœì†Œ ì´ë™ ë¹„ìš©ì„ ë°˜í™˜
     public static Dictionary<Vector2Int, int> CalculateReachableTiles(
         GridManager gridManager, Vector2Int startCoord, int maxMoveRange)
     {
         Dictionary<Vector2Int, int> costSoFar = new Dictionary<Vector2Int, int>();
         costSoFar[startCoord] = 0;
 
-        // (³²Àº ÀÌµ¿·ÂÀÌ Å« ¼ø¼­°¡ ¾Æ´Ï¶ó ´©Àû ºñ¿ëÀÌ ÀÛÀº ¼ø¼­·Î Å½»öÇØ¾ß Á¤È®ÇÏÁö¸¸,
-        // ÀÌµ¿ ºñ¿ë °ªÀÌ ÀÛ°í ¸Ê ±Ô¸ð°¡ ÀÛÀº ´Ü°è¶ó ¿ì¼±¼øÀ§ Å¥ ¾øÀÌ ´Ü¼ø Å¥·Îµµ ÃæºÐÇÔ)
+        // (ë‚¨ì€ ì´ë™ë ¥ì´ í° ìˆœì„œê°€ ì•„ë‹ˆë¼ ëˆ„ì  ë¹„ìš©ì´ ìž‘ì€ ìˆœì„œë¡œ íƒìƒ‰í•´ì•¼ ì •í™•í•˜ì§€ë§Œ,
+        // ì´ë™ ë¹„ìš© ê°’ì´ ìž‘ê³  ë§µ ê·œëª¨ê°€ ìž‘ì€ ë‹¨ê³„ë¼ ìš°ì„ ìˆœìœ„ í ì—†ì´ ë‹¨ìˆœ íë¡œë„ ì¶©ë¶„í•¨)
         Queue<Vector2Int> frontier = new Queue<Vector2Int>();
         frontier.Enqueue(startCoord);
 
@@ -42,7 +42,7 @@ public class MovementRangeCalculator
                 if (newCost > maxMoveRange)
                     continue;
 
-                // ¾ÆÁ÷ ¹æ¹® ¾È Çß°Å³ª, ´õ Àú·ÅÇÑ °æ·Î¸¦ Ã£Àº °æ¿ì¿¡¸¸ °»½Å
+                // ì•„ì§ ë°©ë¬¸ ì•ˆ í–ˆê±°ë‚˜, ë” ì €ë ´í•œ ê²½ë¡œë¥¼ ì°¾ì€ ê²½ìš°ì—ë§Œ ê°±ì‹ 
                 if (!costSoFar.ContainsKey(next) || newCost < costSoFar[next])
                 {
                     costSoFar[next] = newCost;
@@ -51,7 +51,7 @@ public class MovementRangeCalculator
             }
         }
 
-        costSoFar.Remove(startCoord); // ½ÃÀÛ ÁöÁ¡ ÀÚ½ÅÀº "ÀÌµ¿ °¡´É ¹üÀ§"¿¡¼­ Á¦¿Ü
+        costSoFar.Remove(startCoord); // ì‹œìž‘ ì§€ì  ìžì‹ ì€ "ì´ë™ ê°€ëŠ¥ ë²”ìœ„"ì—ì„œ ì œì™¸
         return costSoFar;
     }
 }

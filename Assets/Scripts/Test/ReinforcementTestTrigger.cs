@@ -1,8 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// ÀüÅõ Áß°£¿¡ »õ ¼¼·ÂÀÌ ³­ÀÔÇÏ´Â »óÈ²À» Å×½ºÆ®ÇÏ±â À§ÇÑ Æ®¸®°Å.
-/// ÁöÁ¤µÈ ÁÂÇ¥¿¡ À¯´ÖÀ» ½ºÆùÇÏ°í, ±× ¼¼·ÂÀ» ÅÏ ¼ø¼­¿¡ Ãß°¡ÇÑ´Ù.
+/// ì „íˆ¬ ì¤‘ê°„ì— ìƒˆ ì„¸ë ¥ì´ ë‚œì…í•˜ëŠ” ìƒí™©ì„ í…ŒìŠ¤íŠ¸í•˜ê¸° ìœ„í•œ íŠ¸ë¦¬ê±°.
+/// ì§€ì •ëœ ì¢Œí‘œì— ìœ ë‹›ì„ ìŠ¤í°í•˜ê³ , ê·¸ ì„¸ë ¥ì„ í„´ ìˆœì„œì— ì¶”ê°€í•œë‹¤.
 /// </summary>
 public class ReinforcementTestTrigger : MonoBehaviour
 {
@@ -11,6 +11,7 @@ public class ReinforcementTestTrigger : MonoBehaviour
     public TurnManager turnManager;
     public TestUnit testUnitPrefab;
     public BattleOutcomeManager outcomeManager;
+    public CombatLogger combatLogger;
 
     public FactionData reinforcementFaction;
     public Vector2Int spawnCoord;
@@ -23,8 +24,10 @@ public class ReinforcementTestTrigger : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.R))
         {
-            UnitSpawner.Spawn(testUnitPrefab, spawnCoord, reinforcementFaction, gridManager, outcomeManager);
-            turnManager.AddFaction(reinforcementFaction, insertAsNextTurn);
+            UnitBase unit = UnitSpawner.Spawn(testUnitPrefab, spawnCoord, reinforcementFaction, gridManager, outcomeManager, combatLogger);
+
+            if (unit != null)
+                turnManager.AddFaction(reinforcementFaction, insertAsNextTurn);
         }
     }
 }

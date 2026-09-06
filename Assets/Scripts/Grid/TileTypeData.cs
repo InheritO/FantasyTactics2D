@@ -10,6 +10,6 @@ public class TileTypeData : ScriptableObject
     public bool blocksLineOfSight = false;
     public int defenseBonus = 0;
 
-    [Header("Prototype Visualization (icon ¾øÀ» ¶§ »ç¿ë)")]
+    [Header("Prototype Visualization (icon ì—†ì„ ë•Œ ì‚¬ìš©)")]
     public Color previewColor = Color.white;
 }

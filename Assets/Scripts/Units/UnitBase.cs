@@ -1,12 +1,11 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
-using NaughtyAttributes;
 
 /// <summary>
-/// ¸ğµç À¯´Ö(Ä³¸¯ÅÍ)ÀÇ ±â¹İÀÌ µÇ´Â Ãß»ó Å¬·¡½º.
-/// Á¾Á· ±âº» ½ºÅÈ(Base Á¢µÎ»ç)Àº Àı´ë Á÷Á¢ º¯°æµÇÁö ¾ÊÀ¸¸ç,
-/// Àåºñ·Î ÀÎÇÑ º¸Á¤Àº °è»ê ÇÁ·ÎÆÛÆ¼(MoveRange, AttackPower µî)¸¦ ÅëÇØ¼­¸¸ ¹İ¿µµÈ´Ù.
+/// ëª¨ë“  ìœ ë‹›(ìºë¦­í„°)ì˜ ê¸°ë°˜ì´ ë˜ëŠ” ì¶”ìƒ í´ë˜ìŠ¤.
+/// ì¢…ì¡± ê¸°ë³¸ ìŠ¤íƒ¯(Base ì ‘ë‘ì‚¬)ì€ ì ˆëŒ€ ì§ì ‘ ë³€ê²½ë˜ì§€ ì•Šìœ¼ë©°,
+/// ì¥ë¹„ë¡œ ì¸í•œ ë³´ì •ì€ ê³„ì‚° í”„ë¡œí¼í‹°(MoveRange, AttackPower ë“±)ë¥¼ í†µí•´ì„œë§Œ ë°˜ì˜ëœë‹¤.
 /// </summary>
 public abstract class UnitBase : MonoBehaviour
 {
@@ -29,11 +28,11 @@ public abstract class UnitBase : MonoBehaviour
     public IUnitAIBehavior AIBehavior { get; set; }
 
     /// <summary>
-    /// Àåºñ ½½·Ô
+    /// ì¥ë¹„ ìŠ¬ë¡¯
     /// </summary>
     [field: SerializeField]
     public WeaponData MainHandWeapon { get; private set; }
-    public WeaponData OffHandWeapon { get; private set; } // µÎ ¹øÂ° ÇÑ¼Õ¹«±âÀÏ ¼öµµ ÀÖÀ½
+    public WeaponData OffHandWeapon { get; private set; } // ë‘ ë²ˆì§¸ í•œì†ë¬´ê¸°ì¼ ìˆ˜ë„ ìˆìŒ
     public ShieldData EquippedShield { get; private set; }
 
     [field: SerializeField]
@@ -43,7 +42,7 @@ public abstract class UnitBase : MonoBehaviour
     protected SpriteRenderer spriteRenderer;
     private static Sprite defaultSquareSprite;
 
-    // ---- °è»ê ½ºÅÈ (Á¾Á· ±âº»Ä¡ + Àåºñ º¸Á¤) ----
+    // ---- ê³„ì‚° ìŠ¤íƒ¯ (ì¢…ì¡± ê¸°ë³¸ì¹˜ + ì¥ë¹„ ë³´ì •) ----
 
     public int MaxHealth => Race != null ? Race.maxHealth : 1;
     public int MoveRange => Race != null
@@ -55,10 +54,10 @@ public abstract class UnitBase : MonoBehaviour
     public int Agility => Race != null ? Race.baseAgility : 0;
 
 
-    // Defense¸¦ µÎ ¿ä¼Ò·Î ºĞ¸®: °üÅë·ÂÀÌ ArmorDefense¿¡¸¸ ¿µÇâÀ» ÁÖ±â À§ÇÔ
+    // Defenseë¥¼ ë‘ ìš”ì†Œë¡œ ë¶„ë¦¬: ê´€í†µë ¥ì´ ArmorDefenseì—ë§Œ ì˜í–¥ì„ ì£¼ê¸° ìœ„í•¨
     public int ConstitutionDefense => Race != null ? Race.baseConstitution : 0;
     public int ArmorDefense => (EquippedArmor?.defenseBonus ?? 0) + (EquippedShield?.defenseBonus ?? 0);
-    public int Defense => ConstitutionDefense + ArmorDefense; // °üÅë·Â ¹Ì¹İ¿µ ÃÑ ¹æ¾î·Â (UI Ç¥½Ã µî¿¡ »ç¿ë)
+    public int Defense => ConstitutionDefense + ArmorDefense; // ê´€í†µë ¥ ë¯¸ë°˜ì˜ ì´ ë°©ì–´ë ¥ (UI í‘œì‹œ ë“±ì— ì‚¬ìš©)
 
     public int BaseAttackRange = 1;
     public int AttackRange =>
@@ -66,14 +65,14 @@ public abstract class UnitBase : MonoBehaviour
             ? MainHandWeapon.attackRangeOverride
             : BaseAttackRange;
 
-    // Çàµ¿ °ü·Ã
+    // í–‰ë™ ê´€ë ¨
     public bool HasMoved { get; private set; }
     public bool HasAttacked { get; private set; }
 
-    // Áö±İ ÀÌ À¯´ÖÀÌ ¹º°¡ ´õ ÇÒ ¼ö ÀÖ´ÂÁö (ÀÌµ¿ or °ø°İ Áß ÇÏ³ª¶óµµ ¾È ÇßÀ¸¸é true)
+    // ì§€ê¸ˆ ì´ ìœ ë‹›ì´ ë­”ê°€ ë” í•  ìˆ˜ ìˆëŠ”ì§€ (ì´ë™ or ê³µê²© ì¤‘ í•˜ë‚˜ë¼ë„ ì•ˆ í–ˆìœ¼ë©´ true)
     public bool CanStillAct => !HasMoved || !HasAttacked;
 
-    //ÀÌº¥Æ®
+    //ì´ë²¤íŠ¸
 
     public event Action<UnitBase, int> OnDamaged;
     public event Action<UnitBase> OnDied;
@@ -83,6 +82,8 @@ public abstract class UnitBase : MonoBehaviour
     public event Action<UnitBase> OnActionsExhausted;
     public event Action<UnitBase> OnTurnReset;
 
+    private int unitSortOrder = 2;
+
     protected virtual void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -91,6 +92,9 @@ public abstract class UnitBase : MonoBehaviour
 
         if (spriteRenderer.sprite == null)
             spriteRenderer.sprite = GetDefaultSquareSprite();
+
+        if (spriteRenderer.sortingOrder < unitSortOrder)
+            spriteRenderer.sortingOrder = unitSortOrder;
     }
 
     private static Sprite GetDefaultSquareSprite()
@@ -106,19 +110,28 @@ public abstract class UnitBase : MonoBehaviour
     }
 
 
-    // ¼¼·Â ÁöÁ¤ (½ºÆù ½Ã È£Ãâ)
+    // ì„¸ë ¥ ì§€ì • (ìŠ¤í° ì‹œ í˜¸ì¶œ)
     public virtual void SetFaction(FactionData faction)
     {
+        if (faction == null)
+        {
+            Debug.LogError($"[{name}] nullì¸ FactionDataë¡œ SetFactionì´ í˜¸ì¶œë˜ì—ˆìŠµë‹ˆë‹¤.");
+            return;
+        }
+
         Faction = faction;
         Race = faction.race;
 
-        CurrentHealth = MaxHealth; // Race°¡ È®Á¤µÈ ½ÃÁ¡¿¡ Ã¼·Â ÃÊ±âÈ­
+        if (Race == null)
+            Debug.LogWarning($"[{faction.factionName}] ì„¸ë ¥ì— Raceê°€ ì„¤ì •ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤. ìŠ¤íƒ¯ì´ ê¸°ë³¸ê°’(0)ìœ¼ë¡œ ì²˜ë¦¬ë©ë‹ˆë‹¤.");
 
-        if (spriteRenderer != null && faction != null)
+        CurrentHealth = MaxHealth; // Raceê°€ í™•ì •ëœ ì‹œì ì— ì²´ë ¥ ì´ˆê¸°í™”
+
+        if (spriteRenderer != null)
             spriteRenderer.color = faction.factionColor;
     }
 
-    //Àåºñ
+    //ì¥ë¹„
 
     public bool EquipMainHandWeapon(WeaponData weapon)
     {
@@ -132,7 +145,7 @@ public abstract class UnitBase : MonoBehaviour
 
         if (weapon.handedness == WeaponHandedness.TwoHanded)
         {
-            // ¾ç¼Õ ¹«±â´Â º¸Á¶ ½½·ÔÀ» ÀüºÎ ºñ¿ò
+            // ì–‘ì† ë¬´ê¸°ëŠ” ë³´ì¡° ìŠ¬ë¡¯ì„ ì „ë¶€ ë¹„ì›€
             OffHandWeapon = null;
             EquippedShield = null;
         }
@@ -144,20 +157,20 @@ public abstract class UnitBase : MonoBehaviour
     {
         if (weapon != null && weapon.handedness == WeaponHandedness.TwoHanded)
         {
-            Debug.Log("¾ç¼Õ ¹«±â´Â º¸Á¶ ½½·Ô¿¡ ÀåÂøÇÒ ¼ö ¾ø½À´Ï´Ù.");
+            Debug.Log("ì–‘ì† ë¬´ê¸°ëŠ” ë³´ì¡° ìŠ¬ë¡¯ì— ì¥ì°©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
             return false;
         }
 
         if (MainHandWeapon != null && MainHandWeapon.handedness == WeaponHandedness.TwoHanded)
         {
-            Debug.Log("¾ç¼Õ ¹«±â¸¦ ÀåÂø ÁßÀÌ¶ó º¸Á¶ ¹«±â¸¦ ÀåÂøÇÒ ¼ö ¾ø½À´Ï´Ù.");
+            Debug.Log("ì–‘ì† ë¬´ê¸°ë¥¼ ì¥ì°© ì¤‘ì´ë¼ ë³´ì¡° ë¬´ê¸°ë¥¼ ì¥ì°©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
             return false;
         }
 
         OffHandWeapon = weapon;
 
         if (weapon != null)
-            EquippedShield = null; // º¸Á¶¹«±â¿Í ¹æÆĞ´Â °°Àº ½½·ÔÀ» µÎ°í °æÀï
+            EquippedShield = null; // ë³´ì¡°ë¬´ê¸°ì™€ ë°©íŒ¨ëŠ” ê°™ì€ ìŠ¬ë¡¯ì„ ë‘ê³  ê²½ìŸ
 
         return true;
     }
@@ -166,7 +179,7 @@ public abstract class UnitBase : MonoBehaviour
     {
         if (MainHandWeapon != null && MainHandWeapon.handedness == WeaponHandedness.TwoHanded)
         {
-            Debug.Log("¾ç¼Õ ¹«±â¸¦ ÀåÂø ÁßÀÌ¶ó ¹æÆĞ¸¦ ÀåÂøÇÒ ¼ö ¾ø½À´Ï´Ù.");
+            Debug.Log("ì–‘ì† ë¬´ê¸°ë¥¼ ì¥ì°© ì¤‘ì´ë¼ ë°©íŒ¨ë¥¼ ì¥ì°©í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
             return false;
         }
 
@@ -180,7 +193,7 @@ public abstract class UnitBase : MonoBehaviour
 
     public void EquipArmor(ArmorData armor) => EquippedArmor = armor;
 
-    // ¹«±â ¾îºô¸®Æ¼
+    // ë¬´ê¸° ì–´ë¹Œë¦¬í‹°
     public IEnumerable<IWeaponAbility> GetActiveAbilities()
     {
         if (OffHandWeapon != null)
@@ -189,7 +202,7 @@ public abstract class UnitBase : MonoBehaviour
 
 
 
-    // À¯´ÖÀ» Æ¯Á¤ ±×¸®µå ÁÂÇ¥¿¡ ¹èÄ¡ (ÃÖÃÊ ¹èÄ¡, ¼ø°£ÀÌµ¿ µî¿¡ »ç¿ë)
+    // ìœ ë‹›ì„ íŠ¹ì • ê·¸ë¦¬ë“œ ì¢Œí‘œì— ë°°ì¹˜ (ìµœì´ˆ ë°°ì¹˜, ìˆœê°„ì´ë™ ë“±ì— ì‚¬ìš©)
     public virtual void PlaceOnGrid(Vector2Int coord, GridManager grid)
     {
         gridManager = grid;
@@ -207,11 +220,17 @@ public abstract class UnitBase : MonoBehaviour
     }
 
 
-    // ÀÎÁ¢ÇÑ ÇÑ Ä­À¸·Î ÀÌµ¿ ½Ãµµ (ÀÌµ¿ °¡´ÉÇÏ¸é true ¹İÈ¯)
+    // ì¸ì ‘í•œ í•œ ì¹¸ìœ¼ë¡œ ì´ë™ ì‹œë„ (ì´ë™ ê°€ëŠ¥í•˜ë©´ true ë°˜í™˜)
     public virtual bool TryMoveTo(Vector2Int targetCoord)
     {
         if (!CanMove || HasMoved)
             return false;
+
+        if (gridManager == null)
+        {
+            Debug.LogError($"[{name}] gridManagerê°€ ì„¤ì •ë˜ì§€ ì•Šì€ ì±„ë¡œ TryMoveToê°€ í˜¸ì¶œë˜ì—ˆìŠµë‹ˆë‹¤. PlaceOnGridê°€ ë¨¼ì € í˜¸ì¶œë˜ì—ˆëŠ”ì§€ í™•ì¸í•˜ì„¸ìš”.");
+            return false;
+        }
 
         TileInstance targetTile = gridManager.GetTile(targetCoord);
         if (targetTile == null || !targetTile.IsWalkable())
@@ -221,12 +240,13 @@ public abstract class UnitBase : MonoBehaviour
         if (currentTile != null)
             currentTile.OccupyingUnit = null;
 
+        Vector2Int previousCoord = GridCoord;
         GridCoord = targetCoord;
         transform.position = gridManager.GridToWorld(targetCoord);
         targetTile.OccupyingUnit = this;
 
         HasMoved = true;
-
+        OnMoved?.Invoke(this, previousCoord, targetCoord);
 
         if (!CanStillAct)
             OnActionsExhausted?.Invoke(this);
@@ -234,7 +254,7 @@ public abstract class UnitBase : MonoBehaviour
         return true;
     }
 
-    // ´ë»óÀÌ °ø°İ »ç°Å¸® ¾È¿¡ ÀÖ´ÂÁö È®ÀÎ
+    // ëŒ€ìƒì´ ê³µê²© ì‚¬ê±°ë¦¬ ì•ˆì— ìˆëŠ”ì§€ í™•ì¸
     public bool IsInAttackRange(UnitBase target)
     {
         if (target == null || gridManager == null)
@@ -245,9 +265,12 @@ public abstract class UnitBase : MonoBehaviour
     }
 
 
-    // ´ë»óÀ» °ø°İ ½Ãµµ (»ç°Å¸® ¹ÛÀÌ¸é ½ÇÆĞ)
+    // ëŒ€ìƒì„ ê³µê²© ì‹œë„ (ì‚¬ê±°ë¦¬ ë°–ì´ë©´ ì‹¤íŒ¨)
     public virtual bool TryAttack(UnitBase target)
     {
+        if (target == null)
+            return false; // ëŒ€ìƒì´ ì´ë¯¸ ì‚¬ë¼ì§„ ì •ìƒì ì¸ ìƒí™©ì¼ ìˆ˜ ìˆìœ¼ë¯€ë¡œ ì¡°ìš©íˆ ë¬´ì‹œ
+
         if (!CanAttack || HasAttacked)
             return false;
 
@@ -255,6 +278,7 @@ public abstract class UnitBase : MonoBehaviour
             return false;
 
         List<CombatResult> results = CombatResolver.ResolveFullAttack(this, target);
+        OnAttackPerformed?.Invoke(this, target);
 
         foreach (var result in results)
         {
@@ -266,19 +290,19 @@ public abstract class UnitBase : MonoBehaviour
             if (result.IsHit)
                 target.TakeDamage(result.DamageDealt);
             else
-                Debug.Log($"{name}ÀÇ °ø°İÀÌ ºø³ª°¬½À´Ï´Ù.");
+                Debug.Log($"{name}ì˜ ê³µê²©ì´ ë¹—ë‚˜ê°”ìŠµë‹ˆë‹¤.");
         }
 
         HasAttacked = true;
 
-        // ±âº» ±ÔÄ¢: °ø°İ ÈÄ¿¡´Â ÀÌµ¿µµ ¸·À½ (ÀÌµ¿-°ø°İ ¼ø¼­¸¸ Çã¿ë) 
+        // ê¸°ë³¸ ê·œì¹™: ê³µê²© í›„ì—ëŠ” ì´ë™ë„ ë§‰ìŒ (ì´ë™-ê³µê²© ìˆœì„œë§Œ í—ˆìš©) 
         HasMoved = true;
         OnActionsExhausted?.Invoke(this);
 
         return true;
     }
 
-    // amount´Â CombatResolver¿¡¼­ ÀÌ¹Ì ¹æ¾î·ÂÀÌ ¹İ¿µµÈ ÃÖÁ¾ µ¥¹ÌÁö
+    // amountëŠ” CombatResolverì—ì„œ ì´ë¯¸ ë°©ì–´ë ¥ì´ ë°˜ì˜ëœ ìµœì¢… ë°ë¯¸ì§€
     public virtual void TakeDamage(int amount)
     {
         CurrentHealth = Mathf.Max(0, CurrentHealth - amount);
@@ -291,9 +315,16 @@ public abstract class UnitBase : MonoBehaviour
 
     protected virtual void Die()
     {
-        TileInstance tile = gridManager.GetTile(GridCoord);
-        if (tile != null && tile.OccupyingUnit == this)
-            tile.OccupyingUnit = null;
+        if (gridManager != null)
+        {
+            TileInstance tile = gridManager.GetTile(GridCoord);
+            if (tile != null && tile.OccupyingUnit == this)
+                tile.OccupyingUnit = null;
+        }
+        else
+        {
+            Debug.LogWarning($"[{name}] gridManagerê°€ ì„¤ì •ë˜ì§€ ì•Šì€ ì±„ë¡œ ì‚¬ë§ ì²˜ë¦¬ë˜ì—ˆìŠµë‹ˆë‹¤.");
+        }
 
         OnDied?.Invoke(this);
 
@@ -302,7 +333,7 @@ public abstract class UnitBase : MonoBehaviour
 
 
 
-    // ---- ÅÏ »óÅÂ ----
+    // ---- í„´ ìƒíƒœ ----
 
     public void ResetTurnState()
     {

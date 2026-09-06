@@ -1,8 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// ÀüÅõ °ü·Ã ÀÌº¥Æ®¸¦ ±¸µ¶ÇØ¼­ ÄÜ¼Ö¿¡ ·Î±×·Î Ãâ·ÂÇÏ´Â µğ¹ö±× µµ±¸.
-/// ½ÇÁ¦ UI/»ç¿îµå/ÀÌÆåÆ®°¡ ¸¸µé¾îÁö¸é ÀÌ Å¬·¡½º´Â Âü°í¸¸ ÇÏ°í ´ëÃ¼µÉ ¼ö ÀÖÀ½.
+/// ì „íˆ¬ ê´€ë ¨ ì´ë²¤íŠ¸ë¥¼ êµ¬ë…í•´ì„œ ì½˜ì†”ì— ë¡œê·¸ë¡œ ì¶œë ¥í•˜ëŠ” ë””ë²„ê·¸ ë„êµ¬.
+/// ì‹¤ì œ UI/ì‚¬ìš´ë“œ/ì´í™íŠ¸ê°€ ë§Œë“¤ì–´ì§€ë©´ ì´ í´ë˜ìŠ¤ëŠ” ì°¸ê³ ë§Œ í•˜ê³  ëŒ€ì²´ë  ìˆ˜ ìˆìŒ.
 /// </summary>
 public class CombatLogger : MonoBehaviour
 {
@@ -18,34 +18,34 @@ public class CombatLogger : MonoBehaviour
 
     private void HandleMoved(UnitBase unit, Vector2Int from, Vector2Int to)
     {
-        Debug.Log($"[{unit.name}] ÀÌµ¿: {from} ¡æ {to}");
+        Debug.Log($"[{unit.name}] ì´ë™: {from} â†’ {to}");
     }
 
     private void HandleAttackPerformed(UnitBase attacker, UnitBase target)
     {
-        Debug.Log($"[{attacker.name}]ÀÌ(°¡) {target.name}À»(¸¦) °ø°İÇÕ´Ï´Ù.");
+        Debug.Log($"[{attacker.name}]ì´(ê°€) {target.name}ì„(ë¥¼) ê³µê²©í•©ë‹ˆë‹¤.");
     }
 
     private void HandleAttackResult(UnitBase attacker, UnitBase target, CombatResult result)
     {
         if (result.IsHit)
-            Debug.Log($"  ¡æ ¸íÁß! {result.DamageDealt} µ¥¹ÌÁö.");
+            Debug.Log($"  â†’ ëª…ì¤‘! {result.DamageDealt} ë°ë¯¸ì§€.");
         else
-            Debug.Log($"  ¡æ ºø³ª°¨.");
+            Debug.Log($"  â†’ ë¹—ë‚˜ê°.");
     }
 
     private void HandleDamaged(UnitBase unit, int amount)
     {
-        Debug.Log($"[{unit.name}] {amount} µ¥¹ÌÁö ¹ŞÀ½. ³²Àº Ã¼·Â: {unit.CurrentHealth}/{unit.MaxHealth}");
+        Debug.Log($"[{unit.name}] {amount} ë°ë¯¸ì§€ ë°›ìŒ. ë‚¨ì€ ì²´ë ¥: {unit.CurrentHealth}/{unit.MaxHealth}");
     }
 
     private void HandleDied(UnitBase unit)
     {
-        Debug.Log($"[{unit.name}] »ç¸Á.");
+        Debug.Log($"[{unit.name}] ì‚¬ë§.");
     }
 
     private void HandleActionsExhausted(UnitBase unit)
     {
-        Debug.Log($"[{unit.name}] ÀÌ¹ø ÅÏ¿¡ ´õ ÀÌ»ó Çàµ¿ÇÒ ¼ö ¾ø½À´Ï´Ù.");
+        Debug.Log($"[{unit.name}] ì´ë²ˆ í„´ì— ë” ì´ìƒ í–‰ë™í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
     }
 }

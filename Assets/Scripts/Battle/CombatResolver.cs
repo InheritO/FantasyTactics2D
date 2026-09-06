@@ -2,22 +2,31 @@ using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
-/// µÎ À¯´Ö °£ ÀüÅõ ÆÇÁ¤À» °è»êÇÑ´Ù. »óÅÂ¸¦ °®Áö ¾Ê´Â ¼ø¼ö °è»ê Å¬·¡½º.
-/// MovementRangeCalculator¿Í °°Àº ÆĞÅÏ: °è»ê¸¸ ÇÏ°í, Àû¿ëÀº È£ÃâÇÑ ÂÊÀÌ ´ã´çÇÑ´Ù.
+/// ë‘ ìœ ë‹› ê°„ ì „íˆ¬ íŒì •ì„ ê³„ì‚°í•œë‹¤. ìƒíƒœë¥¼ ê°–ì§€ ì•ŠëŠ” ìˆœìˆ˜ ê³„ì‚° í´ë˜ìŠ¤.
+/// MovementRangeCalculatorì™€ ê°™ì€ íŒ¨í„´: ê³„ì‚°ë§Œ í•˜ê³ , ì ìš©ì€ í˜¸ì¶œí•œ ìª½ì´ ë‹´ë‹¹í•œë‹¤.
 /// </summary>
 public static class CombatResolver
 {
-    private const int BaseHitChance = 70; // ±â¼ú°ú È¸ÇÇ°¡ °°À» ¶§ÀÇ ±âº» ¸íÁß·ü(%)
+    private const int BaseHitChance = 70; // ê¸°ìˆ ê³¼ íšŒí”¼ê°€ ê°™ì„ ë•Œì˜ ê¸°ë³¸ ëª…ì¤‘ë¥ (%)
 
     public static List<CombatResult> ResolveFullAttack(UnitBase attacker, UnitBase defender)
     {
         List<CombatResult> results = new List<CombatResult>();
+
+        if (attacker == null || defender == null)
+        {
+            Debug.LogWarning("ResolveFullAttackì— null ìœ ë‹›ì´ ì „ë‹¬ë˜ì—ˆìŠµë‹ˆë‹¤.");
+            return results;
+        }
 
         CombatResult mainResult = Resolve(attacker, defender, attacker.MainHandWeapon);
         results.Add(mainResult);
 
         foreach (var ability in attacker.GetActiveAbilities())
         {
+            if (defender == null || defender.CurrentHealth <= 0)
+                break; // ì£¼ê³µê²©ì—ì„œ ì´ë¯¸ ì£½ì—ˆìœ¼ë©´ ì–´ë¹Œë¦¬í‹°(ì¶”ê°€ ê³µê²© ë“±)ëŠ” ìƒëµ
+
             CombatResult? extra = ability.TryTrigger(attacker, defender);
             if (extra.HasValue)
                 results.Add(extra.Value);
@@ -28,6 +37,12 @@ public static class CombatResolver
 
     public static CombatResult Resolve(UnitBase attacker, UnitBase defender, WeaponData weapon)
     {
+        if (attacker == null || defender == null)
+        {
+            Debug.LogWarning("Resolveì— null ìœ ë‹›ì´ ì „ë‹¬ë˜ì—ˆìŠµë‹ˆë‹¤.");
+            return CombatResult.Miss();
+        }
+
         int hitChance = CalculateHitChance(attacker, defender, weapon);
         bool isHit = Random.Range(0, 100) < hitChance;
 
@@ -44,23 +59,25 @@ public static class CombatResolver
         int accuracyBonus = weapon?.accuracyBonus ?? 0;
 
 
-        int chance = BaseHitChance + (attackSkill - defender.Agility) * 5 + accuracyBonus; // ±â¼ú-È¸ÇÇ Â÷ÀÌ 1´ç 5%p Á¶Á¤
-        return Mathf.Clamp(chance, 5, 95); // ¿ÏÀü 100%/0%´Â Áö¾ç (Ç×»ó ¾à°£ÀÇ ¿î °³ÀÔ)
+        int chance = BaseHitChance + (attackSkill - defender.Agility) * 5 + accuracyBonus; // ê¸°ìˆ -íšŒí”¼ ì°¨ì´ 1ë‹¹ 5%p ì¡°ì •
+        return Mathf.Clamp(chance, 5, 95); // ì™„ì „ 100%/0%ëŠ” ì§€ì–‘ (í•­ìƒ ì•½ê°„ì˜ ìš´ ê°œì…)
     }
 
     public static int CalculateDamage(UnitBase attacker, UnitBase defender, WeaponData weapon)
     {
         int rawDamage = weapon == null
-            ? attacker.Strength // ºñ¹«ÀåÀº ¸Ç¼Õ µ¥¹ÌÁö(Èû ±â¹İ)
+            ? attacker.Strength // ë¹„ë¬´ì¥ì€ ë§¨ì† ë°ë¯¸ì§€(í˜ ê¸°ë°˜)
             : (weapon.damageScaling == DamageScaling.Strength
                 ? weapon.basePower + attacker.Strength
                 : weapon.basePower);
 
-        int armorPenetration = weapon?.armorPenetration ?? 0;
+        rawDamage = Mathf.Max(0, rawDamage); // basePowerê°€ ì‹¤ìˆ˜ë¡œ ìŒìˆ˜ë¡œ ì„¤ì •ë˜ì–´ë„ ë°©ì–´
+
+        int armorPenetration = Mathf.Max(0, weapon?.armorPenetration ?? 0);
         int effectiveArmorDefense = Mathf.Max(0, defender.ArmorDefense - armorPenetration);
         int effectiveDefense = defender.ConstitutionDefense + effectiveArmorDefense;
 
         int finalDamage = rawDamage - effectiveDefense;
-        return Mathf.Max(1, finalDamage); // ÃÖ¼Ò 1 µ¥¹ÌÁö º¸Àå
+        return Mathf.Max(1, finalDamage); // ìµœì†Œ 1 ë°ë¯¸ì§€ ë³´ì¥
     }
 }

@@ -1,8 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// ÇöÀç ¼±ÅÃµÈ À¯´ÖÀÇ Àåºñ/½ºÅÈÀ» È­¸é¿¡ Ç¥½ÃÇÏ´Â µğ¹ö±× µµ±¸.
-/// Á¤½Ä UI°¡ ¸¸µé¾îÁö¸é Á¦°ÅÇØµµ µÈ´Ù.
+/// í˜„ì¬ ì„ íƒëœ ìœ ë‹›ì˜ ì¥ë¹„/ìŠ¤íƒ¯ì„ í™”ë©´ì— í‘œì‹œí•˜ëŠ” ë””ë²„ê·¸ ë„êµ¬.
+/// ì •ì‹ UIê°€ ë§Œë“¤ì–´ì§€ë©´ ì œê±°í•´ë„ ëœë‹¤.
 /// </summary>
 public class UnitStatusDebugDisplay : MonoBehaviour
 {
@@ -13,19 +13,19 @@ public class UnitStatusDebugDisplay : MonoBehaviour
         UnitBase unit = selectionController.SelectedUnit;
         if (unit == null) return;
 
-        string mainHand = unit.MainHandWeapon != null ? unit.MainHandWeapon.weaponName : "¾øÀ½";
-        string offHand = unit.OffHandWeapon != null ? unit.OffHandWeapon.weaponName : "¾øÀ½";
-        string shield = unit.EquippedShield != null ? unit.EquippedShield.shieldName : "¾øÀ½";
-        string armor = unit.EquippedArmor != null ? unit.EquippedArmor.armorName : "¾øÀ½";
+        string mainHand = unit.MainHandWeapon != null ? unit.MainHandWeapon.weaponName : "ì—†ìŒ";
+        string offHand = unit.OffHandWeapon != null ? unit.OffHandWeapon.weaponName : "ì—†ìŒ";
+        string shield = unit.EquippedShield != null ? unit.EquippedShield.shieldName : "ì—†ìŒ";
+        string armor = unit.EquippedArmor != null ? unit.EquippedArmor.armorName : "ì—†ìŒ";
 
         string text = $"[{unit.name}]\n" +
-                      $"ÁÖ¹«±â: {mainHand}\n" +
-                      $"º¸Á¶¹«±â: {offHand}\n" +
-                      $"¹æÆĞ: {shield}\n" +
-                      $"¹æ¾î±¸: {armor}\n" +
-                      $"ÀÌµ¿·Â: {unit.MoveRange}  »ç°Å¸®: {unit.AttackRange}\n" +
-                      $"Ã¼·Â: {unit.CurrentHealth}/{unit.MaxHealth}\n" +
-                      $"¹æ¾î·Â: {unit.Defense} (¸ËÁı {unit.ConstitutionDefense} + Àåºñ {unit.ArmorDefense})";
+                      $"ì£¼ë¬´ê¸°: {mainHand}\n" +
+                      $"ë³´ì¡°ë¬´ê¸°: {offHand}\n" +
+                      $"ë°©íŒ¨: {shield}\n" +
+                      $"ë°©ì–´êµ¬: {armor}\n" +
+                      $"ì´ë™ë ¥: {unit.MoveRange}  ì‚¬ê±°ë¦¬: {unit.AttackRange}\n" +
+                      $"ì²´ë ¥: {unit.CurrentHealth}/{unit.MaxHealth}\n" +
+                      $"ë°©ì–´ë ¥: {unit.Defense} (ë§·ì§‘ {unit.ConstitutionDefense} + ì¥ë¹„ {unit.ArmorDefense})";
 
         GUI.Box(new Rect(10, 10, 250, 160), text);
     }

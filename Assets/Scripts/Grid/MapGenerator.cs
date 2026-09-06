@@ -1,15 +1,15 @@
 using UnityEngine;
 
 /// <summary>
-/// Perlin Noise ±â¹İ ¹«ÀÛÀ§ ¸Ê »ı¼º±â.
-/// MonoBehaviour°¡ ¾Æ´Ñ ¼ø¼ö ·ÎÁ÷ Å¬·¡½º·Î, GridManager¿¡¼­ ÇÊ¿äÇÒ ¶§ ÀÎ½ºÅÏ½ºÈ­ÇØ¼­ »ç¿ëÇÑ´Ù.
+/// Perlin Noise ê¸°ë°˜ ë¬´ì‘ìœ„ ë§µ ìƒì„±ê¸°.
+/// MonoBehaviourê°€ ì•„ë‹Œ ìˆœìˆ˜ ë¡œì§ í´ë˜ìŠ¤ë¡œ, GridManagerì—ì„œ í•„ìš”í•  ë•Œ ì¸ìŠ¤í„´ìŠ¤í™”í•´ì„œ ì‚¬ìš©í•œë‹¤.
 /// </summary>
 
 [System.Serializable]
 public struct NoiseTileMapping
 {
     public TileTypeData tileType;
-    public float maxNoiseValue; // ÀÌ °ª ¹Ì¸¸ÀÌ¸é ÀÌ Å¸ÀÔ (¿À¸§Â÷¼øÀ¸·Î ¹è¿­¿¡ ³Ö¾î¾ß ÇÔ)
+    public float maxNoiseValue; // ì´ ê°’ ë¯¸ë§Œì´ë©´ ì´ íƒ€ì… (ì˜¤ë¦„ì°¨ìˆœìœ¼ë¡œ ë°°ì—´ì— ë„£ì–´ì•¼ í•¨)
 }
 
 

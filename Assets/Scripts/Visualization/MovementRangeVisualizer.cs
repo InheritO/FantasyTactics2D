@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// °è»êµÈ ÀÌµ¿ °¡´É Å¸ÀÏµéÀ» ¾À¿¡ ÇÏÀÌ¶óÀÌÆ®·Î Ç¥½ÃÇÑ´Ù.
+/// ê³„ì‚°ëœ ì´ë™ ê°€ëŠ¥ íƒ€ì¼ë“¤ì„ ì”¬ì— í•˜ì´ë¼ì´íŠ¸ë¡œ í‘œì‹œí•œë‹¤.
 /// </summary>
 public class MovementRangeVisualizer : MonoBehaviour
 {
@@ -10,6 +10,8 @@ public class MovementRangeVisualizer : MonoBehaviour
 
     private List<GameObject> highlightObjects = new List<GameObject>();
     private GridManager gridManager;
+
+    private int tileHighlightSortOrder = 1;
 
     public void Setup(GridManager grid)
     {
@@ -46,7 +48,7 @@ public class MovementRangeVisualizer : MonoBehaviour
         SpriteRenderer sr = obj.AddComponent<SpriteRenderer>();
         sr.sprite = CreateSquareSprite();
         sr.color = highlightColor;
-        sr.sortingOrder = 0; // Å¸ÀÏ À§, À¯´Ö ¾Æ·¡ Á¤µµ·Î Á¶Á¤ ÇÊ¿ä½Ã °ª º¯°æ
+        sr.sortingOrder = tileHighlightSortOrder; // íƒ€ì¼ ìœ„, ìœ ë‹› ì•„ë˜ ì •ë„ë¡œ ì¡°ì • í•„ìš”ì‹œ ê°’ ë³€ê²½
 
         return obj;
     }

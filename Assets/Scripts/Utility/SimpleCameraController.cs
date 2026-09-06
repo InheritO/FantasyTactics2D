@@ -1,8 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// WASD ¶Ç´Â ¹æÇâÅ°·Î Ä«¸Ş¶ó¸¦ ÀÌµ¿½ÃÅ°´Â °£´ÜÇÑ ½ºÅ©¸³Æ®.
-/// ¸Ê È®ÀÎ¿ë ÇÁ·ÎÅäÅ¸ÀÔ ´Ü°è Àü¿ë (ÁÜ, °æ°è Á¦ÇÑ µîÀº Æ÷ÇÔÇÏÁö ¾ÊÀ½).
+/// WASD ë˜ëŠ” ë°©í–¥í‚¤ë¡œ ì¹´ë©”ë¼ë¥¼ ì´ë™ì‹œí‚¤ëŠ” ê°„ë‹¨í•œ ìŠ¤í¬ë¦½íŠ¸.
+/// ë§µ í™•ì¸ìš© í”„ë¡œí† íƒ€ì… ë‹¨ê³„ ì „ìš© (ì¤Œ, ê²½ê³„ ì œí•œ ë“±ì€ í¬í•¨í•˜ì§€ ì•ŠìŒ).
 /// </summary>
 public class SimpleCameraController : MonoBehaviour
 {
@@ -11,8 +11,8 @@ public class SimpleCameraController : MonoBehaviour
 
     void Update()
     {
-        float horizontal = Input.GetAxisRaw("Horizontal"); // A/D, ÁÂ¿ì ¹æÇâÅ°
-        float vertical = Input.GetAxisRaw("Vertical");     // W/S, »óÇÏ ¹æÇâÅ°
+        float horizontal = Input.GetAxisRaw("Horizontal"); // A/D, ì¢Œìš° ë°©í–¥í‚¤
+        float vertical = Input.GetAxisRaw("Vertical");     // W/S, ìƒí•˜ ë°©í–¥í‚¤
 
         Vector3 moveDir = new Vector3(horizontal, vertical, 0f).normalized;
         transform.position += moveDir * moveSpeed * Time.deltaTime;

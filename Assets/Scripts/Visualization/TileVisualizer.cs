@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using NaughtyAttributes;
 
 /// <summary>
 /// 생성된 맵 데이터를 실제 GameObject로 씬에 배치해서 눈으로 확인하기 위한 클래스.
@@ -12,8 +11,11 @@ public class TileVisualizer : MonoBehaviour
 
     [Header("Visual Settings")]
     public float tileVisualSize = 0.9f; // tileSize보다 살짝 작게 해서 타일 사이 경계선이 보이게 함
-
+    private int tileSortOrder = 0;
+   
     private GameObject[,] tileObjects;
+
+    
 
     void Start()
     {
@@ -46,6 +48,7 @@ public class TileVisualizer : MonoBehaviour
         tileObj.transform.localScale = Vector3.one * tileVisualSize;
 
         SpriteRenderer sr = tileObj.AddComponent<SpriteRenderer>();
+        sr.sortingOrder = tileSortOrder;
 
         if (tile.TypeData.icon != null)
         {

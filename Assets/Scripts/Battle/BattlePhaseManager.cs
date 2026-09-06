@@ -2,14 +2,14 @@ using UnityEngine;
 
 public enum BattlePhase
 {
-    Placement,  // À¯´Ö ¹èÄ¡ Áß
-    Battle,      // ÅÏ ±â¹İ ÀüÅõ ÁøÇà Áß
-    Ended, // ÀüÅõ Á¾·á
+    Placement,  // ìœ ë‹› ë°°ì¹˜ ì¤‘
+    Battle,      // í„´ ê¸°ë°˜ ì „íˆ¬ ì§„í–‰ ì¤‘
+    Ended, // ì „íˆ¬ ì¢…ë£Œ
 }
 
 /// <summary>
-/// ÀüÅõÀÇ ÇöÀç ÆäÀÌÁî(¹èÄ¡ Áß / ÀüÅõ Áß)¸¦ °ü¸®ÇÑ´Ù.
-/// ¹èÄ¡ ÄÁÆ®·Ñ·¯¿Í ÀÌµ¿/¼±ÅÃ ÄÁÆ®·Ñ·¯´Â ÀÌ ¸Å´ÏÀú¸¦ ÂüÁ¶ÇØ¼­ ÀÚ½ÅÀÇ È°¼ºÈ­ ¿©ºÎ¸¦ °áÁ¤ÇÑ´Ù.
+/// ì „íˆ¬ì˜ í˜„ì¬ í˜ì´ì¦ˆ(ë°°ì¹˜ ì¤‘ / ì „íˆ¬ ì¤‘)ë¥¼ ê´€ë¦¬í•œë‹¤.
+/// ë°°ì¹˜ ì»¨íŠ¸ë¡¤ëŸ¬ì™€ ì´ë™/ì„ íƒ ì»¨íŠ¸ë¡¤ëŸ¬ëŠ” ì´ ë§¤ë‹ˆì €ë¥¼ ì°¸ì¡°í•´ì„œ ìì‹ ì˜ í™œì„±í™” ì—¬ë¶€ë¥¼ ê²°ì •í•œë‹¤.
 /// </summary>
 public class BattlePhaseManager : MonoBehaviour
 {
@@ -36,7 +36,7 @@ public class BattlePhaseManager : MonoBehaviour
             return;
 
         CurrentPhase = BattlePhase.Battle;
-        Debug.Log("ÀüÅõ ½ÃÀÛ. ¹èÄ¡ ÆäÀÌÁî Á¾·á.");
+        Debug.Log("ì „íˆ¬ ì‹œì‘. ë°°ì¹˜ í˜ì´ì¦ˆ ì¢…ë£Œ.");
 
         turnManager.InitializeTurnOrder();
     }
@@ -44,15 +44,15 @@ public class BattlePhaseManager : MonoBehaviour
     private void HandleBattleEnded()
     {
         CurrentPhase = BattlePhase.Ended;
-        Debug.Log("ÀüÅõ°¡ Á¾·áµÇ¾î ´õ ÀÌ»ó Á¶ÀÛÇÒ ¼ö ¾ø½À´Ï´Ù.");
-        // ´ÙÀ½ ´Ü°è: ½Â¸®/ÆĞ¹è È­¸é Ç¥½Ã, ¿ùµå¸ÊÀ¸·Î º¹±Í Æ®¸®°Å µî
+        Debug.Log("ì „íˆ¬ê°€ ì¢…ë£Œë˜ì–´ ë” ì´ìƒ ì¡°ì‘í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
+        // ë‹¤ìŒ ë‹¨ê³„: ìŠ¹ë¦¬/íŒ¨ë°° í™”ë©´ í‘œì‹œ, ì›”ë“œë§µìœ¼ë¡œ ë³µê·€ íŠ¸ë¦¬ê±° ë“±
     }
 
-    // Å×½ºÆ® ÆíÀÇ¸¦ À§ÇØ ¹èÄ¡ ÆäÀÌÁî·Î µÇµ¹¸®´Â ±â´Éµµ Ãß°¡
+    // í…ŒìŠ¤íŠ¸ í¸ì˜ë¥¼ ìœ„í•´ ë°°ì¹˜ í˜ì´ì¦ˆë¡œ ë˜ëŒë¦¬ëŠ” ê¸°ëŠ¥ë„ ì¶”ê°€
     public void ReturnToPlacement()
     {
         CurrentPhase = BattlePhase.Placement;
-        Debug.Log("¹èÄ¡ ÆäÀÌÁî·Î º¹±Í.");
+        Debug.Log("ë°°ì¹˜ í˜ì´ì¦ˆë¡œ ë³µê·€.");
     }
 
 }

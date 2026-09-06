@@ -1,15 +1,15 @@
 using UnityEngine;
 
 /// <summary>
-/// ÀÌµ¿ ·ÎÁ÷ °ËÁõ¿ë ÀÓ½Ã Å×½ºÆ® ½ºÅ©¸³Æ®.
-/// TestUnitÀ» ÁöÁ¤ ÁÂÇ¥¿¡ ½ºÆùÇÏ°í, Å° ÀÔ·ÂÀ¸·Î ÇÑ Ä­¾¿ ÀÌµ¿½ÃÄÑº»´Ù.
-/// ½ÇÁ¦ °ÔÀÓ ·ÎÁ÷(¸¶¿ì½º ¼±ÅÃ, ÀÌµ¿ ¹üÀ§ Ç¥½Ã µî)ÀÌ ¸¸µé¾îÁö¸é ÀÌ ½ºÅ©¸³Æ®´Â Á¦°ÅÇØµµ µÈ´Ù.
+/// ì´ë™ ë¡œì§ ê²€ì¦ìš© ì„ì‹œ í…ŒìŠ¤íŠ¸ ìŠ¤í¬ë¦½íŠ¸.
+/// TestUnitì„ ì§€ì • ì¢Œí‘œì— ìŠ¤í°í•˜ê³ , í‚¤ ì…ë ¥ìœ¼ë¡œ í•œ ì¹¸ì”© ì´ë™ì‹œì¼œë³¸ë‹¤.
+/// ì‹¤ì œ ê²Œì„ ë¡œì§(ë§ˆìš°ìŠ¤ ì„ íƒ, ì´ë™ ë²”ìœ„ í‘œì‹œ ë“±)ì´ ë§Œë“¤ì–´ì§€ë©´ ì´ ìŠ¤í¬ë¦½íŠ¸ëŠ” ì œê±°í•´ë„ ëœë‹¤.
 /// </summary>
 public class UnitMoveTester : MonoBehaviour
 {
     [Header("References")]
     public GridManager gridManager;
-    public TestUnit testUnitPrefab; // ÇÁ¸®ÆÕÀÌ ¾øÀ¸¸é ºñ¿öµÎ°í ¾Æ·¡¿¡¼­ ÀÚµ¿ »ı¼ºµÊ
+    public TestUnit testUnitPrefab; // í”„ë¦¬íŒ¹ì´ ì—†ìœ¼ë©´ ë¹„ì›Œë‘ê³  ì•„ë˜ì—ì„œ ìë™ ìƒì„±ë¨
 
     [Header("Spawn Settings")]
     public Vector2Int spawnCoord = new Vector2Int(2, 2);
@@ -42,7 +42,7 @@ public class UnitMoveTester : MonoBehaviour
             bool success = spawnedUnit.TryMoveTo(targetCoord);
 
             if (!success)
-                Debug.Log($"ÀÌµ¿ ½ÇÆĞ: {targetCoord}´Â ÀÌµ¿ ºÒ°¡ Å¸ÀÏÀÌ°Å³ª ¹üÀ§ ¹ÛÀÔ´Ï´Ù.");
+                Debug.Log($"ì´ë™ ì‹¤íŒ¨: {targetCoord}ëŠ” ì´ë™ ë¶ˆê°€ íƒ€ì¼ì´ê±°ë‚˜ ë²”ìœ„ ë°–ì…ë‹ˆë‹¤.");
         }
     }
 
@@ -56,14 +56,14 @@ public class UnitMoveTester : MonoBehaviour
         }
         else
         {
-            // ÇÁ¸®ÆÕÀÌ ¾øÀ¸¸é ÄÚµå·Î Áï¼®¿¡¼­ »ı¼º (½ºÇÁ¶óÀÌÆ®´Â Èò »ç°¢Çü + »¡°£»ö)
+            // í”„ë¦¬íŒ¹ì´ ì—†ìœ¼ë©´ ì½”ë“œë¡œ ì¦‰ì„ì—ì„œ ìƒì„± (ìŠ¤í”„ë¼ì´íŠ¸ëŠ” í° ì‚¬ê°í˜• + ë¹¨ê°„ìƒ‰)
             unitObj = new GameObject("TestUnit");
             unitObj.AddComponent<TestUnit>();
 
             SpriteRenderer sr = unitObj.AddComponent<SpriteRenderer>();
             sr.sprite = CreateSquareSprite();
             sr.color = Color.red;
-            sr.sortingOrder = 1; // Å¸ÀÏº¸´Ù À§¿¡ ±×·ÁÁöµµ·Ï
+            sr.sortingOrder = 1; // íƒ€ì¼ë³´ë‹¤ ìœ„ì— ê·¸ë ¤ì§€ë„ë¡
         }
 
         spawnedUnit = unitObj.GetComponent<TestUnit>();

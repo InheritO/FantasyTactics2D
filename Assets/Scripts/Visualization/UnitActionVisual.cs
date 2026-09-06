@@ -1,8 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// À¯´ÖÀÇ Çàµ¿ »óÅÂ(ÀÌµ¿/°ø°İ ¿Ï·á ¿©ºÎ)¿¡ µû¶ó ½ºÇÁ¶óÀÌÆ® »öÀ» Á¶Á¤ÇÑ´Ù.
-/// UnitSelectionControllerÀÇ ¼±ÅÃ ÇÏÀÌ¶óÀÌÆ®¿Í´Â º°°³·Î, "ÀÌ¹ø ÅÏ¿¡ ´õ Çàµ¿ °¡´ÉÇÑ°¡"¸¦ Ç¥½ÃÇÑ´Ù.
+/// ìœ ë‹›ì˜ í–‰ë™ ìƒíƒœ(ì´ë™/ê³µê²© ì™„ë£Œ ì—¬ë¶€)ì— ë”°ë¼ ìŠ¤í”„ë¼ì´íŠ¸ ìƒ‰ì„ ì¡°ì •í•œë‹¤.
+/// UnitSelectionControllerì˜ ì„ íƒ í•˜ì´ë¼ì´íŠ¸ì™€ëŠ” ë³„ê°œë¡œ, "ì´ë²ˆ í„´ì— ë” í–‰ë™ ê°€ëŠ¥í•œê°€"ë¥¼ í‘œì‹œí•œë‹¤.
 /// </summary>
 public class UnitActionVisual : MonoBehaviour
 {
@@ -17,7 +17,7 @@ public class UnitActionVisual : MonoBehaviour
         factionColor = originalFactionColor;
 
         unit.OnActionsExhausted += HandleActionsExhausted;
-        unit.OnTurnReset += HandleTurnReset; // ¾Æ·¡¿¡¼­ UnitBase¿¡ ÀÌ ÀÌº¥Æ®¸¦ Ãß°¡ÇÒ ¿¹Á¤
+        unit.OnTurnReset += HandleTurnReset; // ì•„ë˜ì—ì„œ UnitBaseì— ì´ ì´ë²¤íŠ¸ë¥¼ ì¶”ê°€í•  ì˜ˆì •
     }
 
     private void HandleActionsExhausted(UnitBase u)

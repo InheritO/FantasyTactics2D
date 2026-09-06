@@ -1,8 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// Å×½ºÆ® ¸ñÀûÀ¸·Î ¼¼·Â, ¹«±â, ¹æ¾î±¸¸¦ ¼øÈ¯ ¼±ÅÃÇÏ°í Å¬¸¯ÇÑ À§Ä¡¿¡ ¹èÄ¡ÇÏ´Â µµ±¸.
-/// Tab: ¼¼·Â ÀüÈ¯, Q: ¹«±â ÀüÈ¯, E: ¹æ¾î±¸ ÀüÈ¯, ¿ìÅ¬¸¯: ¹èÄ¡
+/// í…ŒìŠ¤íŠ¸ ëª©ì ìœ¼ë¡œ ì„¸ë ¥, ë¬´ê¸°, ë°©ì–´êµ¬ë¥¼ ìˆœí™˜ ì„ íƒí•˜ê³  í´ë¦­í•œ ìœ„ì¹˜ì— ë°°ì¹˜í•˜ëŠ” ë„êµ¬.
+/// Tab: ì„¸ë ¥ ì „í™˜, Q: ë¬´ê¸° ì „í™˜, E: ë°©ì–´êµ¬ ì „í™˜, ìš°í´ë¦­: ë°°ì¹˜
 /// </summary>
 public class TestUnitPlacer : MonoBehaviour
 {
@@ -10,12 +10,13 @@ public class TestUnitPlacer : MonoBehaviour
     public GridManager gridManager;
     public BattlePhaseManager phaseManager;
     public BattleOutcomeManager outcomeManager;
+    public CombatLogger combatLogger;
     public TestUnit testUnitPrefab;
     public FactionData[] factions;
 
     private int currentFactionIndex = 0;
-    private int currentWeaponIndex = -1; // -1 = ºñ¹«Àå
-    private int currentArmorIndex = -1;  // -1 = ºñ¹«Àå
+    private int currentWeaponIndex = -1; // -1 = ë¹„ë¬´ì¥
+    private int currentArmorIndex = -1;  // -1 = ë¹„ë¬´ì¥
 
     void Update()
     {
@@ -40,10 +41,10 @@ public class TestUnitPlacer : MonoBehaviour
         if (factions.Length == 0) return;
 
         currentFactionIndex = (currentFactionIndex + 1) % factions.Length;
-        currentWeaponIndex = -1; // ¼¼·ÂÀÌ ¹Ù²î¸é Àåºñ Ç®ÀÌ ´Ş¶óÁö´Ï ÃÊ±âÈ­
+        currentWeaponIndex = -1; // ì„¸ë ¥ì´ ë°”ë€Œë©´ ì¥ë¹„ í’€ì´ ë‹¬ë¼ì§€ë‹ˆ ì´ˆê¸°í™”
         currentArmorIndex = -1;
 
-        Debug.Log($"ÇöÀç ¹èÄ¡ ¼¼·Â: {factions[currentFactionIndex].factionName}");
+        Debug.Log($"í˜„ì¬ ë°°ì¹˜ ì„¸ë ¥: {factions[currentFactionIndex].factionName}");
     }
 
     private void CycleWeapon()
@@ -51,17 +52,17 @@ public class TestUnitPlacer : MonoBehaviour
         RaceData race = factions[currentFactionIndex].race;
         if (race == null || race.availableWeapons.Length == 0)
         {
-            Debug.Log("ÀÌ Á¾Á·Àº »ç¿ë °¡´ÉÇÑ ¹«±â°¡ ¾ø½À´Ï´Ù.");
+            Debug.Log("ì´ ì¢…ì¡±ì€ ì‚¬ìš© ê°€ëŠ¥í•œ ë¬´ê¸°ê°€ ì—†ìŠµë‹ˆë‹¤.");
             return;
         }
 
-        // -1(ºñ¹«Àå)ºÎÅÍ ½ÃÀÛÇØ¼­ ¼øÈ¯
+        // -1(ë¹„ë¬´ì¥)ë¶€í„° ì‹œì‘í•´ì„œ ìˆœí™˜
         currentWeaponIndex++;
         if (currentWeaponIndex >= race.availableWeapons.Length)
             currentWeaponIndex = -1;
 
-        string weaponName = currentWeaponIndex == -1 ? "ºñ¹«Àå" : race.availableWeapons[currentWeaponIndex].weaponName;
-        Debug.Log($"ÇöÀç ¹«±â: {weaponName}");
+        string weaponName = currentWeaponIndex == -1 ? "ë¹„ë¬´ì¥" : race.availableWeapons[currentWeaponIndex].weaponName;
+        Debug.Log($"í˜„ì¬ ë¬´ê¸°: {weaponName}");
     }
 
     private void CycleArmor()
@@ -69,7 +70,7 @@ public class TestUnitPlacer : MonoBehaviour
         RaceData race = factions[currentFactionIndex].race;
         if (race == null || race.availableArmors.Length == 0)
         {
-            Debug.Log("ÀÌ Á¾Á·Àº »ç¿ë °¡´ÉÇÑ ¹æ¾î±¸°¡ ¾ø½À´Ï´Ù.");
+            Debug.Log("ì´ ì¢…ì¡±ì€ ì‚¬ìš© ê°€ëŠ¥í•œ ë°©ì–´êµ¬ê°€ ì—†ìŠµë‹ˆë‹¤.");
             return;
         }
 
@@ -77,15 +78,15 @@ public class TestUnitPlacer : MonoBehaviour
         if (currentArmorIndex >= race.availableArmors.Length)
             currentArmorIndex = -1;
 
-        string armorName = currentArmorIndex == -1 ? "ºñ¹«Àå" : race.availableArmors[currentArmorIndex].armorName;
-        Debug.Log($"ÇöÀç ¹æ¾î±¸: {armorName}");
+        string armorName = currentArmorIndex == -1 ? "ë¹„ë¬´ì¥" : race.availableArmors[currentArmorIndex].armorName;
+        Debug.Log($"í˜„ì¬ ë°©ì–´êµ¬: {armorName}");
     }
 
     private void PlaceUnitAtMouse()
     {
         if (factions.Length == 0)
         {
-            Debug.Log("µî·ÏµÈ ¼¼·ÂÀÌ ¾ø½À´Ï´Ù.");
+            Debug.Log("ë“±ë¡ëœ ì„¸ë ¥ì´ ì—†ìŠµë‹ˆë‹¤.");
             return;
         }
 
@@ -94,7 +95,13 @@ public class TestUnitPlacer : MonoBehaviour
         Vector2Int coord = gridManager.WorldToGrid(mouseWorldPos);
 
         FactionData selectedFaction = factions[currentFactionIndex];
-        UnitBase unit = UnitSpawner.Spawn(testUnitPrefab, coord, selectedFaction, gridManager, outcomeManager);
+        if (selectedFaction == null)
+        {
+            Debug.LogWarning($"ì„¸ë ¥ ë°°ì—´ì˜ {currentFactionIndex}ë²ˆ ìŠ¬ë¡¯ì´ ë¹„ì–´ìˆìŠµë‹ˆë‹¤.");
+            return;
+        }
+
+        UnitBase unit = UnitSpawner.Spawn(testUnitPrefab, coord, selectedFaction, gridManager, outcomeManager, combatLogger);
 
         if (unit == null)
             return;

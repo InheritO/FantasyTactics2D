@@ -8,9 +8,6 @@ public class TurnManager : MonoBehaviour
 {
     public FactionData CurrentFaction { get; private set; }
 
-       public GridManager gridManager;
-    public TurnManager turnManager;
-
     private List<FactionData> turnOrder = new List<FactionData>();
     private int currentIndex = 0;
 
@@ -32,7 +29,7 @@ public class TurnManager : MonoBehaviour
 
         if (turnOrder.Count == 0)
         {
-            Debug.Log("¹èÄ¡µÈ À¯´ÖÀÌ ¾ø¾î ÅÏÀ» ½ÃÀÛÇÒ ¼ö ¾ø½À´Ï´Ù.");
+            Debug.Log("ë°°ì¹˜ëœ ìœ ë‹›ì´ ì—†ì–´ í„´ì„ ì‹œì‘í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
             return;
         }
 
@@ -41,14 +38,21 @@ public class TurnManager : MonoBehaviour
 
     public void EndTurn()
     {
-        if (turnOrder.Count <= 1) return;
+        if (turnOrder.Count == 0)
+        {
+            Debug.LogWarning("í„´ ìˆœì„œê°€ ë¹„ì–´ìˆëŠ” ìƒíƒœì—ì„œ EndTurnì´ í˜¸ì¶œë˜ì—ˆìŠµë‹ˆë‹¤. InitializeTurnOrderê°€ ë¨¼ì € í˜¸ì¶œë˜ì—ˆëŠ”ì§€ í™•ì¸í•˜ì„¸ìš”.");
+            return;
+        }
+
+        if (turnOrder.Count == 1)
+            return; // ì„¸ë ¥ì´ í•˜ë‚˜ë§Œ ë‚¨ì€ ìƒíƒœ (ì „íˆ¬ ì¢…ë£Œ ì²˜ë¦¬ëŠ” BattleOutcomeManagerê°€ ë‹´ë‹¹)
 
         currentIndex = (currentIndex + 1) % turnOrder.Count;
         StartTurnFor(turnOrder[currentIndex]);
     }
 
-    // ÀüÅõ µµÁß »õ·Î¿î ¼¼·ÂÀÌ ³­ÀÔÇÒ ¶§ È£Ãâ
-    // insertNext: true¸é ¹Ù·Î ´ÙÀ½w Â÷·Ê·Î ³¢¿ö³ÖÀ½, false¸é ¼ø¼­ ¸Ç µÚ¿¡ Ãß°¡
+    // ì „íˆ¬ ë„ì¤‘ ìƒˆë¡œìš´ ì„¸ë ¥ì´ ë‚œì…í•  ë•Œ í˜¸ì¶œ
+    // insertNext: trueë©´ ë°”ë¡œ ë‹¤ìŒ ì°¨ë¡€ë¡œ ë¼ì›Œë„£ìŒ, falseë©´ ìˆœì„œ ë§¨ ë’¤ì— ì¶”ê°€
     public void AddFaction(FactionData faction, bool insertNext = true)
     {
         if (faction == null || turnOrder.Contains(faction))
@@ -56,21 +60,21 @@ public class TurnManager : MonoBehaviour
 
         if (turnOrder.Count == 0)
         {
-            // ÀüÅõ ½ÃÀÛ ÀüÀÌ°Å³ª ¸ğµç ¼¼·ÂÀÌ »ç¶óÁø »óÅÂ¿´´Ù¸é ÀÌ ¼¼·ÂºÎÅÍ ½ÃÀÛ
+            // ì „íˆ¬ ì‹œì‘ ì „ì´ê±°ë‚˜ ëª¨ë“  ì„¸ë ¥ì´ ì‚¬ë¼ì§„ ìƒíƒœì˜€ë‹¤ë©´ ì´ ì„¸ë ¥ë¶€í„° ì‹œì‘
             turnOrder.Add(faction);
             currentIndex = 0;
             StartTurnFor(faction);
             return;
         }
 
-        // currentIndexº¸´Ù µÚ¿¡ »ğÀÔµÇ¹Ç·Î currentIndex ÀÚÃ¼´Â ¾ÈÀüÇÔ
+        // currentIndexë³´ë‹¤ ë’¤ì— ì‚½ì…ë˜ë¯€ë¡œ currentIndex ìì²´ëŠ” ì•ˆì „í•¨
         int insertIndex = insertNext ? currentIndex + 1 : turnOrder.Count;
         turnOrder.Insert(insertIndex, faction);
 
-        Debug.Log($"{faction.factionName} ÂüÀü. ÅÏ ¼ø¼­¿¡ Ãß°¡µÊ (´ÙÀ½ Â÷·Ê: {insertNext}).");
+        Debug.Log($"{faction.factionName} ì°¸ì „. í„´ ìˆœì„œì— ì¶”ê°€ë¨ (ë‹¤ìŒ ì°¨ë¡€: {insertNext}).");
     }
 
-    // ¼¼·ÂÀÌ Àü¸êÇÏ´Â µî ÀüÅõ¿¡¼­ Á¦¿ÜµÉ ¶§ È£Ãâ
+    // ì„¸ë ¥ì´ ì „ë©¸í•˜ëŠ” ë“± ì „íˆ¬ì—ì„œ ì œì™¸ë  ë•Œ í˜¸ì¶œ
     public void RemoveFaction(FactionData faction)
     {
         int removedIndex = turnOrder.IndexOf(faction);
@@ -79,7 +83,7 @@ public class TurnManager : MonoBehaviour
 
         turnOrder.RemoveAt(removedIndex);
 
-        // Á¦°ÅµÈ ¼¼·ÂÀÌ ÇöÀç ÅÏÀÌ¾ú°Å³ª, currentIndexº¸´Ù ¾ÕÀÌ¸é ÀÎµ¦½º º¸Á¤ ÇÊ¿ä
+        // ì œê±°ëœ ì„¸ë ¥ì´ í˜„ì¬ í„´ì´ì—ˆê±°ë‚˜, currentIndexë³´ë‹¤ ì•ì´ë©´ ì¸ë±ìŠ¤ ë³´ì • í•„ìš”
         if (removedIndex < currentIndex)
         {
             currentIndex--;
@@ -89,11 +93,11 @@ public class TurnManager : MonoBehaviour
             if (turnOrder.Count == 0)
             {
                 CurrentFaction = null;
-                Debug.Log("¸ğµç ¼¼·ÂÀÌ Á¦°ÅµÇ¾î ÀüÅõ°¡ Á¾·áµË´Ï´Ù.");
+                Debug.Log("ëª¨ë“  ì„¸ë ¥ì´ ì œê±°ë˜ì–´ ì „íˆ¬ê°€ ì¢…ë£Œë©ë‹ˆë‹¤.");
                 return;
             }
 
-            currentIndex %= turnOrder.Count; // ¹üÀ§¸¦ ¹ş¾î³ª¸é ´Ù½Ã Ã³À½À¸·Î
+            currentIndex %= turnOrder.Count; // ë²”ìœ„ë¥¼ ë²—ì–´ë‚˜ë©´ ë‹¤ì‹œ ì²˜ìŒìœ¼ë¡œ
             StartTurnFor(turnOrder[currentIndex]);
         }
     }
@@ -101,7 +105,7 @@ public class TurnManager : MonoBehaviour
     private void StartTurnFor(FactionData faction)
     {
         CurrentFaction = faction;
-        Debug.Log($"{faction.factionName}ÀÇ ÅÏ ½ÃÀÛ.");
+        Debug.Log($"{faction.factionName}ì˜ í„´ ì‹œì‘.");
 
         UnitBase[] allUnits = FindObjectsByType<UnitBase>();
         foreach (var unit in allUnits)
@@ -110,6 +114,6 @@ public class TurnManager : MonoBehaviour
                 unit.ResetTurnState();
         }
 
-        OnTurnStarted?.Invoke(faction); // Ãß°¡
+        OnTurnStarted?.Invoke(faction); // ì¶”ê°€
     }
 }

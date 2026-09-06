@@ -1,19 +1,40 @@
 using UnityEngine;
 
 /// <summary>
-/// À¯´ÖÀ» Æ¯Á¤ ÁÂÇ¥, Æ¯Á¤ ¼¼·ÂÀ¸·Î ½ºÆùÇÏ´Â °ø¿ë ·ÎÁ÷.
-/// Å×½ºÆ® ¹èÄ¡¿Í ½ÇÁ¦ ÀüÅõ ½ÃÀÛ ½Ã ÃÊ±â ¹èÄ¡ ¾çÂÊ¿¡¼­ Àç»ç¿ëµÈ´Ù.
+/// ìœ ë‹›ì„ íŠ¹ì • ì¢Œí‘œ, íŠ¹ì • ì„¸ë ¥ìœ¼ë¡œ ìŠ¤í°í•˜ëŠ” ê³µìš© ë¡œì§.
+/// í…ŒìŠ¤íŠ¸ ë°°ì¹˜ì™€ ì‹¤ì œ ì „íˆ¬ ì‹œì‘ ì‹œ ì´ˆê¸° ë°°ì¹˜ ì–‘ìª½ì—ì„œ ì¬ì‚¬ìš©ëœë‹¤.
 /// </summary>
 public static class UnitSpawner
 {
     public static UnitBase Spawn(UnitBase unitPrefab, Vector2Int coord, FactionData faction,
-         GridManager gridManager, BattleOutcomeManager outcomeManager, CombatLogger combatLogger)
+         GridManager gridManager, BattleOutcomeManager outcomeManager, CombatLogger combatLogger = null)
     {
+        if (unitPrefab == null)
+        {
+            Debug.LogError("ìŠ¤í° ì‹¤íŒ¨: unitPrefabì´ nullì…ë‹ˆë‹¤.");
+            return null;
+        }
+
+        if (faction == null)
+        {
+            Debug.LogError("ìŠ¤í° ì‹¤íŒ¨: factionì´ nullì…ë‹ˆë‹¤.");
+            return null;
+        }
+
+        if (faction.race == null)
+            Debug.LogWarning($"[{faction.factionName}] Raceê°€ ì„¤ì •ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤. ìŠ¤íƒ¯ì´ ê¸°ë³¸ê°’(0)ìœ¼ë¡œ ì²˜ë¦¬ë©ë‹ˆë‹¤.");
+
+        if (gridManager == null)
+        {
+            Debug.LogError("ìŠ¤í° ì‹¤íŒ¨: gridManagerê°€ nullì…ë‹ˆë‹¤.");
+            return null;
+        }
+
         TileInstance tile = gridManager.GetTile(coord);
 
         if (tile == null || !tile.IsWalkable())
         {
-            Debug.Log($"½ºÆù ½ÇÆĞ: {coord}´Â ÀÌµ¿ ºÒ°¡ Å¸ÀÏÀÌ°Å³ª ¹üÀ§ ¹ÛÀÔ´Ï´Ù.");
+            Debug.Log($"ìŠ¤í° ì‹¤íŒ¨: {coord}ëŠ” ì´ë™ ë¶ˆê°€ íƒ€ì¼ì´ê±°ë‚˜ ë²”ìœ„ ë°–ì…ë‹ˆë‹¤.");
             return null;
         }
 
@@ -24,8 +45,14 @@ public static class UnitSpawner
         if (!faction.isPlayerControlled)
             unit.AIBehavior = new AggressiveMoveTowardEnemy();
 
-        outcomeManager.RegisterUnit(unit); // Ãß°¡: »ç¸Á ÀÌº¥Æ® ±¸µ¶
-        combatLogger.RegisterUnit(unit);
+        if (outcomeManager != null)
+            outcomeManager.RegisterUnit(unit); // ì‚¬ë§ ì´ë²¤íŠ¸ êµ¬ë…
+        else
+            Debug.LogWarning("outcomeManagerê°€ ì—°ê²°ë˜ì§€ ì•Šì•„ ì´ ìœ ë‹›ì˜ ì‚¬ë§ì´ ìŠ¹íŒ¨ íŒì •ì— ë°˜ì˜ë˜ì§€ ì•ŠìŠµë‹ˆë‹¤.");
+
+        // combatLoggerëŠ” ë””ë²„ê·¸ ì „ìš© ë„êµ¬ì´ë¯€ë¡œ ì—†ì–´ë„ ìŠ¤í° ìì²´ëŠ” ê³„ì† ì§„í–‰í•¨
+        if (combatLogger != null)
+            combatLogger.RegisterUnit(unit);
 
         UnitActionVisual visual = unit.gameObject.AddComponent<UnitActionVisual>();
         visual.Initialize(unit, faction.factionColor);

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 /// <summary>
-/// °¡Àå °¡±î¿î Àû À¯´ÖÀ» ÇâÇØ, ÀÌµ¿ ¹üÀ§ ³»¿¡¼­ ÃÖ´ëÇÑ Á¢±ÙÇÏ´Â ±âº» AI Çàµ¿.
+/// ê°€ì¥ ê°€ê¹Œìš´ ì  ìœ ë‹›ì„ í–¥í•´, ì´ë™ ë²”ìœ„ ë‚´ì—ì„œ ìµœëŒ€í•œ ì ‘ê·¼í•˜ëŠ” ê¸°ë³¸ AI í–‰ë™.
 /// </summary>
 public class AggressiveMoveTowardEnemy : IUnitAIBehavior
 {
@@ -17,14 +17,14 @@ public class AggressiveMoveTowardEnemy : IUnitAIBehavior
         if (nearestEnemy == null)
             return;
 
-        // ÀÌ¹Ì »ç°Å¸® ¾ÈÀÌ¸é ÀÌµ¿ÇÏÁö ¾Ê°í ¹Ù·Î °ø°İ
+        // ì´ë¯¸ ì‚¬ê±°ë¦¬ ì•ˆì´ë©´ ì´ë™í•˜ì§€ ì•Šê³  ë°”ë¡œ ê³µê²©
         if (unit.IsInAttackRange(nearestEnemy))
         {
             unit.TryAttack(nearestEnemy);
             return;
         }
 
-        // »ç°Å¸® ¹ÛÀÌ¸é ÃÖ´ëÇÑ Á¢±Ù
+        // ì‚¬ê±°ë¦¬ ë°–ì´ë©´ ìµœëŒ€í•œ ì ‘ê·¼
         Dictionary<Vector2Int, int> reachable =
             MovementRangeCalculator.CalculateReachableTiles(gridManager, unit.GridCoord, unit.MoveRange);
 
@@ -42,7 +42,7 @@ public class AggressiveMoveTowardEnemy : IUnitAIBehavior
         {
             unit.TryMoveTo(bestTile);
 
-            // ÀÌµ¿ ÈÄ »ç°Å¸® ¾È¿¡ µé¾î¿ÔÀ¸¸é ÀÌ¾î¼­ °ø°İ
+            // ì´ë™ í›„ ì‚¬ê±°ë¦¬ ì•ˆì— ë“¤ì–´ì™”ìœ¼ë©´ ì´ì–´ì„œ ê³µê²©
             if (unit.IsInAttackRange(nearestEnemy))
                 unit.TryAttack(nearestEnemy);
         }
