@@ -1,0 +1,246 @@
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+
+/// <summary>
+/// 부대 편성 화면의 UI 상호작용을 담당한다.
+/// "현재 구성 중인 한 기(draft)"를 무기/방어구/방패 순환 버튼으로 조정하고,
+/// "추가" 버튼으로 확정된 목록에 넣는 방식.
+/// </summary>
+public class RosterUIController : MonoBehaviour
+{
+    [Header("References")]
+    public RosterPhaseManager rosterManager;
+
+    [Header("Race Selection")]
+    public Transform raceButtonContainer;
+    public GameObject raceButtonPrefab; // Button + 자식에 TMP_Text
+
+    [Header("Draft Controls")]
+    public TMP_Text mainHandWeaponLabel;
+    public Button mainHandWeaponNextButton;
+    public TMP_Text offHandWeaponLabel;
+    public Button offHandWeaponNextButton;
+    public TMP_Text shieldLabel;
+    public Button shieldNextButton;
+    public TMP_Text armorLabel;
+    public Button armorNextButton;
+    public Button addUnitButton;
+
+    [Header("Roster List")]
+    public Transform rosterListContainer;
+    public GameObject rosterListItemPrefab; // 자식에 TMP_Text + Button(제거)
+
+    [Header("Points Display")]
+    public TMP_Text pointsLabel;
+
+    [Header("Confirm")]
+    public Button confirmButton;
+
+    private RosterEntry draft = new RosterEntry();
+    private int mainHandIndex = -1;
+    private int offHandIndex = -1;
+    private int shieldIndex = -1;
+    private int armorIndex = -1;
+
+    private List<GameObject> spawnedListItems = new List<GameObject>();
+
+    void Start()
+    {
+        BuildRaceButtons();
+
+        mainHandWeaponNextButton.onClick.AddListener(CycleMainHandWeapon);
+        offHandWeaponNextButton.onClick.AddListener(CycleOffHandWeapon);
+        shieldNextButton.onClick.AddListener(CycleShield);
+        armorNextButton.onClick.AddListener(CycleArmor);
+        addUnitButton.onClick.AddListener(AddDraftToRoster);
+        confirmButton.onClick.AddListener(rosterManager.ConfirmRoster);
+
+        rosterManager.OnRosterChanged += RefreshUI;
+    }
+
+    void OnDestroy()
+    {
+        rosterManager.OnRosterChanged -= RefreshUI;
+    }
+
+    private void BuildRaceButtons()
+    {
+        foreach (var race in rosterManager.availableRaces)
+        {
+            GameObject buttonObj = Instantiate(raceButtonPrefab, raceButtonContainer);
+
+            TMP_Text label = buttonObj.GetComponentInChildren<TMP_Text>();
+            if (label != null)
+                label.text = race.raceName;
+
+            Button button = buttonObj.GetComponent<Button>();
+            button.onClick.AddListener(() => SelectRace(race));
+        }
+    }
+
+    private void SelectRace(RaceData race)
+    {
+        rosterManager.SelectRace(race);
+        ResetDraft();
+        RefreshUI();
+    }
+
+    private void ResetDraft()
+    {
+        draft = new RosterEntry();
+        mainHandIndex = -1;
+        offHandIndex = -1;
+        shieldIndex = -1;
+        armorIndex = -1;
+        RefreshDraftLabels();
+    }
+
+    private void CycleMainHandWeapon()
+    {
+        RaceData race = rosterManager.SelectedRace;
+        if (race == null || race.availableWeapons.Length == 0)
+            return;
+
+        mainHandIndex++;
+        if (mainHandIndex >= race.availableWeapons.Length)
+            mainHandIndex = -1;
+
+        draft.mainHandWeapon = mainHandIndex == -1 ? null : race.availableWeapons[mainHandIndex];
+
+        // 양손 무기를 골랐으면 보조무기/방패는 UnitBase의 실제 장착 규칙과 동일하게 자동 해제
+        // (이렇게 안 하면 나중에 실제 장착 시 한쪽만 적용되는데 비용은 둘 다 청구되는 문제가 생김)
+        if (draft.mainHandWeapon != null && draft.mainHandWeapon.handedness == WeaponHandedness.TwoHanded)
+        {
+            draft.offHandWeapon = null;
+            offHandIndex = -1;
+            draft.shield = null;
+            shieldIndex = -1;
+        }
+
+        RefreshDraftLabels();
+    }
+
+    private void CycleOffHandWeapon()
+    {
+        RaceData race = rosterManager.SelectedRace;
+        if (race == null)
+            return;
+
+        var offHandCandidates = System.Array.FindAll(race.availableWeapons, w => w.slotType == WeaponSlotType.OffHandCapable);
+        if (offHandCandidates.Length == 0)
+            return;
+
+        offHandIndex++;
+        if (offHandIndex >= offHandCandidates.Length)
+            offHandIndex = -1;
+
+        draft.offHandWeapon = offHandIndex == -1 ? null : offHandCandidates[offHandIndex];
+
+        // 보조무기와 방패는 같은 슬롯을 두고 경쟁 (UnitBase 규칙과 동일)
+        if (draft.offHandWeapon != null)
+        {
+            draft.shield = null;
+            shieldIndex = -1;
+        }
+
+        RefreshDraftLabels();
+    }
+
+    private void CycleShield()
+    {
+        RaceData race = rosterManager.SelectedRace;
+        if (race == null || race.availableShields.Length == 0)
+            return;
+
+        shieldIndex++;
+        if (shieldIndex >= race.availableShields.Length)
+            shieldIndex = -1;
+
+        draft.shield = shieldIndex == -1 ? null : race.availableShields[shieldIndex];
+
+        if (draft.shield != null)
+        {
+            draft.offHandWeapon = null;
+            offHandIndex = -1;
+        }
+
+        RefreshDraftLabels();
+    }
+
+    private void CycleArmor()
+    {
+        RaceData race = rosterManager.SelectedRace;
+        if (race == null || race.availableArmors.Length == 0)
+            return;
+
+        armorIndex++;
+        if (armorIndex >= race.availableArmors.Length)
+            armorIndex = -1;
+
+        draft.armor = armorIndex == -1 ? null : race.availableArmors[armorIndex];
+        RefreshDraftLabels();
+    }
+
+    private void AddDraftToRoster()
+    {
+        RosterEntry newEntry = new RosterEntry
+        {
+            mainHandWeapon = draft.mainHandWeapon,
+            offHandWeapon = draft.offHandWeapon,
+            shield = draft.shield,
+            armor = draft.armor
+        };
+
+        rosterManager.TryAddEntry(newEntry);
+    }
+
+    private void RefreshDraftLabels()
+    {
+        mainHandWeaponLabel.text = draft.mainHandWeapon != null ? draft.mainHandWeapon.weaponName : "비무장";
+        offHandWeaponLabel.text = draft.offHandWeapon != null ? draft.offHandWeapon.weaponName : "없음";
+        shieldLabel.text = draft.shield != null ? draft.shield.shieldName : "없음";
+        armorLabel.text = draft.armor != null ? draft.armor.armorName : "비무장";
+    }
+
+    private void RefreshUI()
+    {
+        if (rosterManager.Builder != null)
+            pointsLabel.text = $"포인트: {rosterManager.Builder.UsedPoints} / {rosterManager.Builder.TotalPoints}";
+
+        RebuildRosterList();
+    }
+
+    private void RebuildRosterList()
+    {
+        foreach (var item in spawnedListItems)
+            Destroy(item);
+        spawnedListItems.Clear();
+
+        if (rosterManager.Builder == null)
+            return;
+
+        foreach (var entry in rosterManager.Builder.GetEntries())
+        {
+            GameObject itemObj = Instantiate(rosterListItemPrefab, rosterListContainer);
+            spawnedListItems.Add(itemObj);
+
+            TMP_Text label = itemObj.GetComponentInChildren<TMP_Text>();
+            if (label != null)
+                label.text = BuildEntryLabel(entry);
+
+            Button removeButton = itemObj.GetComponentInChildren<Button>();
+            if (removeButton != null)
+                removeButton.onClick.AddListener(() => rosterManager.RemoveEntry(entry));
+        }
+    }
+
+    private string BuildEntryLabel(RosterEntry entry)
+    {
+        string weapon = entry.mainHandWeapon != null ? entry.mainHandWeapon.weaponName : "비무장";
+        string armor = entry.armor != null ? entry.armor.armorName : "비무장";
+        int cost = entry.GetTotalCost(rosterManager.SelectedRace);
+        return $"{weapon} / {armor} (비용 {cost})";
+    }
+}

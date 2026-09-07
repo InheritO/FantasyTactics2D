@@ -196,6 +196,7 @@ MonoBehaviour:
   gridManager: {fileID: 669441030}
   phaseManager: {fileID: 1230799407}
   outcomeManager: {fileID: 207065233}
+  combatLogger: {fileID: 869904622}
   testUnitPrefab: {fileID: 3106636929674444334, guid: b76194a7e2a4e1d41988bef829f02342, type: 3}
   factions:
   - {fileID: 11400000, guid: d9e1619d3ddb1f7429c0ae6d39910911, type: 2}
@@ -549,7 +550,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdba75a8763664645bb0e186dd226746, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GridManager
-  tileVisualizer: {fileID: 0}
+  tileVisualizer: {fileID: 1524777792}
   width: 10
   height: 10
   tileSize: 1
@@ -654,8 +655,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e4e81f271959da499d1f846f927226c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TurnManager
-  gridManager: {fileID: 669441030}
-  turnManager: {fileID: 825007393}
 --- !u!4 &825007394
 Transform:
   m_ObjectHideFlags: 0
@@ -666,6 +665,50 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 2.52707, y: 3.85064, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &869904621
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 869904623}
+  - component: {fileID: 869904622}
+  m_Layer: 0
+  m_Name: CombatLogger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &869904622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 869904621}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59517644bfbd023438ea42fa87043e7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CombatLogger
+--- !u!4 &869904623
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 869904621}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.00904, y: 0.05093, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -935,7 +978,8 @@ MonoBehaviour:
   phaseManager: {fileID: 1230799407}
   turnManager: {fileID: 825007393}
   testUnitPrefab: {fileID: 3106636929674444334, guid: b76194a7e2a4e1d41988bef829f02342, type: 3}
-  outcomeManager: {fileID: 0}
+  outcomeManager: {fileID: 207065233}
+  combatLogger: {fileID: 869904622}
   reinforcementFaction: {fileID: 11400000, guid: d81836a19f0559140a9f1cfc10520737, type: 2}
   spawnCoord: {x: 0, y: 0}
   insertAsNextTurn: 1
@@ -1019,3 +1063,4 @@ SceneRoots:
   - {fileID: 1150265977}
   - {fileID: 1724680735}
   - {fileID: 739269525}
+  - {fileID: 869904623}

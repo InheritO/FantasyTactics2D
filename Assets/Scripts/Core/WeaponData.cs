@@ -46,4 +46,7 @@ public class WeaponData : ScriptableObject
     [Header("Display")]
     [TextArea] public string description;
 
+    [Header("Roster Cost")]
+    public int cost = 2; // 기본 비용. 종족별로 다르게 하려면 RaceData의 weaponCostOverrides에 등록
+
 }

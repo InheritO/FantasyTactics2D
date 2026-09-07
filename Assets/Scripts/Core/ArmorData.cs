@@ -15,4 +15,6 @@ public class ArmorData : ScriptableObject
     [ResizableTextArea] 
     public string description;
 
+    [Header("Roster Cost")]
+    public int cost = 4; // 기본 비용. 종족별로 다르게 하려면 RaceData의 armorCostOverrides에 등록
 }
