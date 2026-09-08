@@ -1,5 +1,12 @@
 using UnityEngine;
 
+public enum DeploymentZone
+{
+    None,       // 배치 불가 구역
+    PlayerZone,
+    EnemyZone
+}
+
 [System.Serializable]
 public class TileInstance
 {
@@ -13,6 +20,8 @@ public class TileInstance
         GridCoord = gridCoord;
         TypeData = typeData;
     }
+
+    public DeploymentZone Zone { get; set; } = DeploymentZone.None;
 
     public int GetMovementCost() => TypeData.movementCost;
 

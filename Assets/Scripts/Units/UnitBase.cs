@@ -141,6 +141,12 @@ public abstract class UnitBase : MonoBehaviour
             return true;
         }
 
+        if ((weapon.slotType & WeaponSlotType.MainHand) == 0)
+        {
+            Debug.Log($"{weapon.weaponName}은(는) 주 무기로 장착할 수 없습니다.");
+            return false;
+        }
+
         MainHandWeapon = weapon;
 
         if (weapon.handedness == WeaponHandedness.TwoHanded)
@@ -155,11 +161,12 @@ public abstract class UnitBase : MonoBehaviour
 
     public bool EquipOffHandWeapon(WeaponData weapon)
     {
-        if (weapon != null && weapon.handedness == WeaponHandedness.TwoHanded)
+        if (weapon != null && (weapon.slotType & WeaponSlotType.OffHand) == 0)
         {
-            Debug.Log("양손 무기는 보조 슬롯에 장착할 수 없습니다.");
+            Debug.Log($"{weapon.weaponName}은(는) 보조 무기로 장착할 수 없습니다.");
             return false;
         }
+
 
         if (MainHandWeapon != null && MainHandWeapon.handedness == WeaponHandedness.TwoHanded)
         {

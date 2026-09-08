@@ -13,7 +13,14 @@ MonoBehaviour:
   m_Name: Weapon_Bow
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
   weaponName: Bow
+  icon: {fileID: 21300000, guid: 5d7061fc7da05ce44add317708ec7215, type: 3}
+  handedness: 1
+  slotType: 1
   isRanged: 1
+  attackRangeOverride: 3
   basePower: 1
   damageScaling: 0
-  attackRangeOverride: 3
+  armorPenetration: 0
+  accuracyBonus: 0
+  description: 
+  cost: 2

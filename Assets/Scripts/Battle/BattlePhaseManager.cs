@@ -2,7 +2,6 @@ using UnityEngine;
 
 public enum BattlePhase
 {
-    RosterBuilding, // 추가: 부대 편성
     Placement,
     Battle,
     Ended
@@ -18,7 +17,7 @@ public class BattlePhaseManager : MonoBehaviour
     public TurnManager turnManager;
     public BattleOutcomeManager outcomeManager;
 
-    public BattlePhase CurrentPhase { get; private set; } = BattlePhase.RosterBuilding;
+    public BattlePhase CurrentPhase { get; private set; } = 0;
 
     void OnEnable()
     {
@@ -28,16 +27,6 @@ public class BattlePhaseManager : MonoBehaviour
     void OnDisable()
     {
         outcomeManager.OnBattleEnded -= HandleBattleEnded;
-    }
-
-    // 부대 편성 완료 시 호출 (RosterPhaseManager.ConfirmRoster에서 호출됨)
-    public void FinishRosterBuilding()
-    {
-        if (CurrentPhase != BattlePhase.RosterBuilding)
-            return;
-
-        CurrentPhase = BattlePhase.Placement;
-        Debug.Log("부대 편성 종료. 배치 페이즈 시작.");
     }
 
 

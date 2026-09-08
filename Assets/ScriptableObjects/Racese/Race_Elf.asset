@@ -20,6 +20,7 @@ MonoBehaviour:
   baseStrength: 3
   baseConstitution: 3
   baseAgility: 3
+  unitCost: 10
   availableWeapons:
   - {fileID: 11400000, guid: dc963449c64ea4446b7fbadc00359c89, type: 2}
   - {fileID: 11400000, guid: 4485e6101459f3048bd82f80347165a4, type: 2}
@@ -27,3 +28,14 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ccdb04e36ff92ff469a552a9678132e3, type: 2}
   - {fileID: 11400000, guid: fe93229c0386ab7478e7a7f29f1851bb, type: 2}
   - {fileID: 11400000, guid: 5e907f84f06e98f48aea036b98e33bc7, type: 2}
+  availableShields:
+  - {fileID: 11400000, guid: 0af781e1afd7d6541b75a79aa42ecaef, type: 2}
+  weaponCostOverrides:
+  - weapon: {fileID: 11400000, guid: 4485e6101459f3048bd82f80347165a4, type: 2}
+    costModifier: -1
+  armorCostOverrides:
+  - armor: {fileID: 11400000, guid: 5e907f84f06e98f48aea036b98e33bc7, type: 2}
+    costModifier: 1
+  shieldCostOverrides:
+  - shield: {fileID: 11400000, guid: 0af781e1afd7d6541b75a79aa42ecaef, type: 2}
+    costModifier: 1

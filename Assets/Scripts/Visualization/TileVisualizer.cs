@@ -57,7 +57,7 @@ public class TileVisualizer : MonoBehaviour
         else
         {
             sr.sprite = GetDefaultSquareSprite(); // 없으면 기본 흰색 사각형 스프라이트 + 색상
-            sr.color = tile.TypeData.previewColor;
+            sr.color = ApplyZoneTint(tile.TypeData.previewColor, tile.Zone);
         }
 
         tileObjects[tile.GridCoord.x, tile.GridCoord.y] = tileObj;
@@ -86,6 +86,19 @@ public class TileVisualizer : MonoBehaviour
         return defaultSquareSprite;
     }
 
+    private Color ApplyZoneTint(Color baseColor, DeploymentZone zone)
+    {
+        switch (zone)
+        {
+            case DeploymentZone.PlayerZone:
+                return Color.Lerp(baseColor, Color.blue, 0.3f);
+            case DeploymentZone.EnemyZone:
+                return Color.Lerp(baseColor, Color.red, 0.3f);
+            default:
+                return baseColor;
+        }
+    }
+
     public void ClearVisuals()
     {
         if (tileObjects == null) return;
@@ -98,4 +111,5 @@ public class TileVisualizer : MonoBehaviour
 
         tileObjects = null;
     }
+
 }

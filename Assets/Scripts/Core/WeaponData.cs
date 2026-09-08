@@ -12,10 +12,12 @@ public enum WeaponHandedness
     TwoHanded  // 양손 무기 (손 2개 차지)
 }
 
+[System.Flags]
 public enum WeaponSlotType
 {
-    MainHandOnly,   // 검, 창, 활, 대검 등 — 주손에만 장착 가능
-    OffHandCapable  // 단검처럼 가볍고 보조 슬롯에도 들어갈 수 있는 무기
+    None = 0,
+    MainHand = 1 << 0,   // 검, 창, 활, 대검 등 — 주손에만 장착 가능
+    OffHand = 1 << 1,  // 단검처럼 가볍고 보조 슬롯에도 들어갈 수 있는 무기
 }
 
 [CreateAssetMenu(fileName = "NewWeapon", menuName = "Strategy/Equipment/Weapon")]
@@ -27,7 +29,7 @@ public class WeaponData : ScriptableObject
 
     [Header("Handedness")]
     public WeaponHandedness handedness = WeaponHandedness.OneHanded;
-    public WeaponSlotType slotType = WeaponSlotType.MainHandOnly;
+    public WeaponSlotType slotType = WeaponSlotType.MainHand;
 
     [Header("Range")]
     public bool isRanged;

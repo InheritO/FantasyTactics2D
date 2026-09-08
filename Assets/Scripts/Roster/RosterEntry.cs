@@ -18,7 +18,7 @@ public class RosterEntry
         int cost = race.unitCost;
         cost += race.GetWeaponCost(mainHandWeapon);
         cost += race.GetWeaponCost(offHandWeapon);
-        cost += shield?.cost ?? 0; // 방패는 아직 종족별 예외 없음, 필요해지면 같은 패턴으로 확장
+        cost += race.GetShieldCost(shield);
         cost += race.GetArmorCost(armor);
         return cost;
     }

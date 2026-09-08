@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fc61bf8a40e02f64ca24985d6fff5a1c, type: 3}
-  m_Name: Weapon_Axe
+  m_Name: Weapon_TwohandedSword
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
-  weaponName: Axe
-  icon: {fileID: 21300000, guid: 172774604c1bee84185a69041576525b, type: 3}
-  handedness: 0
-  slotType: -1
+  weaponName: LongSword
+  icon: {fileID: 21300000, guid: 5fd50594014b70e48bd6993443d46b32, type: 3}
+  handedness: 1
+  slotType: 1
   isRanged: 0
   attackRangeOverride: -1
   basePower: 2
   damageScaling: 0
-  armorPenetration: 0
+  armorPenetration: 1
   accuracyBonus: 0
   description: 
   cost: 2

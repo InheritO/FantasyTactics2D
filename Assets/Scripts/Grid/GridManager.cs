@@ -1,6 +1,13 @@
 using UnityEngine;
 using NaughtyAttributes;
 
+public enum ZoneAxis
+{
+    TopBottom,
+    LeftRight
+    // 나중에 DiagonalCorners 등 추가 가능
+}
+
 public class GridManager : MonoBehaviour
 {
     [Header("Visualizer Reference (선택)")]
@@ -19,6 +26,13 @@ public class GridManager : MonoBehaviour
     [Header("Tile Types (노이즈 값 오름차순으로 배치)")]
     public NoiseTileMapping[] tileMappings;
 
+    [Header("Deployment Zones")]
+    public ZoneAxis zoneAxis = ZoneAxis.TopBottom;
+    [Tooltip("플레이어 배치 구역의 두께 (TopBottom: 아래쪽 행 수 / LeftRight: 왼쪽 열 수)")]
+    public int playerZoneDepth = 3;
+    [Tooltip("적 배치 구역의 두께 (TopBottom: 위쪽 행 수 / LeftRight: 오른쪽 열 수)")]
+    public int enemyZoneDepth = 3;
+
     private MapGenerator mapGenerator;
     private TileInstance[,] tiles;
 
@@ -32,6 +46,7 @@ public class GridManager : MonoBehaviour
     public void GenerateNewMap()
     {
         tiles = mapGenerator.GenerateMap(width, height);
+        ApplyDeploymentZones();
     }
 
     [Button]
@@ -55,6 +70,49 @@ public class GridManager : MonoBehaviour
         return tiles[coord.x, coord.y];
     }
 
+    private void ApplyDeploymentZones()
+    {
+        RectInt playerRect;
+        RectInt enemyRect;
+
+        switch (zoneAxis)
+        {
+            case ZoneAxis.LeftRight:
+                {
+                    int playerDepth = Mathf.Clamp(playerZoneDepth, 0, width);
+                    int enemyDepth = Mathf.Clamp(enemyZoneDepth, 0, width);
+                    playerRect = new RectInt(0, 0, playerDepth, height);                  // 왼쪽 N열
+                    enemyRect = new RectInt(width - enemyDepth, 0, enemyDepth, height);   // 오른쪽 N열
+                    break;
+                }
+            case ZoneAxis.TopBottom:
+            default:
+                {
+                    int playerDepth = Mathf.Clamp(playerZoneDepth, 0, height);
+                    int enemyDepth = Mathf.Clamp(enemyZoneDepth, 0, height);
+                    playerRect = new RectInt(0, 0, width, playerDepth);                   // 아래쪽 N행
+                    enemyRect = new RectInt(0, height - enemyDepth, width, enemyDepth);  // 위쪽 N행
+                    break;
+                }
+        }
+
+        ApplyZoneRect(playerRect, DeploymentZone.PlayerZone);
+        ApplyZoneRect(enemyRect, DeploymentZone.EnemyZone);
+    }
+
+    private void ApplyZoneRect(RectInt rect, DeploymentZone zone)
+    {
+        for (int x = rect.xMin; x < rect.xMax; x++)
+        {
+            for (int y = rect.yMin; y < rect.yMax; y++)
+            {
+                TileInstance tile = GetTile(new Vector2Int(x, y));
+                if (tile != null)
+                    tile.Zone = zone;
+            }
+        }
+    }
+
     public Vector3 GridToWorld(Vector2Int gridCoord) =>
         new Vector3(gridCoord.x * tileSize, gridCoord.y * tileSize, 0f);
 
@@ -63,4 +121,18 @@ public class GridManager : MonoBehaviour
 
     public int GetDistance(Vector2Int a, Vector2Int b) =>
         Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y);
+
+    void OnValidate()
+    {
+        width = Mathf.Max(1, width);
+        height = Mathf.Max(1, height);
+
+        playerZoneDepth = Mathf.Max(0, playerZoneDepth);
+        enemyZoneDepth = Mathf.Max(0, enemyZoneDepth);
+
+        int mapExtent = zoneAxis == ZoneAxis.LeftRight ? width : height;
+
+        if (playerZoneDepth + enemyZoneDepth > mapExtent)
+            Debug.LogWarning($"[{name}] 배치 구역 두께의 합({playerZoneDepth + enemyZoneDepth})이 맵 크기({mapExtent})를 넘어 두 구역이 겹칠 수 있습니다.");
+    }
 }

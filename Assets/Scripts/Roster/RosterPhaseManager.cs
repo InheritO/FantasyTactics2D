@@ -13,8 +13,6 @@ public class RosterPhaseManager : MonoBehaviour
     public RaceData[] availableRaces;
     public int totalPoints = 100;
 
-    [Header("References")]
-    public BattlePhaseManager phaseManager;
 
     public RaceData SelectedRace { get; private set; }
     public RosterBuilder Builder { get; private set; }
@@ -28,6 +26,13 @@ public class RosterPhaseManager : MonoBehaviour
     // 종족을 선택(또는 재선택)하면 편성 진행 상황이 초기화됨
     public void SelectRace(RaceData race)
     {
+        if (race == null)
+        {
+            Debug.LogWarning("SelectRace에 null 종족이 전달되었습니다.");
+            return;
+        }
+
+
         SelectedRace = race;
         Builder = new RosterBuilder(race, totalPoints);
         OnRosterChanged?.Invoke();
@@ -68,7 +73,5 @@ public class RosterPhaseManager : MonoBehaviour
 
         ConfirmedEntries = new List<RosterEntry>(Builder.GetEntries());
         OnRosterConfirmed?.Invoke();
-
-        phaseManager.FinishRosterBuilding();
     }
 }

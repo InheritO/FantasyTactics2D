@@ -45,9 +45,15 @@ public class RosterUIController : MonoBehaviour
     private int armorIndex = -1;
 
     private List<GameObject> spawnedListItems = new List<GameObject>();
+    private bool isValid;
+
 
     void Start()
     {
+        isValid = InspectorFieldValidator.ValidateAllFieldsAssigned(this);
+        if (!isValid)
+            return;
+
         BuildRaceButtons();
 
         mainHandWeaponNextButton.onClick.AddListener(CycleMainHandWeapon);
@@ -58,6 +64,9 @@ public class RosterUIController : MonoBehaviour
         confirmButton.onClick.AddListener(rosterManager.ConfirmRoster);
 
         rosterManager.OnRosterChanged += RefreshUI;
+
+        if (rosterManager.availableRaces.Length > 0 && rosterManager.availableRaces[0] != null)
+            SelectRace(rosterManager.availableRaces[0]);
     }
 
     void OnDestroy()
@@ -65,23 +74,80 @@ public class RosterUIController : MonoBehaviour
         rosterManager.OnRosterChanged -= RefreshUI;
     }
 
+    private bool ValidateReferences()
+    {
+        var required = new (Object obj, string name)[]
+   {
+        (rosterManager, nameof(rosterManager)),
+        (raceButtonContainer, nameof(raceButtonContainer)),
+        (raceButtonPrefab, nameof(raceButtonPrefab)),
+        (mainHandWeaponLabel, nameof(mainHandWeaponLabel)),
+        (mainHandWeaponNextButton, nameof(mainHandWeaponNextButton)),
+        (offHandWeaponLabel, nameof(offHandWeaponLabel)),
+        (offHandWeaponNextButton, nameof(offHandWeaponNextButton)),
+        (shieldLabel, nameof(shieldLabel)),
+        (shieldNextButton, nameof(shieldNextButton)),
+        (armorLabel, nameof(armorLabel)),
+        (armorNextButton, nameof(armorNextButton)),
+        (addUnitButton, nameof(addUnitButton)),
+        (rosterListContainer, nameof(rosterListContainer)),
+        (rosterListItemPrefab, nameof(rosterListItemPrefab)),
+        (pointsLabel, nameof(pointsLabel)),
+        (confirmButton, nameof(confirmButton)),
+   };
+
+        bool ok = true;
+
+        foreach (var (obj, fieldName) in required)
+        {
+            if (obj == null)
+            {
+                Debug.LogError($"[{name}] {fieldName}이(가) 연결되지 않았습니다.");
+                ok = false;
+            }
+        }
+
+        if (ok && (rosterManager.availableRaces == null || rosterManager.availableRaces.Length == 0))
+            Debug.LogWarning($"[{name}] rosterManager.availableRaces가 비어있습니다.");
+
+        return ok;
+    }
+
     private void BuildRaceButtons()
     {
+        if (rosterManager.availableRaces == null)
+            return;
+
+
         foreach (var race in rosterManager.availableRaces)
         {
+            if (race == null)
+            {
+                Debug.LogWarning($"[{name}] availableRaces 배열에 빈 슬롯이 있습니다.");
+                continue;
+            }
+
             GameObject buttonObj = Instantiate(raceButtonPrefab, raceButtonContainer);
 
             TMP_Text label = buttonObj.GetComponentInChildren<TMP_Text>();
             if (label != null)
                 label.text = race.raceName;
+            else
+                Debug.LogWarning($"[{name}] raceButtonPrefab에 TMP_Text 컴포넌트가 없습니다.");
 
             Button button = buttonObj.GetComponent<Button>();
-            button.onClick.AddListener(() => SelectRace(race));
+            if (button != null)
+                button.onClick.AddListener(() => SelectRace(race));
+            else
+                Debug.LogWarning($"[{name}] raceButtonPrefab에 Button 컴포넌트가 없습니다.");
         }
     }
 
     private void SelectRace(RaceData race)
     {
+        if (race == null)
+            return;
+
         rosterManager.SelectRace(race);
         ResetDraft();
         RefreshUI();
@@ -100,14 +166,18 @@ public class RosterUIController : MonoBehaviour
     private void CycleMainHandWeapon()
     {
         RaceData race = rosterManager.SelectedRace;
-        if (race == null || race.availableWeapons.Length == 0)
+        if (race == null || race.availableWeapons == null || race.availableWeapons.Length == 0)
+            return;
+
+        var mainHandCandidates = System.Array.FindAll(race.availableWeapons, w => (w.slotType & WeaponSlotType.MainHand) != 0);
+        if (mainHandCandidates.Length == 0)
             return;
 
         mainHandIndex++;
-        if (mainHandIndex >= race.availableWeapons.Length)
+        if (mainHandIndex >= mainHandCandidates.Length)
             mainHandIndex = -1;
 
-        draft.mainHandWeapon = mainHandIndex == -1 ? null : race.availableWeapons[mainHandIndex];
+        draft.mainHandWeapon = mainHandIndex == -1 ? null : mainHandCandidates[mainHandIndex];
 
         // 양손 무기를 골랐으면 보조무기/방패는 UnitBase의 실제 장착 규칙과 동일하게 자동 해제
         // (이렇게 안 하면 나중에 실제 장착 시 한쪽만 적용되는데 비용은 둘 다 청구되는 문제가 생김)
@@ -125,10 +195,17 @@ public class RosterUIController : MonoBehaviour
     private void CycleOffHandWeapon()
     {
         RaceData race = rosterManager.SelectedRace;
-        if (race == null)
+        if (race == null || race.availableWeapons == null || race.availableWeapons.Length == 0)
             return;
 
-        var offHandCandidates = System.Array.FindAll(race.availableWeapons, w => w.slotType == WeaponSlotType.OffHandCapable);
+
+        if (draft.mainHandWeapon != null && draft.mainHandWeapon.handedness == WeaponHandedness.TwoHanded)
+        {
+            Debug.Log("양손 무기를 장착 중이라 보조 무기를 선택할 수 없습니다.");
+            return;
+        }
+
+        var offHandCandidates = System.Array.FindAll(race.availableWeapons, w => (w.slotType & WeaponSlotType.OffHand) != 0);
         if (offHandCandidates.Length == 0)
             return;
 
@@ -151,8 +228,14 @@ public class RosterUIController : MonoBehaviour
     private void CycleShield()
     {
         RaceData race = rosterManager.SelectedRace;
-        if (race == null || race.availableShields.Length == 0)
+        if (race == null || race.availableShields == null || race.availableShields.Length == 0)
             return;
+
+        if (draft.mainHandWeapon != null && draft.mainHandWeapon.handedness == WeaponHandedness.TwoHanded)
+        {
+            Debug.Log("양손 무기를 장착 중이라 방패를 선택할 수 없습니다.");
+            return;
+        }
 
         shieldIndex++;
         if (shieldIndex >= race.availableShields.Length)
@@ -172,7 +255,7 @@ public class RosterUIController : MonoBehaviour
     private void CycleArmor()
     {
         RaceData race = rosterManager.SelectedRace;
-        if (race == null || race.availableArmors.Length == 0)
+        if (race == null || race.availableArmors == null || race.availableArmors.Length == 0)
             return;
 
         armorIndex++;
@@ -185,6 +268,13 @@ public class RosterUIController : MonoBehaviour
 
     private void AddDraftToRoster()
     {
+        if (rosterManager.SelectedRace == null)
+        {
+            Debug.Log("종족을 먼저 선택해주세요.");
+            return;
+        }
+
+
         RosterEntry newEntry = new RosterEntry
         {
             mainHandWeapon = draft.mainHandWeapon,
