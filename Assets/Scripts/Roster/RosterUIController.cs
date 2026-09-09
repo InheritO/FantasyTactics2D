@@ -292,6 +292,10 @@ public class RosterUIController : MonoBehaviour
         offHandWeaponLabel.text = draft.offHandWeapon != null ? draft.offHandWeapon.weaponName : "없음";
         shieldLabel.text = draft.shield != null ? draft.shield.shieldName : "없음";
         armorLabel.text = draft.armor != null ? draft.armor.armorName : "비무장";
+
+        bool isTwoHanded = draft.mainHandWeapon != null && draft.mainHandWeapon.handedness == WeaponHandedness.TwoHanded;
+        offHandWeaponNextButton.interactable = !isTwoHanded;
+        shieldNextButton.interactable = !isTwoHanded;
     }
 
     private void RefreshUI()

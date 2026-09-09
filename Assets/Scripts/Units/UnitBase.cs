@@ -82,6 +82,7 @@ public abstract class UnitBase : MonoBehaviour
     public event Action<UnitBase> OnActionsExhausted;
     public event Action<UnitBase> OnTurnReset;
 
+    public event Action<UnitBase> OnEquipmentChanged;
     private int unitSortOrder = 2;
 
     protected virtual void Awake()
@@ -156,17 +157,23 @@ public abstract class UnitBase : MonoBehaviour
             EquippedShield = null;
         }
 
+        OnEquipmentChanged?.Invoke(this);
         return true;
     }
 
     public bool EquipOffHandWeapon(WeaponData weapon)
     {
-        if (weapon != null && (weapon.slotType & WeaponSlotType.OffHand) == 0)
+        if (weapon == null)
+        {
+            OffHandWeapon = null;
+            return true;
+        }
+
+        if ((weapon.slotType & WeaponSlotType.OffHand) == 0)
         {
             Debug.Log($"{weapon.weaponName}은(는) 보조 무기로 장착할 수 없습니다.");
             return false;
         }
-
 
         if (MainHandWeapon != null && MainHandWeapon.handedness == WeaponHandedness.TwoHanded)
         {
@@ -175,15 +182,20 @@ public abstract class UnitBase : MonoBehaviour
         }
 
         OffHandWeapon = weapon;
+        EquippedShield = null; // 방패와 보조무기는 함께 착용 불가함
 
-        if (weapon != null)
-            EquippedShield = null; // 보조무기와 방패는 같은 슬롯을 두고 경쟁
-
+        OnEquipmentChanged?.Invoke(this);
         return true;
     }
 
     public bool EquipShield(ShieldData shield)
     {
+        if (shield == null)
+        {
+            EquippedShield = null;
+            return true;
+        }
+
         if (MainHandWeapon != null && MainHandWeapon.handedness == WeaponHandedness.TwoHanded)
         {
             Debug.Log("양손 무기를 장착 중이라 방패를 장착할 수 없습니다.");
@@ -191,10 +203,9 @@ public abstract class UnitBase : MonoBehaviour
         }
 
         EquippedShield = shield;
+        OffHandWeapon = null;
 
-        if (shield != null)
-            OffHandWeapon = null;
-
+        OnEquipmentChanged?.Invoke(this);
         return true;
     }
 
@@ -207,7 +218,17 @@ public abstract class UnitBase : MonoBehaviour
             yield return new ExtraAttackAbility(OffHandWeapon);
     }
 
+    // RosterEntry의 장비 구성을 그대로 적용
+    public void ApplyLoadout(RosterEntry entry)
+    {
+        if (entry == null)
+            return;
 
+        EquipMainHandWeapon(entry.mainHandWeapon);
+        EquipOffHandWeapon(entry.offHandWeapon);
+        EquipShield(entry.shield);
+        EquipArmor(entry.armor);
+    }
 
     // 유닛을 특정 그리드 좌표에 배치 (최초 배치, 순간이동 등에 사용)
     public virtual void PlaceOnGrid(Vector2Int coord, GridManager grid)

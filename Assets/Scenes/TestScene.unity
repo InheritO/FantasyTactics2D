@@ -1083,6 +1083,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkirmishFlowController
   rosterManager: {fileID: 5507726}
+  playerDeployment: {fileID: 486723509}
+  enemyDeployment: {fileID: 1240194256}
+  enemyFaction: {fileID: 11400000, guid: d9e1619d3ddb1f7429c0ae6d39910911, type: 2}
   rosterUIPanel: {fileID: 117367003}
   battleUIPanel: {fileID: 533647229}
   battleRoot: {fileID: 2034156665}
@@ -1117,7 +1120,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &332952176
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1538,6 +1541,57 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2034156666}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &486723507
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 486723508}
+  - component: {fileID: 486723509}
+  m_Layer: 0
+  m_Name: PlayerDeploymentController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &486723508
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 486723507}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2034156666}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &486723509
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 486723507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 597efc681b6093940bf30b604f5e61a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerDeploymentController
+  gridManager: {fileID: 669441030}
+  phaseManager: {fileID: 1230799407}
+  outcomeManager: {fileID: 207065233}
+  combatLogger: {fileID: 869904622}
+  rosterManager: {fileID: 5507726}
+  playerFaction: {fileID: 11400000, guid: d9e1619d3ddb1f7429c0ae6d39910911, type: 2}
+  unitPrefab: {fileID: 3106636929674444334, guid: b76194a7e2a4e1d41988bef829f02342, type: 3}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -2051,6 +2105,9 @@ MonoBehaviour:
     maxNoiseValue: 0.8
   - tileType: {fileID: 11400000, guid: bd8c65293c76dd94ca77229ed041571e, type: 2}
     maxNoiseValue: 1
+  zoneAxis: 1
+  playerZoneDepth: 3
+  enemyZoneDepth: 3
 --- !u!4 &669441031
 Transform:
   m_ObjectHideFlags: 0
@@ -3027,6 +3084,54 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2034156666}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1240194254
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1240194255}
+  - component: {fileID: 1240194256}
+  m_Layer: 0
+  m_Name: EnemyDeploymentController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1240194255
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1240194254}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2034156666}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1240194256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1240194254}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ecc280221d4fcc42ab1ad0b9361e8a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyDeploymentController
+  gridManager: {fileID: 669441030}
+  outcomeManager: {fileID: 207065233}
+  combatLogger: {fileID: 869904622}
+  unitPrefab: {fileID: 3106636929674444334, guid: b76194a7e2a4e1d41988bef829f02342, type: 3}
 --- !u!1 &1299136738
 GameObject:
   m_ObjectHideFlags: 0
@@ -4534,6 +4639,8 @@ Transform:
   - {fileID: 1724680735}
   - {fileID: 739269525}
   - {fileID: 869904623}
+  - {fileID: 486723508}
+  - {fileID: 1240194255}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807

@@ -1,0 +1,68 @@
+using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
+
+/// <summary>
+/// AI 세력의 확정된 로스터를 적 배치 구역 안에서 무작위 위치에 자동 배치한다.
+/// </summary>
+public class EnemyDeploymentController : MonoBehaviour
+{
+    [Header("References")]
+    public GridManager gridManager;
+    public BattleOutcomeManager outcomeManager;
+    public CombatLogger combatLogger;
+    public TestUnit unitPrefab;
+
+    public void DeployRoster(FactionData enemyFaction, IReadOnlyList<RosterEntry> entries)
+    {
+        if (enemyFaction == null || entries == null)
+            return;
+
+        List<Vector2Int> candidateCoords = GetEnemyZoneWalkableCoords();
+        Shuffle(candidateCoords);
+
+        int index = 0;
+
+        foreach (var entry in entries)
+        {
+            if (index >= candidateCoords.Count)
+            {
+                Debug.LogWarning("적 배치 구역에 남은 빈 자리가 없습니다.");
+                break;
+            }
+
+            Vector2Int coord = candidateCoords[index];
+            index++;
+
+            UnitSpawner.Spawn(unitPrefab, coord, enemyFaction, entry, gridManager, outcomeManager, combatLogger);
+        }
+    }
+
+    private List<Vector2Int> GetEnemyZoneWalkableCoords()
+    {
+        List<Vector2Int> result = new List<Vector2Int>();
+
+        for (int x = 0; x < gridManager.width; x++)
+        {
+            for (int y = 0; y < gridManager.height; y++)
+            {
+                Vector2Int coord = new Vector2Int(x, y);
+                TileInstance tile = gridManager.GetTile(coord);
+
+                if (tile != null && tile.Zone == DeploymentZone.EnemyZone && tile.IsWalkable())
+                    result.Add(coord);
+            }
+        }
+
+        return result;
+    }
+
+    private void Shuffle(List<Vector2Int> list)
+    {
+        for (int i = list.Count - 1; i > 0; i--)
+        {
+            int j = Random.Range(0, i + 1);
+            (list[i], list[j]) = (list[j], list[i]);
+        }
+    }
+}

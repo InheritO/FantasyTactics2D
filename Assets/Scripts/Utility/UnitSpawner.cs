@@ -6,6 +6,17 @@ using UnityEngine;
 /// </summary>
 public static class UnitSpawner
 {
+    public static UnitBase Spawn(UnitBase unitPrefab, Vector2Int coord, FactionData faction, RosterEntry entry,
+     GridManager gridManager, BattleOutcomeManager outcomeManager, CombatLogger combatLogger = null)
+    {
+        UnitBase unit = Spawn(unitPrefab, coord, faction, gridManager, outcomeManager, combatLogger);
+
+        if (unit != null)
+            unit.ApplyLoadout(entry);
+
+        return unit;
+    }
+
     public static UnitBase Spawn(UnitBase unitPrefab, Vector2Int coord, FactionData faction,
          GridManager gridManager, BattleOutcomeManager outcomeManager, CombatLogger combatLogger = null)
     {

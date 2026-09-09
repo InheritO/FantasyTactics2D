@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 /// <summary>
 /// 대전 플레이의 최상위 흐름(편성 → 전투)을 오브젝트 활성화로 제어한다.
@@ -8,7 +9,11 @@ using UnityEngine;
 public class SkirmishFlowController : MonoBehaviour
 {
     [Header("References")]
-    public RosterPhaseManager rosterManager;
+    public RosterPhaseManager rosterManager; 
+    public PlayerDeploymentController playerDeployment;
+    public EnemyDeploymentController enemyDeployment;
+    public FactionData enemyFaction;
+
     [Header("UI Panels (같은 Canvas 하위)")]
     public GameObject rosterUIPanel;
     public GameObject battleUIPanel;
@@ -31,11 +36,17 @@ public class SkirmishFlowController : MonoBehaviour
 
     void OnEnable()
     {
+        if (!isValid)
+            return;
+
         rosterManager.OnRosterConfirmed += HandleRosterConfirmed;
     }
 
     void OnDisable()
     {
+        if (!isValid)
+            return;
+
         rosterManager.OnRosterConfirmed -= HandleRosterConfirmed;
     }
 
@@ -44,6 +55,8 @@ public class SkirmishFlowController : MonoBehaviour
         rosterUIPanel.SetActive(false);
         battleUIPanel.SetActive(true);
         battleRoot.SetActive(true);
+
+        StartCoroutine(DeployAfterActivation());
     }
 
     private bool ValidateReferences()
@@ -75,5 +88,13 @@ public class SkirmishFlowController : MonoBehaviour
         }
 
         return ok;
+    }
+
+    private IEnumerator DeployAfterActivation()
+    {
+        yield return null; // 한 프레임 대기
+
+        // AI는 같은 로스터를 그대로 복사해서 사용 (임시. 나중에 별도 AI 자동 편성으로 교체 예정)
+        enemyDeployment.DeployRoster(enemyFaction, rosterManager.ConfirmedEntries);
     }
 }
