@@ -17,10 +17,10 @@ MonoBehaviour:
   handedness: 1
   slotType: 1
   isRanged: 1
-  attackRangeOverride: 3
+  attackRangeOverride: 2
   basePower: 1
   damageScaling: 0
-  armorPenetration: 0
-  accuracyBonus: 0
+  attacks:
+  - {fileID: 11400000, guid: b28560c0950a9654db377edbbef6e60a, type: 2}
   description: 
-  cost: 2
+  cost: 5

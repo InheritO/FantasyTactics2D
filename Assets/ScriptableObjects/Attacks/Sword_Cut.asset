@@ -9,11 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1b9d7376792948b4d9834465e2c30100, type: 3}
-  m_Name: RegularShield
-  m_EditorClassIdentifier: Assembly-CSharp::ShieldData
-  shieldName: Shield
-  icon: {fileID: 0}
-  defenseBonus: 4
-  moveRangePenalty: 0
-  cost: 4
+  m_Script: {fileID: 11500000, guid: d1050f7542d569f44b91956003876231, type: 3}
+  m_Name: Sword_Cut
+  m_EditorClassIdentifier: Assembly-CSharp::WeaponAttack
+  attackName: Sword_Cut
+  basePower: 5
+  armorPenetration: 0
+  accuracyBonus: 0

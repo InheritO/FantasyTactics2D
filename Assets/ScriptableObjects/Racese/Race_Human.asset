@@ -13,21 +13,23 @@ MonoBehaviour:
   m_Name: Race_Human
   m_EditorClassIdentifier: Assembly-CSharp::RaceData
   raceName: Human
-  maxHealth: 10
-  baseMoveRange: 3
-  baseMeleeSkill: 3
-  baseRangedSkill: 3
-  baseStrength: 3
-  baseConstitution: 3
-  baseAgility: 3
+  maxHealth: 40
+  baseMoveRange: 6
+  baseMeleeSkill: 20
+  baseRangedSkill: 20
+  baseStrength: 20
+  baseConstitution: 20
+  baseAgility: 20
   unitCost: 10
   availableWeapons:
   - {fileID: 11400000, guid: dc963449c64ea4446b7fbadc00359c89, type: 2}
   - {fileID: 11400000, guid: 0cdb76c0455d8df4aab5bf20fbacd409, type: 2}
   - {fileID: 11400000, guid: da7a84c917a20e54da48616e1c89448e, type: 2}
+  - {fileID: 11400000, guid: f3922a591a085da4795bf93d62336427, type: 2}
+  - {fileID: 11400000, guid: f8732838b8def0e44a678b88ff75e57b, type: 2}
   - {fileID: 11400000, guid: 4485e6101459f3048bd82f80347165a4, type: 2}
+  - {fileID: 11400000, guid: deee1cdf10f37ac4eb978e70e7a73328, type: 2}
   availableArmors:
-  - {fileID: 11400000, guid: ccdb04e36ff92ff469a552a9678132e3, type: 2}
   - {fileID: 11400000, guid: fe93229c0386ab7478e7a7f29f1851bb, type: 2}
   - {fileID: 11400000, guid: 5e907f84f06e98f48aea036b98e33bc7, type: 2}
   availableShields:

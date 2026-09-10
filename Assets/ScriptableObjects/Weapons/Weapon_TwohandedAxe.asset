@@ -20,7 +20,7 @@ MonoBehaviour:
   attackRangeOverride: -1
   basePower: 4
   damageScaling: 0
-  armorPenetration: 2
-  accuracyBonus: 0
+  attacks:
+  - {fileID: 11400000, guid: ab2fdd6852d93924880fd4fe45acadff, type: 2}
   description: 
   cost: 2

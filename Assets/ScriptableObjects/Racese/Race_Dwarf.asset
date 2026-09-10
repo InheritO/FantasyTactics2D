@@ -13,20 +13,19 @@ MonoBehaviour:
   m_Name: Race_Dwarf
   m_EditorClassIdentifier: Assembly-CSharp::RaceData
   raceName: Dwarf
-  maxHealth: 10
-  baseMoveRange: 3
-  baseMeleeSkill: 3
-  baseRangedSkill: 3
-  baseStrength: 3
-  baseConstitution: 3
-  baseAgility: 3
-  unitCost: 10
+  maxHealth: 44
+  baseMoveRange: 5
+  baseMeleeSkill: 23
+  baseRangedSkill: 19
+  baseStrength: 22
+  baseConstitution: 26
+  baseAgility: 12
+  unitCost: 13
   availableWeapons:
-  - {fileID: 11400000, guid: dc963449c64ea4446b7fbadc00359c89, type: 2}
   - {fileID: 11400000, guid: da7a84c917a20e54da48616e1c89448e, type: 2}
   - {fileID: 11400000, guid: 0cdb76c0455d8df4aab5bf20fbacd409, type: 2}
+  - {fileID: 11400000, guid: deee1cdf10f37ac4eb978e70e7a73328, type: 2}
   availableArmors:
-  - {fileID: 11400000, guid: ccdb04e36ff92ff469a552a9678132e3, type: 2}
   - {fileID: 11400000, guid: fe93229c0386ab7478e7a7f29f1851bb, type: 2}
   - {fileID: 11400000, guid: 5e907f84f06e98f48aea036b98e33bc7, type: 2}
   availableShields:
@@ -35,4 +34,6 @@ MonoBehaviour:
   armorCostOverrides:
   - armor: {fileID: 11400000, guid: 5e907f84f06e98f48aea036b98e33bc7, type: 2}
     costModifier: -1
-  shieldCostOverrides: []
+  shieldCostOverrides:
+  - shield: {fileID: 11400000, guid: d3b4b05e4716ac741aef71b3b5be8ba3, type: 2}
+    costModifier: -1

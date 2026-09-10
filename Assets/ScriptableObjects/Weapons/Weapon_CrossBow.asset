@@ -10,18 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fc61bf8a40e02f64ca24985d6fff5a1c, type: 3}
-  m_Name: Weapon_Sword
+  m_Name: Weapon_CrossBow
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
-  weaponName: Sword
-  icon: {fileID: 21300000, guid: 5fd50594014b70e48bd6993443d46b32, type: 3}
-  handedness: 0
+  weaponName: Bow
+  icon: {fileID: 21300000, guid: 5d7061fc7da05ce44add317708ec7215, type: 3}
+  handedness: 1
   slotType: 1
-  isRanged: 0
-  attackRangeOverride: -1
+  isRanged: 1
+  attackRangeOverride: 2
   basePower: 1
-  damageScaling: 0
+  damageScaling: 1
   attacks:
-  - {fileID: 11400000, guid: 885193e4dc2b8f546b45fbee26dd0818, type: 2}
-  - {fileID: 11400000, guid: 79d9ecb21ee4f2e4c8ba9fd56f8aa025, type: 2}
+  - {fileID: 11400000, guid: ab2fdd6852d93924880fd4fe45acadff, type: 2}
   description: 
-  cost: 4
+  cost: 6

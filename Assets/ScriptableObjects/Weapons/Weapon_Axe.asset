@@ -14,13 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
   weaponName: Axe
   icon: {fileID: 21300000, guid: 172774604c1bee84185a69041576525b, type: 3}
-  handedness: 0
-  slotType: -1
+  handedness: 1
+  slotType: 1
   isRanged: 0
   attackRangeOverride: -1
   basePower: 2
   damageScaling: 0
-  armorPenetration: 0
-  accuracyBonus: 0
+  attacks:
+  - {fileID: 11400000, guid: abafda6ab1529164eaee8a4a3fc542c6, type: 2}
   description: 
-  cost: 2
+  cost: 6

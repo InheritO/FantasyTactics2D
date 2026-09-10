@@ -14,5 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShieldData
   shieldName: Targe
   icon: {fileID: 0}
-  defenseBonus: 1
-  cost: 1
+  defenseBonus: 2
+  moveRangePenalty: 0
+  cost: 2

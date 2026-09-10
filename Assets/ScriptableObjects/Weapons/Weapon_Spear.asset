@@ -10,18 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fc61bf8a40e02f64ca24985d6fff5a1c, type: 3}
-  m_Name: Weapon_Sword
+  m_Name: Weapon_Spear
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
-  weaponName: Sword
+  weaponName: Spear
   icon: {fileID: 21300000, guid: 5fd50594014b70e48bd6993443d46b32, type: 3}
   handedness: 0
   slotType: 1
   isRanged: 0
-  attackRangeOverride: -1
-  basePower: 1
+  attackRangeOverride: 2
+  basePower: 2
   damageScaling: 0
   attacks:
-  - {fileID: 11400000, guid: 885193e4dc2b8f546b45fbee26dd0818, type: 2}
-  - {fileID: 11400000, guid: 79d9ecb21ee4f2e4c8ba9fd56f8aa025, type: 2}
+  - {fileID: 11400000, guid: 2e5b20332c833024ba46c63163f76956, type: 2}
   description: 
-  cost: 4
+  cost: 5
