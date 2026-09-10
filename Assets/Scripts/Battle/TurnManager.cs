@@ -116,4 +116,16 @@ public class TurnManager : MonoBehaviour
 
         OnTurnStarted?.Invoke(faction); // 추가
     }
+
+    public FactionData GetSoleRemainingFaction()
+    {
+        return turnOrder.Count == 1 ? turnOrder[0] : null;
+    }
+
+    public void ResetState()
+    {
+        turnOrder.Clear();
+        currentIndex = 0;
+        CurrentFaction = null;
+    }
 }

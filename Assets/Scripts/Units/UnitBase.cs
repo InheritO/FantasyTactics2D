@@ -132,6 +132,33 @@ public abstract class UnitBase : MonoBehaviour
             spriteRenderer.color = faction.factionColor;
     }
 
+    // 대전 모드에서 사용: 이 유닛의 종족을 명시적으로 지정한다.
+    // (캠페인 모드는 SetFaction()이 FactionData.race를 그대로 따르는 기존 방식을 유지한다.)
+    public void AssignRace(RaceData race)
+    {
+        if (race == null)
+        {
+            Debug.LogWarning($"[{name}] AssignRace에 null이 전달되었습니다.");
+            return;
+        }
+
+        Race = race;
+        CurrentHealth = MaxHealth; // 종족이 바뀌면 최대체력도 바뀌므로 재초기화
+    }
+
+    // 세력의 기본 종족과 무관하게, 스폰 시점에 실제 종족을 명시적으로 지정
+    public void OverrideRace(RaceData race)
+{
+    if (race == null)
+    {
+        Debug.LogWarning($"[{name}] OverrideRace에 null이 전달되었습니다.");
+        return;
+    }
+
+    Race = race;
+    CurrentHealth = MaxHealth;
+}
+
     //장비
 
     public bool EquipMainHandWeapon(WeaponData weapon)
@@ -294,10 +321,10 @@ public abstract class UnitBase : MonoBehaviour
 
 
     // 대상을 공격 시도 (사거리 밖이면 실패)
-    public virtual bool TryAttack(UnitBase target)
+    public virtual bool TryAttack(UnitBase target, WeaponAttack chosenAttack = null)
     {
         if (target == null)
-            return false; // 대상이 이미 사라진 정상적인 상황일 수 있으므로 조용히 무시
+            return false;
 
         if (!CanAttack || HasAttacked)
             return false;
@@ -305,7 +332,9 @@ public abstract class UnitBase : MonoBehaviour
         if (!IsInAttackRange(target))
             return false;
 
-        List<CombatResult> results = CombatResolver.ResolveFullAttack(this, target);
+        WeaponAttack attack = chosenAttack ?? MainHandWeapon?.GetDefaultAttack();
+
+        List<CombatResult> results = CombatResolver.ResolveFullAttack(this, target, attack);
         OnAttackPerformed?.Invoke(this, target);
 
         foreach (var result in results)
@@ -317,13 +346,9 @@ public abstract class UnitBase : MonoBehaviour
 
             if (result.IsHit)
                 target.TakeDamage(result.DamageDealt);
-            else
-                Debug.Log($"{name}의 공격이 빗나갔습니다.");
         }
 
         HasAttacked = true;
-
-        // 기본 규칙: 공격 후에는 이동도 막음 (이동-공격 순서만 허용) 
         HasMoved = true;
         OnActionsExhausted?.Invoke(this);
 

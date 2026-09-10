@@ -12,8 +12,9 @@ public class PlayerDeploymentController : MonoBehaviour
     public BattlePhaseManager phaseManager;
     public BattleOutcomeManager outcomeManager;
     public CombatLogger combatLogger;
-    public RosterPhaseManager rosterManager;
-    public FactionData playerFaction;
+    public RosterPhaseManager rosterManager; // 세력/종족/로스터 정보를 전부 여기서 가져옴
+
+    private SkirmishParticipant participant;
     public TestUnit unitPrefab; // 나중에 종족별 프리팹이 생기면 교체될 자리
 
     public event System.Action OnAllUnitsDeployed;
@@ -21,10 +22,22 @@ public class PlayerDeploymentController : MonoBehaviour
     private Queue<RosterEntry> pendingEntries = new Queue<RosterEntry>();
     public int RemainingCount => pendingEntries.Count;
 
+    private GameControls controls;
+
+    void Awake()
+    {
+        controls = new GameControls();
+    }
+
     void OnEnable()
     {
+        controls.GamePlay.Enable();
+        participant = rosterManager.BuildPlayerParticipant();
         BuildPendingQueue();
     }
+
+    void OnDisable() => controls.GamePlay.Disable();
+
 
     private void BuildPendingQueue()
     {
@@ -48,13 +61,20 @@ public class PlayerDeploymentController : MonoBehaviour
         if (pendingEntries.Count == 0)
             return;
 
-        if (Input.GetMouseButtonDown(0))
+        if (controls.GamePlay.Click.WasPressedThisFrame())
             TryDeployAtMouse();
     }
 
     private void TryDeployAtMouse()
     {
-        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        if (participant == null)
+        {
+            Debug.LogWarning("참가자 정보가 없어 배치할 수 없습니다.");
+            return;
+        }
+
+        Vector2 screenPos = controls.GamePlay.Point.ReadValue<Vector2>();
+        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(screenPos);
         mouseWorldPos.z = 0f;
         Vector2Int coord = gridManager.WorldToGrid(mouseWorldPos);
 
@@ -73,7 +93,7 @@ public class PlayerDeploymentController : MonoBehaviour
         }
 
         RosterEntry entry = pendingEntries.Peek();
-        UnitBase unit = UnitSpawner.Spawn(unitPrefab, coord, playerFaction, entry, gridManager, outcomeManager, combatLogger);
+        UnitBase unit = UnitSpawner.Spawn(unitPrefab, coord, participant, entry, gridManager, outcomeManager, combatLogger);
 
         if (unit != null)
         {

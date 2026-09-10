@@ -8,6 +8,7 @@ public class UnitSelectionController : MonoBehaviour
     public MovementRangeVisualizer rangeVisualizer;
     public TurnManager turnManager;
     public BattlePhaseManager phaseManager;
+    public BattleAttackPanel attackPanel;
 
     private UnitBase selectedUnit;
     private SpriteRenderer selectedUnitRenderer;
@@ -15,6 +16,17 @@ public class UnitSelectionController : MonoBehaviour
     private Dictionary<Vector2Int, int> currentReachableTiles;
 
     public UnitBase SelectedUnit => selectedUnit;
+
+
+    private GameControls controls;
+
+    void Awake()
+    {
+        controls = new GameControls();
+    }
+
+    void OnEnable() => controls.GamePlay.Enable();
+    void OnDisable() => controls.GamePlay.Disable();
 
     void Start()
     {
@@ -24,12 +36,11 @@ public class UnitSelectionController : MonoBehaviour
 
     void Update()
     {
-        if (phaseManager.CurrentPhase != BattlePhase.Battle) return;
+        if (phaseManager.CurrentPhase != BattlePhase.Battle)
+            return;
 
-        if (Input.GetMouseButtonDown(0))
-        {
+        if (controls.GamePlay.Click.WasPressedThisFrame())
             HandleClick();
-        }
     }
 
     private void HandleClick()
@@ -52,7 +63,8 @@ public class UnitSelectionController : MonoBehaviour
 
     private Vector2Int GetClickedGridCoord()
     {
-        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 screenPos = controls.GamePlay.Point.ReadValue<Vector2>();
+        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(screenPos);
         mouseWorldPos.z = 0f;
         return gridManager.WorldToGrid(mouseWorldPos);
     }
@@ -98,10 +110,9 @@ public class UnitSelectionController : MonoBehaviour
 
         if (targetUnit != null)
         {
-            // 다른 세력 유닛이면 공격 시도, 같은 세력이면 선택 대상 변경
             if (targetUnit.Faction != selectedUnit.Faction)
             {
-                TryAttackTarget(targetUnit);
+                ShowAttackOptions(targetUnit);
             }
             else
             {
@@ -126,14 +137,20 @@ public class UnitSelectionController : MonoBehaviour
         RefreshSelectionDisplay();
     }
 
-    private void TryAttackTarget(UnitBase target)
+    private void ShowAttackOptions(UnitBase target)
     {
-        bool attacked = selectedUnit.TryAttack(target);
+        if (!selectedUnit.IsInAttackRange(target))
+        {
+            Debug.Log("사거리 밖입니다.");
+            return;
+        }
 
-        if (!attacked)
-            Debug.Log("공격할 수 없습니다 (사거리 밖이거나 이미 행동함).");
+        attackPanel.Show(selectedUnit, target, HandleAttackExecuted);
+    }
 
-        DeselectUnit(); // 공격은 항상 이동까지 봉인되므로 무조건 선택 해제
+    private void HandleAttackExecuted()
+    {
+        DeselectUnit();
     }
 
     private void RefreshSelection()
@@ -180,8 +197,12 @@ public class UnitSelectionController : MonoBehaviour
         RefreshSelectionDisplay();
     }
 
+
     private void DeselectUnit()
     {
+        if (attackPanel != null)
+            attackPanel.Hide();
+
         if (selectedUnitRenderer != null)
             selectedUnitRenderer.color = originalColor;
 

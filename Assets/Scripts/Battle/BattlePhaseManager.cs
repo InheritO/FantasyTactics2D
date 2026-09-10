@@ -42,7 +42,7 @@ public class BattlePhaseManager : MonoBehaviour
         turnManager.InitializeTurnOrder();
     }
 
-    private void HandleBattleEnded()
+    private void HandleBattleEnded(FactionData winner)
     {
         CurrentPhase = BattlePhase.Ended;
         Debug.Log("전투가 종료되어 더 이상 조작할 수 없습니다.");

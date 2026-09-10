@@ -13,9 +13,10 @@ public class EnemyDeploymentController : MonoBehaviour
     public CombatLogger combatLogger;
     public TestUnit unitPrefab;
 
-    public void DeployRoster(FactionData enemyFaction, IReadOnlyList<RosterEntry> entries)
+
+    public void DeployRoster(SkirmishParticipant participant)
     {
-        if (enemyFaction == null || entries == null)
+        if (participant == null)
             return;
 
         List<Vector2Int> candidateCoords = GetEnemyZoneWalkableCoords();
@@ -23,7 +24,7 @@ public class EnemyDeploymentController : MonoBehaviour
 
         int index = 0;
 
-        foreach (var entry in entries)
+        foreach (var entry in participant.Roster)
         {
             if (index >= candidateCoords.Count)
             {
@@ -34,7 +35,7 @@ public class EnemyDeploymentController : MonoBehaviour
             Vector2Int coord = candidateCoords[index];
             index++;
 
-            UnitSpawner.Spawn(unitPrefab, coord, enemyFaction, entry, gridManager, outcomeManager, combatLogger);
+            UnitSpawner.Spawn(unitPrefab, coord, participant, entry, gridManager, outcomeManager, combatLogger);
         }
     }
 

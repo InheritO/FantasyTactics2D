@@ -17,15 +17,16 @@ public class ExtraAttackAbility : IWeaponAbility
 
     public CombatResult? TryTrigger(UnitBase attacker, UnitBase defender)
     {
-        // 보조무기 전용 명중 판정 (기본 명중률에 페널티 적용)
-        int baseChance = CombatResolver.CalculateHitChance(attacker, defender, offHandWeapon);
+        WeaponAttack attack = offHandWeapon.GetDefaultAttack();
+
+        int baseChance = CombatResolver.CalculateHitChance(attacker, defender, offHandWeapon, attack);
         int adjustedChance = Mathf.RoundToInt(baseChance * accuracyMultiplier);
 
         bool isHit = Random.Range(0, 100) < adjustedChance;
         if (!isHit)
             return CombatResult.Miss();
 
-        int damage = CombatResolver.CalculateDamage(attacker, defender, offHandWeapon);
+        int damage = CombatResolver.CalculateDamage(attacker, defender, offHandWeapon, attack);
         return CombatResult.Hit(damage);
     }
 }

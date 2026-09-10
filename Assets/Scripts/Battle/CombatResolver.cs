@@ -9,7 +9,7 @@ public static class CombatResolver
 {
     private const int BaseHitChance = 70; // 기술과 회피가 같을 때의 기본 명중률(%)
 
-    public static List<CombatResult> ResolveFullAttack(UnitBase attacker, UnitBase defender)
+    public static List<CombatResult> ResolveFullAttack(UnitBase attacker, UnitBase defender, WeaponAttack chosenAttack)
     {
         List<CombatResult> results = new List<CombatResult>();
 
@@ -19,13 +19,13 @@ public static class CombatResolver
             return results;
         }
 
-        CombatResult mainResult = Resolve(attacker, defender, attacker.MainHandWeapon);
+        CombatResult mainResult = Resolve(attacker, defender, attacker.MainHandWeapon, chosenAttack);
         results.Add(mainResult);
 
         foreach (var ability in attacker.GetActiveAbilities())
         {
             if (defender == null || defender.CurrentHealth <= 0)
-                break; // 주공격에서 이미 죽었으면 어빌리티(추가 공격 등)는 생략
+                break;
 
             CombatResult? extra = ability.TryTrigger(attacker, defender);
             if (extra.HasValue)
@@ -35,7 +35,7 @@ public static class CombatResolver
         return results;
     }
 
-    public static CombatResult Resolve(UnitBase attacker, UnitBase defender, WeaponData weapon)
+    public static CombatResult Resolve(UnitBase attacker, UnitBase defender, WeaponData weapon, WeaponAttack attack)
     {
         if (attacker == null || defender == null)
         {
@@ -43,41 +43,42 @@ public static class CombatResolver
             return CombatResult.Miss();
         }
 
-        int hitChance = CalculateHitChance(attacker, defender, weapon);
+        int hitChance = CalculateHitChance(attacker, defender, weapon, attack);
         bool isHit = Random.Range(0, 100) < hitChance;
 
         if (!isHit)
             return CombatResult.Miss();
 
-        int damage = CalculateDamage(attacker, defender, weapon);
+        int damage = CalculateDamage(attacker, defender, weapon, attack);
         return CombatResult.Hit(damage);
     }
 
-    public static int CalculateHitChance(UnitBase attacker, UnitBase defender, WeaponData weapon)
+    public static int CalculateHitChance(UnitBase attacker, UnitBase defender, WeaponData weapon, WeaponAttack attack)
     {
         int attackSkill = (weapon != null && weapon.isRanged) ? attacker.RangedSkill : attacker.MeleeSkill;
-        int accuracyBonus = weapon?.accuracyBonus ?? 0;
+        int accuracyBonus = attack?.accuracyBonus ?? 0;
 
-
-        int chance = BaseHitChance + (attackSkill - defender.Agility) * 5 + accuracyBonus; // 기술-회피 차이 1당 5%p 조정
-        return Mathf.Clamp(chance, 5, 95); // 완전 100%/0%는 지양 (항상 약간의 운 개입)
+        int chance = BaseHitChance + (attackSkill - defender.Agility) * 5 + accuracyBonus;
+        return Mathf.Clamp(chance, 5, 95);
     }
 
-    public static int CalculateDamage(UnitBase attacker, UnitBase defender, WeaponData weapon)
+    public static int CalculateDamage(UnitBase attacker, UnitBase defender, WeaponData weapon, WeaponAttack attack)
     {
-        int rawDamage = weapon == null
-            ? attacker.Strength // 비무장은 맨손 데미지(힘 기반)
+        int rawDamage = attack == null
+            ? attacker.Strength
             : (weapon.damageScaling == DamageScaling.Strength
-                ? weapon.basePower + attacker.Strength
-                : weapon.basePower);
+                ? attack.basePower + attacker.Strength
+                : attack.basePower);
 
-        rawDamage = Mathf.Max(0, rawDamage); // basePower가 실수로 음수로 설정되어도 방어
+        rawDamage = Mathf.Max(0, rawDamage);
 
-        int armorPenetration = Mathf.Max(0, weapon?.armorPenetration ?? 0);
+        int armorPenetration = Mathf.Max(0, attack?.armorPenetration ?? 0);
         int effectiveArmorDefense = Mathf.Max(0, defender.ArmorDefense - armorPenetration);
         int effectiveDefense = defender.ConstitutionDefense + effectiveArmorDefense;
 
         int finalDamage = rawDamage - effectiveDefense;
-        return Mathf.Max(1, finalDamage); // 최소 1 데미지 보장
+        return Mathf.Max(1, finalDamage);
     }
+
+
 }

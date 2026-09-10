@@ -68,6 +68,30 @@ public static class UnitSpawner
         UnitActionVisual visual = unit.gameObject.AddComponent<UnitActionVisual>();
         visual.Initialize(unit, faction.factionColor);
 
+        UnitHealthBar healthBar = new GameObject("HealthBar").AddComponent<UnitHealthBar>();
+        healthBar.Initialize(unit);
+
+        return unit;
+    }
+
+    // 대전 모드 전용 스폰 경로. SkirmishParticipant의 종족을 명시적으로 부여한다.
+    public static UnitBase Spawn(UnitBase unitPrefab, Vector2Int coord, SkirmishParticipant participant, RosterEntry entry,
+         GridManager gridManager, BattleOutcomeManager outcomeManager, CombatLogger combatLogger = null)
+    {
+        if (participant == null)
+        {
+            Debug.LogError("스폰 실패: participant가 null입니다.");
+            return null;
+        }
+
+        UnitBase unit = Spawn(unitPrefab, coord, participant.Faction, gridManager, outcomeManager, combatLogger);
+
+        if (unit != null)
+        {
+            unit.AssignRace(participant.Race);
+            unit.ApplyLoadout(entry);
+        }
+
         return unit;
     }
 }

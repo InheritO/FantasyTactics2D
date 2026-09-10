@@ -39,11 +39,8 @@ public class WeaponData : ScriptableObject
     public int basePower;
     public DamageScaling damageScaling = DamageScaling.Strength;
 
-    [Header("Armor Interaction")]
-    public int armorPenetration; // 상대 방어구 보너스를 깎는 수치 (맷집에는 영향 없음)
-
-    [Header("Accuracy")]
-    public int accuracyBonus; // 명중률 보정 (기계식 무기 등에 유용)
+    [Header("Attacks (최소 1개 이상)")]
+    public WeaponAttack[] attacks = new WeaponAttack[1];
 
     [Header("Display")]
     [TextArea] public string description;
@@ -51,4 +48,9 @@ public class WeaponData : ScriptableObject
     [Header("Roster Cost")]
     public int cost = 2; // 기본 비용. 종족별로 다르게 하려면 RaceData의 weaponCostOverrides에 등록
 
+
+    public WeaponAttack GetDefaultAttack()
+    {
+        return (attacks != null && attacks.Length > 0) ? attacks[0] : null;
+    }
 }

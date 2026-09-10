@@ -6,7 +6,7 @@ using UnityEngine;
 public class BattleOutcomeManager : MonoBehaviour
 {
     public event Action<FactionData> OnFactionDefeated;
-    public event Action OnBattleEnded;
+    public event Action<FactionData> OnBattleEnded;
 
     public TurnManager turnManager;
 
@@ -46,8 +46,9 @@ public class BattleOutcomeManager : MonoBehaviour
 
         if (turnManager.RemainingFactionCount <= 1)
         {
-            Debug.Log("전투 종료.");
-            OnBattleEnded?.Invoke();
+            FactionData winner = turnManager.GetSoleRemainingFaction();
+            Debug.Log($"전투 종료. 승자: {winner?.factionName ?? "없음"}");
+            OnBattleEnded?.Invoke(winner);
         }
     }
 

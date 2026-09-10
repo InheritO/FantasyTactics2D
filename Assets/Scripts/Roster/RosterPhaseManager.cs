@@ -13,6 +13,9 @@ public class RosterPhaseManager : MonoBehaviour
     public RaceData[] availableRaces;
     public int totalPoints = 100;
 
+    [Header("Factions (대전 모드 전용)")]
+    public FactionData playerFaction;
+    public FactionData enemyFaction;
 
     public RaceData SelectedRace { get; private set; }
     public RosterBuilder Builder { get; private set; }
@@ -23,6 +26,18 @@ public class RosterPhaseManager : MonoBehaviour
     public event Action OnRosterChanged; // 포인트/목록이 바뀔 때마다 (UI 갱신용)
     public event Action OnRosterConfirmed;
 
+    void OnValidate()
+    {
+        if (playerFaction != null && enemyFaction != null && playerFaction == enemyFaction)
+            Debug.LogError($"[{name}] playerFaction과 enemyFaction이 같은 FactionData를 가리키고 있습니다.", this);
+
+        if (playerFaction != null && !playerFaction.isPlayerControlled)
+            Debug.LogWarning($"[{name}] playerFaction({playerFaction.factionName})의 Is Player Controlled가 꺼져 있습니다.", this);
+
+        if (enemyFaction != null && enemyFaction.isPlayerControlled)
+            Debug.LogWarning($"[{name}] enemyFaction({enemyFaction.factionName})의 Is Player Controlled가 켜져 있습니다.", this);
+    }
+
     // 종족을 선택(또는 재선택)하면 편성 진행 상황이 초기화됨
     public void SelectRace(RaceData race)
     {
@@ -31,7 +46,6 @@ public class RosterPhaseManager : MonoBehaviour
             Debug.LogWarning("SelectRace에 null 종족이 전달되었습니다.");
             return;
         }
-
 
         SelectedRace = race;
         Builder = new RosterBuilder(race, totalPoints);
@@ -54,6 +68,7 @@ public class RosterPhaseManager : MonoBehaviour
         return success;
     }
 
+
     public void RemoveEntry(RosterEntry entry)
     {
         if (Builder == null)
@@ -61,6 +76,13 @@ public class RosterPhaseManager : MonoBehaviour
 
         Builder.RemoveEntry(entry);
         OnRosterChanged?.Invoke();
+    }
+    public void ResetRoster()
+    {
+        SelectedRace = null;
+        Builder = null;
+        ConfirmedEntries = null;
+        OnRosterChanged?.Invoke(); // UI가 목록/포인트 표시를 비우도록
     }
 
     public void ConfirmRoster()
@@ -73,5 +95,40 @@ public class RosterPhaseManager : MonoBehaviour
 
         ConfirmedEntries = new List<RosterEntry>(Builder.GetEntries());
         OnRosterConfirmed?.Invoke();
+    }
+
+    public SkirmishParticipant BuildPlayerParticipant()
+    {
+        if (playerFaction == null)
+        {
+            Debug.LogWarning("playerFaction이 설정되지 않아 참가자 정보를 만들 수 없습니다.");
+            return null;
+        }
+
+        if (SelectedRace == null || ConfirmedEntries == null)
+        {
+            Debug.LogWarning("확정된 로스터가 없어 참가자 정보를 만들 수 없습니다.");
+            return null;
+        }
+
+        return new SkirmishParticipant(playerFaction, SelectedRace, ConfirmedEntries);
+    }
+
+    // 임시: AI가 플레이어 로스터를 그대로 복사해서 쓰는 방식. 나중에 AI 자체 편성 로직으로 교체될 자리
+    public SkirmishParticipant BuildEnemyParticipant()
+    {
+        if (enemyFaction == null)
+        {
+            Debug.LogWarning("enemyFaction이 설정되지 않아 참가자 정보를 만들 수 없습니다.");
+            return null;
+        }
+
+        if (SelectedRace == null || ConfirmedEntries == null)
+        {
+            Debug.LogWarning("확정된 로스터가 없어 참가자 정보를 만들 수 없습니다.");
+            return null;
+        }
+
+        return new SkirmishParticipant(enemyFaction, SelectedRace, ConfirmedEntries);
     }
 }
