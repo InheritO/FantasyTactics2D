@@ -17,6 +17,11 @@ public class RosterPhaseManager : MonoBehaviour
     public FactionData playerFaction;
     public FactionData enemyFaction;
 
+
+    [Header("AI Settings")]
+    public RaceData aiRace; // AI가 고정으로 사용할 종족 (테스트/기획 의도에 따라 지정)
+    public AIRosterStrategy aiStrategy = AIRosterStrategy.Standard;
+
     public RaceData SelectedRace { get; private set; }
     public RosterBuilder Builder { get; private set; }
 
@@ -123,12 +128,14 @@ public class RosterPhaseManager : MonoBehaviour
             return null;
         }
 
-        if (SelectedRace == null || ConfirmedEntries == null)
+        if (aiRace == null)
         {
-            Debug.LogWarning("확정된 로스터가 없어 참가자 정보를 만들 수 없습니다.");
+            Debug.LogWarning("aiRace가 설정되지 않아 참가자 정보를 만들 수 없습니다.");
             return null;
         }
 
-        return new SkirmishParticipant(enemyFaction, SelectedRace, ConfirmedEntries);
+        List<RosterEntry> aiEntries = AIRosterGenerator.GenerateRoster(aiRace, totalPoints, aiStrategy);
+
+        return new SkirmishParticipant(enemyFaction, aiRace, aiEntries);
     }
 }

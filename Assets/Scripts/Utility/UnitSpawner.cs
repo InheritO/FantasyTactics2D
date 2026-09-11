@@ -6,19 +6,31 @@ using UnityEngine;
 /// </summary>
 public static class UnitSpawner
 {
-    public static UnitBase Spawn(UnitBase unitPrefab, Vector2Int coord, FactionData faction, RosterEntry entry,
-     GridManager gridManager, BattleOutcomeManager outcomeManager, CombatLogger combatLogger = null)
+    public static UnitBase Spawn(UnitBase unitPrefab, Vector2Int coord, SkirmishParticipant participant, RosterEntry entry,
+     GridManager gridManager, BattleOutcomeManager outcomeManager, CombatLogger combatLogger = null,
+     AICombatDisposition disposition = AICombatDisposition.Aggressive)
     {
-        UnitBase unit = Spawn(unitPrefab, coord, faction, gridManager, outcomeManager, combatLogger);
+        if (participant == null)
+        {
+            Debug.LogError("스폰 실패: participant가 null입니다.");
+            return null;
+        }
+
+        UnitBase unit = Spawn(unitPrefab, coord, participant.Faction, gridManager, outcomeManager, combatLogger, disposition);
 
         if (unit != null)
+        {
+            unit.AssignRace(participant.Race);
             unit.ApplyLoadout(entry);
+        }
 
         return unit;
+
     }
 
     public static UnitBase Spawn(UnitBase unitPrefab, Vector2Int coord, FactionData faction,
-         GridManager gridManager, BattleOutcomeManager outcomeManager, CombatLogger combatLogger = null)
+      GridManager gridManager, BattleOutcomeManager outcomeManager, CombatLogger combatLogger = null,
+      AICombatDisposition disposition = AICombatDisposition.Aggressive)
     {
         if (unitPrefab == null)
         {
@@ -53,8 +65,11 @@ public static class UnitSpawner
         unit.SetFaction(faction);
         unit.PlaceOnGrid(coord, gridManager);
 
+        string raceName = faction.race != null ? faction.race.raceName : "종족불명";
+        unit.gameObject.name = $"{faction.factionName}_{raceName}_{coord.x}_{coord.y}";
+
         if (!faction.isPlayerControlled)
-            unit.AIBehavior = new AggressiveMoveTowardEnemy();
+            unit.AIBehavior = CreateAIBehavior(disposition);
 
         if (outcomeManager != null)
             outcomeManager.RegisterUnit(unit); // 사망 이벤트 구독
@@ -93,5 +108,20 @@ public static class UnitSpawner
         }
 
         return unit;
+    }
+
+    // AI 성향 부여
+    private static IUnitAIBehavior CreateAIBehavior(AICombatDisposition disposition)
+    {
+        switch (disposition)
+        {
+            case AICombatDisposition.Defensive:
+                return new DefensiveHoldPosition();
+            case AICombatDisposition.RangedKiting:
+                return new KeepDistanceAndShoot();
+            case AICombatDisposition.Aggressive:
+            default:
+                return new AggressiveMoveTowardEnemy();
+        }
     }
 }

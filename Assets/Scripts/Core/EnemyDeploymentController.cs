@@ -13,6 +13,9 @@ public class EnemyDeploymentController : MonoBehaviour
     public CombatLogger combatLogger;
     public TestUnit unitPrefab;
 
+    [Header("AI Settings")]
+    public AICombatDisposition disposition = AICombatDisposition.Aggressive; // 이 부대 전체의 교전 성향
+
 
     public void DeployRoster(SkirmishParticipant participant)
     {
@@ -35,7 +38,7 @@ public class EnemyDeploymentController : MonoBehaviour
             Vector2Int coord = candidateCoords[index];
             index++;
 
-            UnitSpawner.Spawn(unitPrefab, coord, participant, entry, gridManager, outcomeManager, combatLogger);
+            UnitSpawner.Spawn(unitPrefab, coord, participant, entry, gridManager, outcomeManager, combatLogger, disposition);
         }
     }
 
