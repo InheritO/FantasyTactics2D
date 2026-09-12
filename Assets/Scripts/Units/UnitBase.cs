@@ -11,32 +11,32 @@ public abstract class UnitBase : MonoBehaviour
 {
 
     [Header("Grid Position")]
-    public Vector2Int GridCoord { get; private set; }
+    [field: SerializeField] public Vector2Int GridCoord { get; private set; }
 
     [Header("Faction")]
-    public FactionData Faction { get; private set; }
-    public RaceData Race { get; private set; }
+    [field: SerializeField] public FactionData Faction { get; private set; }
+    [field: SerializeField] public RaceData Race { get; private set; }
 
 
 
     [Header("Capabilities")]
-    public bool CanMove { get; protected set; } = true;
-    public bool CanAttack { get; protected set; } = true;
+    [field: SerializeField] public bool CanMove { get; protected set; } = true;
+    [field: SerializeField]public bool CanAttack { get; protected set; } = true;
 
-    [field:SerializeField]
-    public int CurrentHealth { get; protected set; }
+    [field:SerializeField]    public int CurrentHealth { get; protected set; }
     public IUnitAIBehavior AIBehavior { get; set; }
+    [Header("AI 확인용")]
+    public AICombatDisposition AssignedDisposition;
+
 
     /// <summary>
     /// 장비 슬롯
     /// </summary>
-    [field: SerializeField]
-    public WeaponData MainHandWeapon { get; private set; }
-    public WeaponData OffHandWeapon { get; private set; } // 두 번째 한손무기일 수도 있음
-    public ShieldData EquippedShield { get; private set; }
+    [field: SerializeField] public WeaponData MainHandWeapon { get; private set; }
+    [field: SerializeField] public WeaponData OffHandWeapon { get; private set; } // 두 번째 한손무기일 수도 있음
+    [field: SerializeField] public ShieldData EquippedShield { get; private set; }
 
-    [field: SerializeField]
-    public ArmorData EquippedArmor { get; private set; }
+    [field: SerializeField] public ArmorData EquippedArmor { get; private set; }
 
     protected GridManager gridManager;
     protected SpriteRenderer spriteRenderer;
@@ -394,5 +394,9 @@ public abstract class UnitBase : MonoBehaviour
         HasAttacked = false;
     }
 
-
+    public void SetAIBehavior(IUnitAIBehavior behavior, AICombatDisposition disposition)
+    {
+        AIBehavior = behavior;
+        AssignedDisposition = disposition;
+    }
 }

@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: TestEnemyFaction
   m_EditorClassIdentifier: Assembly-CSharp::FactionData
   factionName: Enemy
-  race: {fileID: 11400000, guid: ba8d94485874bc4438951f1b1607e818, type: 2}
+  race: {fileID: 11400000, guid: f29a44a310fccb540afd091e5d3b6634, type: 2}
   factionColor: {r: 1, g: 0.078431375, b: 0, a: 1}
   isPlayerControlled: 0

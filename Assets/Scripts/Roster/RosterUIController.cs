@@ -17,6 +17,17 @@ public class RosterUIController : MonoBehaviour
     public Transform raceButtonContainer;
     public GameObject raceButtonPrefab; // Button + 자식에 TMP_Text
 
+    [Header("Points Setting")]
+    public Slider pointsSlider; // Unity UI의 Slider (min=50, max=200, step=10 정도로 설정)
+    public TMP_Text pointsSettingLabel;
+
+    [Header("AI Race Selection")]
+    public Transform aiRaceButtonContainer;
+    public GameObject aiRaceButtonPrefab;
+
+    [Header("AI Selection Display")]
+    public TMP_Text aiRaceLabel;
+
     [Header("Draft Controls")]
     public TMP_Text mainHandWeaponLabel;
     public Button mainHandWeaponNextButton;
@@ -55,6 +66,8 @@ public class RosterUIController : MonoBehaviour
             return;
 
         BuildRaceButtons();
+        BuildAIRaceButtons();
+
 
         mainHandWeaponNextButton.onClick.AddListener(CycleMainHandWeapon);
         offHandWeaponNextButton.onClick.AddListener(CycleOffHandWeapon);
@@ -62,6 +75,11 @@ public class RosterUIController : MonoBehaviour
         armorNextButton.onClick.AddListener(CycleArmor);
         addUnitButton.onClick.AddListener(AddDraftToRoster);
         confirmButton.onClick.AddListener(rosterManager.ConfirmRoster);
+
+        // 슬라이더 초기값을 현재 rosterManager 설정값으로 맞추고, 변경 이벤트 연결
+        pointsSlider.value = rosterManager.totalPoints;
+        pointsSlider.onValueChanged.AddListener(OnPointsSliderChanged);
+        UpdatePointsSettingLabel();
 
         rosterManager.OnRosterChanged += RefreshUI;
 
@@ -71,7 +89,12 @@ public class RosterUIController : MonoBehaviour
 
     void OnDestroy()
     {
+        if (!isValid)
+            return;
+
         rosterManager.OnRosterChanged -= RefreshUI;
+
+        pointsSlider.onValueChanged.RemoveListener(OnPointsSliderChanged);
     }
 
     private bool ValidateReferences()
@@ -298,10 +321,51 @@ public class RosterUIController : MonoBehaviour
         shieldNextButton.interactable = !isTwoHanded;
     }
 
+    // 슬라이더 값이 바뀔 때마다 총 포인트를 갱신하고, 편성 목록/라벨을 새로 고침
+    private void OnPointsSliderChanged(float value)
+    {
+        rosterManager.SetTotalPoints(Mathf.RoundToInt(value));
+        UpdatePointsSettingLabel();
+        // RefreshUI는 SetTotalPoints 내부의 SelectRace 호출이 OnRosterChanged를 발생시켜 자동으로 호출됨
+    }
+
+    private void UpdatePointsSettingLabel()
+    {
+        if (pointsSettingLabel != null)
+            pointsSettingLabel.text = $"편성 포인트: {rosterManager.totalPoints}";
+    }
+
+
+    // 적이 사용할 종족 후보 버튼 생성 (플레이어 종족 선택과 같은 목록을 재사용)
+    private void BuildAIRaceButtons()
+    {
+        if (rosterManager.availableRaces == null)
+            return;
+
+        foreach (var race in rosterManager.availableRaces)
+        {
+            if (race == null)
+                continue;
+
+            GameObject buttonObj = Instantiate(aiRaceButtonPrefab, aiRaceButtonContainer);
+
+            TMP_Text label = buttonObj.GetComponentInChildren<TMP_Text>();
+            if (label != null)
+                label.text = race.raceName;
+
+            Button button = buttonObj.GetComponent<Button>();
+            if (button != null)
+                button.onClick.AddListener(() => rosterManager.SelectAIRace(race));
+        }
+    }
+
     private void RefreshUI()
     {
         if (rosterManager.Builder != null)
             pointsLabel.text = $"포인트: {rosterManager.Builder.UsedPoints} / {rosterManager.Builder.TotalPoints}";
+
+        if (aiRaceLabel != null)
+            aiRaceLabel.text = $"적 종족: {(rosterManager.aiRace != null ? rosterManager.aiRace.raceName : "미선택")}";
 
         RebuildRosterList();
     }

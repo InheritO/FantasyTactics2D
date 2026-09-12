@@ -19,6 +19,7 @@ public class RosterPhaseManager : MonoBehaviour
 
 
     [Header("AI Settings")]
+    public RaceData[] availableEnemyFactions; // AI가 선택 가능한 종족
     public RaceData aiRace; // AI가 고정으로 사용할 종족 (테스트/기획 의도에 따라 지정)
     public AIRosterStrategy aiStrategy = AIRosterStrategy.Standard;
 
@@ -92,6 +93,12 @@ public class RosterPhaseManager : MonoBehaviour
 
     public void ConfirmRoster()
     {
+        if (aiRace == null)
+        {
+            Debug.LogWarning("적 종족이 선택되지 않았습니다.");
+            return;
+        }
+
         if (Builder == null || Builder.GetEntries().Count == 0)
         {
             Debug.LogWarning("편성된 유닛이 없습니다.");
@@ -135,7 +142,29 @@ public class RosterPhaseManager : MonoBehaviour
         }
 
         List<RosterEntry> aiEntries = AIRosterGenerator.GenerateRoster(aiRace, totalPoints, aiStrategy);
-
         return new SkirmishParticipant(enemyFaction, aiRace, aiEntries);
+    }
+
+    public void SetTotalPoints(int points)
+    {
+        totalPoints = Mathf.Max(0, points);
+
+        // 이미 종족을 선택한 상태라면, 새 포인트로 편성을 다시 시작
+        if (SelectedRace != null)
+            SelectRace(SelectedRace);
+    }
+
+
+    // 적 종족 선택 (UI 버튼에서 호출)
+    public void SelectAIRace(RaceData race)
+    {
+        if (race == null)
+        {
+            Debug.LogWarning("SelectAIRace에 null 종족이 전달되었습니다.");
+            return;
+        }
+
+        aiRace = race;
+        OnRosterChanged?.Invoke();
     }
 }
