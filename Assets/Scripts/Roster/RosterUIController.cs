@@ -25,8 +25,12 @@ public class RosterUIController : MonoBehaviour
     public Transform aiRaceButtonContainer;
     public GameObject aiRaceButtonPrefab;
 
+    [Header("AI Strategy Selection")]
+    public TMP_Dropdown aiStrategyDropdown;
+
     [Header("AI Selection Display")]
     public TMP_Text aiRaceLabel;
+  
 
     [Header("Draft Controls")]
     public TMP_Text mainHandWeaponLabel;
@@ -67,7 +71,7 @@ public class RosterUIController : MonoBehaviour
 
         BuildRaceButtons();
         BuildAIRaceButtons();
-
+        SetupAIStrategyDropdown();
 
         mainHandWeaponNextButton.onClick.AddListener(CycleMainHandWeapon);
         offHandWeaponNextButton.onClick.AddListener(CycleOffHandWeapon);
@@ -95,6 +99,7 @@ public class RosterUIController : MonoBehaviour
         rosterManager.OnRosterChanged -= RefreshUI;
 
         pointsSlider.onValueChanged.RemoveListener(OnPointsSliderChanged);
+        aiStrategyDropdown.onValueChanged.RemoveListener(OnAIStrategyChanged);
     }
 
     private bool ValidateReferences()
@@ -401,4 +406,24 @@ public class RosterUIController : MonoBehaviour
         int cost = entry.GetTotalCost(rosterManager.SelectedRace);
         return $"{weapon} / {armor} (비용 {cost})";
     }
+
+    // 드롭다운 옵션을 enum 순서와 정확히 맞춰서 채우고, 현재 설정값을 초기 선택으로 표시
+    private void SetupAIStrategyDropdown()
+    {
+        aiStrategyDropdown.ClearOptions();
+
+        // AIRosterStrategy 순서: Standard=0, MeleeFocus=1, RangedFocus=2
+        // 옵션 문자열 순서도 반드시 이 순서와 일치해야 함 (순서가 어긋나면 엉뚱한 전략이 선택됨)
+        aiStrategyDropdown.AddOptions(new List<string> { "표준", "근거리 위주", "원거리 위주" });
+
+        aiStrategyDropdown.value = (int)rosterManager.aiStrategy;
+        aiStrategyDropdown.onValueChanged.AddListener(OnAIStrategyChanged);
+    }
+
+    private void OnAIStrategyChanged(int index)
+    {
+        rosterManager.aiStrategy = (AIRosterStrategy)index;
+    }
+
+
 }
