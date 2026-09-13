@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TileTypeData
   tileName: Plain
   icon: {fileID: 0}
-  movementCost: 10
+  movementCost: 1
   isWalkable: 1
   blocksLineOfSight: 0
   defenseBonus: 0
