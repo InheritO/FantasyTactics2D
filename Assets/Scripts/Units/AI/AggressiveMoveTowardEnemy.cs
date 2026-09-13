@@ -28,7 +28,7 @@ public class AggressiveMoveTowardEnemy : IUnitAIBehavior
 
         // 사거리 밖이면 최대한 접근
         Dictionary<Vector2Int, int> reachable =
-            MovementRangeCalculator.CalculateReachableTiles(gridManager, unit.GridCoord, unit.MoveRange);
+            MovementRangeCalculator.CalculateReachableTiles(gridManager, unit);
 
         Debug.Log($"[AI-TakeTurn] {unit.name}: 사거리 밖, 이동 가능 타일 수: {reachable.Count}");
 

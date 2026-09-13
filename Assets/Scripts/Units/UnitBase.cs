@@ -69,8 +69,14 @@ public abstract class UnitBase : MonoBehaviour
     public bool HasMoved { get; private set; }
     public bool HasAttacked { get; private set; }
 
+    // ---- 공격 횟수 전환: HasAttacked(bool) -> AttacksUsedThisTurn(int) ----
+    public int AttacksUsedThisTurn { get; private set; }
+
+
     // 지금 이 유닛이 뭔가 더 할 수 있는지 (이동 or 공격 중 하나라도 안 했으면 true)
-    public bool CanStillAct => !HasMoved || !HasAttacked;
+
+    public bool CanStillAct => !HasMoved || AttacksUsedThisTurn < MaxAttacksPerTurn;
+
 
     //이벤트
 
@@ -326,7 +332,7 @@ public abstract class UnitBase : MonoBehaviour
         if (target == null)
             return false;
 
-        if (!CanAttack || HasAttacked)
+        if (!CanAttack || AttacksUsedThisTurn >= MaxAttacksPerTurn)
             return false;
 
         if (!IsInAttackRange(target))
@@ -348,9 +354,12 @@ public abstract class UnitBase : MonoBehaviour
                 target.TakeDamage(result.DamageDealt);
         }
 
-        HasAttacked = true;
-        HasMoved = true;
-        OnActionsExhausted?.Invoke(this);
+        AttacksUsedThisTurn++;
+        HasMoved = true; // 기존 규칙 유지: 공격하면 이동도 함께 봉인
+
+        // 남은 공격 횟수를 다 썼을 때만 "행동 종료" 이벤트 발동 (엘프처럼 여러 번 공격 가능하면 아직 안 끝났을 수 있음)
+        if (AttacksUsedThisTurn >= MaxAttacksPerTurn)
+            OnActionsExhausted?.Invoke(this);
 
         return true;
     }
@@ -384,6 +393,56 @@ public abstract class UnitBase : MonoBehaviour
         Destroy(gameObject);
     }
 
+    // 특성 계산
+
+    // 이동 비용 계산 시 특성 반영 (드워프의 지형 할인 등)
+    public int GetEffectiveMoveCost(TileInstance tile)
+    {
+        int cost = tile.GetMovementCost();
+
+        if (Race?.traits != null)
+        {
+            foreach (var trait in Race.traits)
+                if (trait != null)
+                    cost = trait.ModifyMoveCost(tile, cost);
+        }
+
+        return cost;
+    }
+
+    // 턴당 최대 공격 횟수 (엘프의 추가 공격 등, 기본값 1)
+    public int MaxAttacksPerTurn
+    {
+        get
+        {
+            int max = 1;
+
+            if (Race?.traits != null)
+            {
+                foreach (var trait in Race.traits)
+                    if (trait != null)
+                        max = trait.ModifyMaxAttacks(max);
+            }
+
+            return max;
+        }
+    }
+
+    // isMeleeContext가 true일 때만 근접 특성(오크의 힘 보너스 등)이 적용된 힘 반환
+    public int GetEffectiveStrength(bool isMeleeContext)
+    {
+        int strength = Strength; // 종족 기본 힘 (계산 프로퍼티, 기존 그대로)
+
+        if (isMeleeContext && Race?.traits != null)
+        {
+            foreach (var trait in Race.traits)
+                if (trait != null)
+                    strength = trait.ModifyMeleeStrength(strength);
+        }
+
+        return strength;
+    }
+
 
 
     // ---- 턴 상태 ----
@@ -391,7 +450,8 @@ public abstract class UnitBase : MonoBehaviour
     public void ResetTurnState()
     {
         HasMoved = false;
-        HasAttacked = false;
+        AttacksUsedThisTurn = 0;
+        OnTurnReset?.Invoke(this);
     }
 
     public void SetAIBehavior(IUnitAIBehavior behavior, AICombatDisposition disposition)

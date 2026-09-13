@@ -13,10 +13,10 @@ public class MovementRangeCalculator
     };
 
     // 시작 좌표에서 maxMoveRange 이내에 도달 가능한 타일과, 그 타일까지의 최소 이동 비용을 반환
-    public static Dictionary<Vector2Int, int> CalculateReachableTiles(
-        GridManager gridManager, Vector2Int startCoord, int maxMoveRange)
+    public static Dictionary<Vector2Int, int> CalculateReachableTiles(GridManager gridManager, UnitBase unit)
     {
         Dictionary<Vector2Int, int> costSoFar = new Dictionary<Vector2Int, int>();
+        Vector2Int startCoord = unit.GridCoord;
         costSoFar[startCoord] = 0;
 
         // (남은 이동력이 큰 순서가 아니라 누적 비용이 작은 순서로 탐색해야 정확하지만,
@@ -37,12 +37,13 @@ public class MovementRangeCalculator
                 if (nextTile == null || !nextTile.IsWalkable())
                     continue;
 
-                int newCost = currentCost + nextTile.GetMovementCost();
+                // 종족 특성(지형 할인 등)이 반영된 이동 비용 사용
+                int tileCost = unit.GetEffectiveMoveCost(nextTile);
+                int newCost = currentCost + tileCost;
 
-                if (newCost > maxMoveRange)
+                if (newCost > unit.MoveRange)
                     continue;
 
-                // 아직 방문 안 했거나, 더 저렴한 경로를 찾은 경우에만 갱신
                 if (!costSoFar.ContainsKey(next) || newCost < costSoFar[next])
                 {
                     costSoFar[next] = newCost;

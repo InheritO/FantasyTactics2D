@@ -33,7 +33,7 @@ public class KeepDistanceAndShoot : IUnitAIBehavior
         if (tooClose)
         {
             Dictionary<Vector2Int, int> reachable =
-                MovementRangeCalculator.CalculateReachableTiles(gridManager, unit.GridCoord, unit.MoveRange);
+                MovementRangeCalculator.CalculateReachableTiles(gridManager, unit);
 
             if (reachable.Count > 0)
             {
@@ -60,7 +60,7 @@ public class KeepDistanceAndShoot : IUnitAIBehavior
 
         // 사거리 밖 → 접근
         Dictionary<Vector2Int, int> approachReachable =
-             MovementRangeCalculator.CalculateReachableTiles(gridManager, unit.GridCoord, unit.MoveRange);
+            MovementRangeCalculator.CalculateReachableTiles(gridManager, unit);
 
         if (approachReachable.Count == 0)
             return;

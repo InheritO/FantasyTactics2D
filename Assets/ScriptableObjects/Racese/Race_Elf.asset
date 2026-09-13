@@ -20,7 +20,9 @@ MonoBehaviour:
   baseStrength: 18
   baseConstitution: 15
   baseAgility: 25
-  unitCost: 13
+  unitCost: 14
+  traits:
+  - {fileID: 11400000, guid: 3a7186c1711c86a43808490bc4af5fda, type: 2}
   availableWeapons:
   - {fileID: 11400000, guid: dc963449c64ea4446b7fbadc00359c89, type: 2}
   - {fileID: 11400000, guid: 0cdb76c0455d8df4aab5bf20fbacd409, type: 2}

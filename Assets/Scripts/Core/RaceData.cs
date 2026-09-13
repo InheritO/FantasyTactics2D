@@ -38,6 +38,9 @@ public class RaceData : ScriptableObject
     [Header("Roster Cost")]
     public int unitCost = 10; // 대전 편성 시 이 종족 유닛 한 기의 기본 비용
 
+    [Header("Racial Traits")]
+    public RacialTrait[] traits = new RacialTrait[0];
+
     [Header("Available Equipment")]
     public WeaponData[] availableWeapons = new WeaponData[0];
     public ArmorData[] availableArmors = new ArmorData[0];

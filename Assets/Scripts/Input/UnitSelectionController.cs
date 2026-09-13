@@ -155,9 +155,7 @@ public class UnitSelectionController : MonoBehaviour
 
     private void RefreshSelection()
     {
-        currentReachableTiles = MovementRangeCalculator.CalculateReachableTiles(
-            gridManager, selectedUnit.GridCoord, selectedUnit.MoveRange);
-
+        currentReachableTiles = MovementRangeCalculator.CalculateReachableTiles(gridManager, selectedUnit); // 변경
         rangeVisualizer.ShowRange(currentReachableTiles);
     }
 

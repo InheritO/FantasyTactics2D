@@ -64,10 +64,14 @@ public static class CombatResolver
 
     public static int CalculateDamage(UnitBase attacker, UnitBase defender, WeaponData weapon, WeaponAttack attack)
     {
+        // 원거리 무기가 아니면(비무장 포함) 근접으로 취급 -> 근접 특성(오크 등)이 여기서 적용됨
+        bool isMelee = weapon == null || !weapon.isRanged;
+        int effectiveStrength = attacker.GetEffectiveStrength(isMelee);
+
         int rawDamage = attack == null
-            ? attacker.Strength
+            ? effectiveStrength
             : (weapon.damageScaling == DamageScaling.Strength
-                ? attack.basePower + attacker.Strength
+                ? attack.basePower + effectiveStrength
                 : attack.basePower);
 
         rawDamage = Mathf.Max(0, rawDamage);
@@ -79,6 +83,5 @@ public static class CombatResolver
         int finalDamage = rawDamage - effectiveDefense;
         return Mathf.Max(1, finalDamage);
     }
-
 
 }
