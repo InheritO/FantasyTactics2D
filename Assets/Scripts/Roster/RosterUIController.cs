@@ -30,7 +30,9 @@ public class RosterUIController : MonoBehaviour
 
     [Header("AI Selection Display")]
     public TMP_Text aiRaceLabel;
-  
+
+    [Header("AI Disposition Selection")]
+    public TMP_Dropdown aiDispositionDropdown;
 
     [Header("Draft Controls")]
     public TMP_Text mainHandWeaponLabel;
@@ -72,6 +74,7 @@ public class RosterUIController : MonoBehaviour
         BuildRaceButtons();
         BuildAIRaceButtons();
         SetupAIStrategyDropdown();
+        SetupAIDispositionDropdown();
 
         mainHandWeaponNextButton.onClick.AddListener(CycleMainHandWeapon);
         offHandWeaponNextButton.onClick.AddListener(CycleOffHandWeapon);
@@ -100,6 +103,7 @@ public class RosterUIController : MonoBehaviour
 
         pointsSlider.onValueChanged.RemoveListener(OnPointsSliderChanged);
         aiStrategyDropdown.onValueChanged.RemoveListener(OnAIStrategyChanged);
+        aiDispositionDropdown.onValueChanged.RemoveListener(OnAIDispositionChanged);
     }
 
     private bool ValidateReferences()
@@ -420,10 +424,26 @@ public class RosterUIController : MonoBehaviour
         aiStrategyDropdown.onValueChanged.AddListener(OnAIStrategyChanged);
     }
 
+    private void SetupAIDispositionDropdown()
+    {
+        aiDispositionDropdown.ClearOptions();
+        aiDispositionDropdown.AddOptions(new List<string> { "공격적", "방어적", "거리 유지" });
+
+        aiDispositionDropdown.value = (int)rosterManager.aiDisposition;
+        aiDispositionDropdown.onValueChanged.AddListener(OnAIDispositionChanged);
+    }
+
+
     private void OnAIStrategyChanged(int index)
     {
         rosterManager.aiStrategy = (AIRosterStrategy)index;
     }
+
+    private void OnAIDispositionChanged(int index)
+    {
+        rosterManager.SetAIDisposition((AICombatDisposition)index);
+    }
+
 
 
 }

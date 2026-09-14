@@ -13,11 +13,11 @@ public class EnemyDeploymentController : MonoBehaviour
     public CombatLogger combatLogger;
     public TestUnit unitPrefab;
 
-    [Header("AI Settings")]
-    public AICombatDisposition disposition = AICombatDisposition.Aggressive; // 이 부대 전체의 교전 성향
+  
 
 
-    public void DeployRoster(SkirmishParticipant participant)
+    // RosterPhaseManager가 UI에서 선택된 값을 관리하고, DeployRoster 호출 시 넘겨받는다.
+    public void DeployRoster(SkirmishParticipant participant, AICombatDisposition disposition)
     {
         if (participant == null)
             return;

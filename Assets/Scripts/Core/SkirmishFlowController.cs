@@ -95,7 +95,7 @@ public class SkirmishFlowController : MonoBehaviour
 
         // AI는 같은 로스터를 그대로 복사해서 사용 (임시. 나중에 별도 AI 자동 편성으로 교체 예정)
         SkirmishParticipant enemyParticipant = rosterManager.BuildEnemyParticipant();
-        enemyDeployment.DeployRoster(enemyParticipant);
+        enemyDeployment.DeployRoster(enemyParticipant, rosterManager.aiDisposition);
     }
 
     private void HandleBattleEnded(FactionData winner)

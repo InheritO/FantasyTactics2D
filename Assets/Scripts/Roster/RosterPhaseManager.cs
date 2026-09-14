@@ -22,6 +22,8 @@ public class RosterPhaseManager : MonoBehaviour
     public RaceData[] availableEnemyFactions; // AI가 선택 가능한 종족
     public RaceData aiRace; // AI가 고정으로 사용할 종족 (테스트/기획 의도에 따라 지정)
     public AIRosterStrategy aiStrategy = AIRosterStrategy.Standard;
+    public AICombatDisposition aiDisposition = AICombatDisposition.Aggressive;
+
 
     public RaceData SelectedRace { get; private set; }
     public RosterBuilder Builder { get; private set; }
@@ -166,5 +168,11 @@ public class RosterPhaseManager : MonoBehaviour
 
         aiRace = race;
         OnRosterChanged?.Invoke();
+    }
+
+    // AI 교전 성향 선택 (UI 드롭다운에서 호출)
+    public void SetAIDisposition(AICombatDisposition disposition)
+    {
+        aiDisposition = disposition;
     }
 }
