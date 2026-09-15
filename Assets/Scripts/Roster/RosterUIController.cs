@@ -4,9 +4,9 @@ using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// ºÎ´ë Æí¼º È­¸éÀÇ UI »óÈ£ÀÛ¿ëÀ» ´ã´çÇÑ´Ù.
-/// "ÇöÀç ±¸¼º ÁßÀÎ ÇÑ ±â(draft)"¸¦ ¹«±â/¹æ¾î±¸/¹æÆĞ ¼øÈ¯ ¹öÆ°À¸·Î Á¶Á¤ÇÏ°í,
-/// "Ãß°¡" ¹öÆ°À¸·Î È®Á¤µÈ ¸ñ·Ï¿¡ ³Ö´Â ¹æ½Ä.
+/// ë¶€ëŒ€ í¸ì„± í™”ë©´ì˜ UI ìƒí˜¸ì‘ìš©ì„ ë‹´ë‹¹í•œë‹¤.
+/// "í˜„ì¬ êµ¬ì„± ì¤‘ì¸ í•œ ê¸°(draft)"ë¥¼ ë¬´ê¸°/ë°©ì–´êµ¬/ë°©íŒ¨ ìˆœí™˜ ë²„íŠ¼ìœ¼ë¡œ ì¡°ì •í•˜ê³ ,
+/// "ì¶”ê°€" ë²„íŠ¼ìœ¼ë¡œ í™•ì •ëœ ëª©ë¡ì— ë„£ëŠ” ë°©ì‹.
 /// </summary>
 public class RosterUIController : MonoBehaviour
 {
@@ -15,10 +15,10 @@ public class RosterUIController : MonoBehaviour
 
     [Header("Race Selection")]
     public Transform raceButtonContainer;
-    public GameObject raceButtonPrefab; // Button + ÀÚ½Ä¿¡ TMP_Text
+    public GameObject raceButtonPrefab; // Button + ìì‹ì— TMP_Text
 
     [Header("Points Setting")]
-    public Slider pointsSlider; // Unity UIÀÇ Slider (min=50, max=200, step=10 Á¤µµ·Î ¼³Á¤)
+    public Slider pointsSlider; // Unity UIì˜ Slider (min=50, max=200, step=10 ì •ë„ë¡œ ì„¤ì •)
     public TMP_Text pointsSettingLabel;
 
     [Header("AI Race Selection")]
@@ -47,7 +47,7 @@ public class RosterUIController : MonoBehaviour
 
     [Header("Roster List")]
     public Transform rosterListContainer;
-    public GameObject rosterListItemPrefab; // ÀÚ½Ä¿¡ TMP_Text + Button(Á¦°Å)
+    public GameObject rosterListItemPrefab; // ìì‹ì— TMP_Text + Button(ì œê±°)
 
     [Header("Points Display")]
     public TMP_Text pointsLabel;
@@ -83,14 +83,15 @@ public class RosterUIController : MonoBehaviour
         addUnitButton.onClick.AddListener(AddDraftToRoster);
         confirmButton.onClick.AddListener(rosterManager.ConfirmRoster);
 
-        // ½½¶óÀÌ´õ ÃÊ±â°ªÀ» ÇöÀç rosterManager ¼³Á¤°ªÀ¸·Î ¸ÂÃß°í, º¯°æ ÀÌº¥Æ® ¿¬°á
+        // ìŠ¬ë¼ì´ë” ì´ˆê¸°ê°’ì„ í˜„ì¬ rosterManager ì„¤ì •ê°’ìœ¼ë¡œ ë§ì¶”ê³ , ë³€ê²½ ì´ë²¤íŠ¸ ì—°ê²°
         pointsSlider.value = rosterManager.totalPoints;
         pointsSlider.onValueChanged.AddListener(OnPointsSliderChanged);
         UpdatePointsSettingLabel();
 
         rosterManager.OnRosterChanged += RefreshUI;
 
-        if (rosterManager.availableRaces.Length > 0 && rosterManager.availableRaces[0] != null)
+        // 142ë²ˆì§¸ ì¤„(ValidateReferences)ì—ì„œëŠ” nullê¹Œì§€ ì²´í¬í•˜ëŠ”ë° ì—¬ê¸°ëŠ” ì•ˆ í•˜ê³  ìˆì–´ì„œ í†µì¼í•¨.
+        if (rosterManager.availableRaces != null && rosterManager.availableRaces.Length > 0 && rosterManager.availableRaces[0] != null)
             SelectRace(rosterManager.availableRaces[0]);
     }
 
@@ -134,13 +135,13 @@ public class RosterUIController : MonoBehaviour
         {
             if (obj == null)
             {
-                Debug.LogError($"[{name}] {fieldName}ÀÌ(°¡) ¿¬°áµÇÁö ¾Ê¾Ò½À´Ï´Ù.");
+                Debug.LogError($"[{name}] {fieldName}ì´(ê°€) ì—°ê²°ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤.");
                 ok = false;
             }
         }
 
         if (ok && (rosterManager.availableRaces == null || rosterManager.availableRaces.Length == 0))
-            Debug.LogWarning($"[{name}] rosterManager.availableRaces°¡ ºñ¾îÀÖ½À´Ï´Ù.");
+            Debug.LogWarning($"[{name}] rosterManager.availableRacesê°€ ë¹„ì–´ìˆìŠµë‹ˆë‹¤.");
 
         return ok;
     }
@@ -155,7 +156,7 @@ public class RosterUIController : MonoBehaviour
         {
             if (race == null)
             {
-                Debug.LogWarning($"[{name}] availableRaces ¹è¿­¿¡ ºó ½½·ÔÀÌ ÀÖ½À´Ï´Ù.");
+                Debug.LogWarning($"[{name}] availableRaces ë°°ì—´ì— ë¹ˆ ìŠ¬ë¡¯ì´ ìˆìŠµë‹ˆë‹¤.");
                 continue;
             }
 
@@ -165,13 +166,13 @@ public class RosterUIController : MonoBehaviour
             if (label != null)
                 label.text = race.raceName;
             else
-                Debug.LogWarning($"[{name}] raceButtonPrefab¿¡ TMP_Text ÄÄÆ÷³ÍÆ®°¡ ¾ø½À´Ï´Ù.");
+                Debug.LogWarning($"[{name}] raceButtonPrefabì— TMP_Text ì»´í¬ë„ŒíŠ¸ê°€ ì—†ìŠµë‹ˆë‹¤.");
 
             Button button = buttonObj.GetComponent<Button>();
             if (button != null)
                 button.onClick.AddListener(() => SelectRace(race));
             else
-                Debug.LogWarning($"[{name}] raceButtonPrefab¿¡ Button ÄÄÆ÷³ÍÆ®°¡ ¾ø½À´Ï´Ù.");
+                Debug.LogWarning($"[{name}] raceButtonPrefabì— Button ì»´í¬ë„ŒíŠ¸ê°€ ì—†ìŠµë‹ˆë‹¤.");
         }
     }
 
@@ -201,7 +202,8 @@ public class RosterUIController : MonoBehaviour
         if (race == null || race.availableWeapons == null || race.availableWeapons.Length == 0)
             return;
 
-        var mainHandCandidates = System.Array.FindAll(race.availableWeapons, w => (w.slotType & WeaponSlotType.MainHand) != 0);
+        // availableWeapons ë°°ì—´ì— í• ë‹¹ë˜ì§€ ì•Šì€(null) ìŠ¬ë¡¯ì´ ìˆìœ¼ë©´ w.slotTypeì—ì„œ NullReferenceExceptionì´ ë‚¬ì—ˆìŒ.
+        var mainHandCandidates = System.Array.FindAll(race.availableWeapons, w => w != null && (w.slotType & WeaponSlotType.MainHand) != 0);
         if (mainHandCandidates.Length == 0)
             return;
 
@@ -211,8 +213,8 @@ public class RosterUIController : MonoBehaviour
 
         draft.mainHandWeapon = mainHandIndex == -1 ? null : mainHandCandidates[mainHandIndex];
 
-        // ¾ç¼Õ ¹«±â¸¦ °ñ¶úÀ¸¸é º¸Á¶¹«±â/¹æÆĞ´Â UnitBaseÀÇ ½ÇÁ¦ ÀåÂø ±ÔÄ¢°ú µ¿ÀÏÇÏ°Ô ÀÚµ¿ ÇØÁ¦
-        // (ÀÌ·¸°Ô ¾È ÇÏ¸é ³ªÁß¿¡ ½ÇÁ¦ ÀåÂø ½Ã ÇÑÂÊ¸¸ Àû¿ëµÇ´Âµ¥ ºñ¿ëÀº µÑ ´Ù Ã»±¸µÇ´Â ¹®Á¦°¡ »ı±è)
+        // ì–‘ì† ë¬´ê¸°ë¥¼ ê³¨ëìœ¼ë©´ ë³´ì¡°ë¬´ê¸°/ë°©íŒ¨ëŠ” UnitBaseì˜ ì‹¤ì œ ì¥ì°© ê·œì¹™ê³¼ ë™ì¼í•˜ê²Œ ìë™ í•´ì œ
+        // (ì´ë ‡ê²Œ ì•ˆ í•˜ë©´ ë‚˜ì¤‘ì— ì‹¤ì œ ì¥ì°© ì‹œ í•œìª½ë§Œ ì ìš©ë˜ëŠ”ë° ë¹„ìš©ì€ ë‘˜ ë‹¤ ì²­êµ¬ë˜ëŠ” ë¬¸ì œê°€ ìƒê¹€)
         if (draft.mainHandWeapon != null && draft.mainHandWeapon.handedness == WeaponHandedness.TwoHanded)
         {
             draft.offHandWeapon = null;
@@ -233,11 +235,12 @@ public class RosterUIController : MonoBehaviour
 
         if (draft.mainHandWeapon != null && draft.mainHandWeapon.handedness == WeaponHandedness.TwoHanded)
         {
-            Debug.Log("¾ç¼Õ ¹«±â¸¦ ÀåÂø ÁßÀÌ¶ó º¸Á¶ ¹«±â¸¦ ¼±ÅÃÇÒ ¼ö ¾ø½À´Ï´Ù.");
+            Debug.Log("ì–‘ì† ë¬´ê¸°ë¥¼ ì¥ì°© ì¤‘ì´ë¼ ë³´ì¡° ë¬´ê¸°ë¥¼ ì„ íƒí•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
             return;
         }
 
-        var offHandCandidates = System.Array.FindAll(race.availableWeapons, w => (w.slotType & WeaponSlotType.OffHand) != 0);
+        // ìœ„ì™€ ë™ì¼í•œ ì´ìœ ë¡œ null ìŠ¬ë¡¯ì„ ë¨¼ì € ê±¸ëŸ¬ë‚¸ë‹¤.
+        var offHandCandidates = System.Array.FindAll(race.availableWeapons, w => w != null && (w.slotType & WeaponSlotType.OffHand) != 0);
         if (offHandCandidates.Length == 0)
             return;
 
@@ -247,7 +250,7 @@ public class RosterUIController : MonoBehaviour
 
         draft.offHandWeapon = offHandIndex == -1 ? null : offHandCandidates[offHandIndex];
 
-        // º¸Á¶¹«±â¿Í ¹æÆĞ´Â °°Àº ½½·ÔÀ» µÎ°í °æÀï (UnitBase ±ÔÄ¢°ú µ¿ÀÏ)
+        // ë³´ì¡°ë¬´ê¸°ì™€ ë°©íŒ¨ëŠ” ê°™ì€ ìŠ¬ë¡¯ì„ ë‘ê³  ê²½ìŸ (UnitBase ê·œì¹™ê³¼ ë™ì¼)
         if (draft.offHandWeapon != null)
         {
             draft.shield = null;
@@ -265,7 +268,7 @@ public class RosterUIController : MonoBehaviour
 
         if (draft.mainHandWeapon != null && draft.mainHandWeapon.handedness == WeaponHandedness.TwoHanded)
         {
-            Debug.Log("¾ç¼Õ ¹«±â¸¦ ÀåÂø ÁßÀÌ¶ó ¹æÆĞ¸¦ ¼±ÅÃÇÒ ¼ö ¾ø½À´Ï´Ù.");
+            Debug.Log("ì–‘ì† ë¬´ê¸°ë¥¼ ì¥ì°© ì¤‘ì´ë¼ ë°©íŒ¨ë¥¼ ì„ íƒí•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
             return;
         }
 
@@ -302,7 +305,7 @@ public class RosterUIController : MonoBehaviour
     {
         if (rosterManager.SelectedRace == null)
         {
-            Debug.Log("Á¾Á·À» ¸ÕÀú ¼±ÅÃÇØÁÖ¼¼¿ä.");
+            Debug.Log("ì¢…ì¡±ì„ ë¨¼ì € ì„ íƒí•´ì£¼ì„¸ìš”.");
             return;
         }
 
@@ -320,32 +323,32 @@ public class RosterUIController : MonoBehaviour
 
     private void RefreshDraftLabels()
     {
-        mainHandWeaponLabel.text = draft.mainHandWeapon != null ? draft.mainHandWeapon.weaponName : "ºñ¹«Àå";
-        offHandWeaponLabel.text = draft.offHandWeapon != null ? draft.offHandWeapon.weaponName : "¾øÀ½";
-        shieldLabel.text = draft.shield != null ? draft.shield.shieldName : "¾øÀ½";
-        armorLabel.text = draft.armor != null ? draft.armor.armorName : "ºñ¹«Àå";
+        mainHandWeaponLabel.text = draft.mainHandWeapon != null ? draft.mainHandWeapon.weaponName : "ë¹„ë¬´ì¥";
+        offHandWeaponLabel.text = draft.offHandWeapon != null ? draft.offHandWeapon.weaponName : "ì—†ìŒ";
+        shieldLabel.text = draft.shield != null ? draft.shield.shieldName : "ì—†ìŒ";
+        armorLabel.text = draft.armor != null ? draft.armor.armorName : "ë¹„ë¬´ì¥";
 
         bool isTwoHanded = draft.mainHandWeapon != null && draft.mainHandWeapon.handedness == WeaponHandedness.TwoHanded;
         offHandWeaponNextButton.interactable = !isTwoHanded;
         shieldNextButton.interactable = !isTwoHanded;
     }
 
-    // ½½¶óÀÌ´õ °ªÀÌ ¹Ù²ğ ¶§¸¶´Ù ÃÑ Æ÷ÀÎÆ®¸¦ °»½ÅÇÏ°í, Æí¼º ¸ñ·Ï/¶óº§À» »õ·Î °íÄ§
+    // ìŠ¬ë¼ì´ë” ê°’ì´ ë°”ë€” ë•Œë§ˆë‹¤ ì´ í¬ì¸íŠ¸ë¥¼ ê°±ì‹ í•˜ê³ , í¸ì„± ëª©ë¡/ë¼ë²¨ì„ ìƒˆë¡œ ê³ ì¹¨
     private void OnPointsSliderChanged(float value)
     {
         rosterManager.SetTotalPoints(Mathf.RoundToInt(value));
         UpdatePointsSettingLabel();
-        // RefreshUI´Â SetTotalPoints ³»ºÎÀÇ SelectRace È£ÃâÀÌ OnRosterChanged¸¦ ¹ß»ı½ÃÄÑ ÀÚµ¿À¸·Î È£ÃâµÊ
+        // RefreshUIëŠ” SetTotalPoints ë‚´ë¶€ì˜ SelectRace í˜¸ì¶œì´ OnRosterChangedë¥¼ ë°œìƒì‹œì¼œ ìë™ìœ¼ë¡œ í˜¸ì¶œë¨
     }
 
     private void UpdatePointsSettingLabel()
     {
         if (pointsSettingLabel != null)
-            pointsSettingLabel.text = $"Æí¼º Æ÷ÀÎÆ®: {rosterManager.totalPoints}";
+            pointsSettingLabel.text = $"í¸ì„± í¬ì¸íŠ¸: {rosterManager.totalPoints}";
     }
 
 
-    // ÀûÀÌ »ç¿ëÇÒ Á¾Á· ÈÄº¸ ¹öÆ° »ı¼º (ÇÃ·¹ÀÌ¾î Á¾Á· ¼±ÅÃ°ú °°Àº ¸ñ·ÏÀ» Àç»ç¿ë)
+    // ì ì´ ì‚¬ìš©í•  ì¢…ì¡± í›„ë³´ ë²„íŠ¼ ìƒì„± (í”Œë ˆì´ì–´ ì¢…ì¡± ì„ íƒê³¼ ê°™ì€ ëª©ë¡ì„ ì¬ì‚¬ìš©)
     private void BuildAIRaceButtons()
     {
         if (rosterManager.availableRaces == null)
@@ -371,10 +374,10 @@ public class RosterUIController : MonoBehaviour
     private void RefreshUI()
     {
         if (rosterManager.Builder != null)
-            pointsLabel.text = $"Æ÷ÀÎÆ®: {rosterManager.Builder.UsedPoints} / {rosterManager.Builder.TotalPoints}";
+            pointsLabel.text = $"í¬ì¸íŠ¸: {rosterManager.Builder.UsedPoints} / {rosterManager.Builder.TotalPoints}";
 
         if (aiRaceLabel != null)
-            aiRaceLabel.text = $"Àû Á¾Á·: {(rosterManager.aiRace != null ? rosterManager.aiRace.raceName : "¹Ì¼±ÅÃ")}";
+            aiRaceLabel.text = $"ì  ì¢…ì¡±: {(rosterManager.aiRace != null ? rosterManager.aiRace.raceName : "ë¯¸ì„ íƒ")}";
 
         RebuildRosterList();
     }
@@ -405,20 +408,20 @@ public class RosterUIController : MonoBehaviour
 
     private string BuildEntryLabel(RosterEntry entry)
     {
-        string weapon = entry.mainHandWeapon != null ? entry.mainHandWeapon.weaponName : "ºñ¹«Àå";
-        string armor = entry.armor != null ? entry.armor.armorName : "ºñ¹«Àå";
+        string weapon = entry.mainHandWeapon != null ? entry.mainHandWeapon.weaponName : "ë¹„ë¬´ì¥";
+        string armor = entry.armor != null ? entry.armor.armorName : "ë¹„ë¬´ì¥";
         int cost = entry.GetTotalCost(rosterManager.SelectedRace);
-        return $"{weapon} / {armor} (ºñ¿ë {cost})";
+        return $"{weapon} / {armor} (ë¹„ìš© {cost})";
     }
 
-    // µå·Ó´Ù¿î ¿É¼ÇÀ» enum ¼ø¼­¿Í Á¤È®È÷ ¸ÂÃç¼­ Ã¤¿ì°í, ÇöÀç ¼³Á¤°ªÀ» ÃÊ±â ¼±ÅÃÀ¸·Î Ç¥½Ã
+    // ë“œë¡­ë‹¤ìš´ ì˜µì…˜ì„ enum ìˆœì„œì™€ ì •í™•íˆ ë§ì¶°ì„œ ì±„ìš°ê³ , í˜„ì¬ ì„¤ì •ê°’ì„ ì´ˆê¸° ì„ íƒìœ¼ë¡œ í‘œì‹œ
     private void SetupAIStrategyDropdown()
     {
         aiStrategyDropdown.ClearOptions();
 
-        // AIRosterStrategy ¼ø¼­: Standard=0, MeleeFocus=1, RangedFocus=2
-        // ¿É¼Ç ¹®ÀÚ¿­ ¼ø¼­µµ ¹İµå½Ã ÀÌ ¼ø¼­¿Í ÀÏÄ¡ÇØ¾ß ÇÔ (¼ø¼­°¡ ¾î±ß³ª¸é ¾û¶×ÇÑ Àü·«ÀÌ ¼±ÅÃµÊ)
-        aiStrategyDropdown.AddOptions(new List<string> { "Ç¥ÁØ", "±Ù°Å¸® À§ÁÖ", "¿ø°Å¸® À§ÁÖ" });
+        // AIRosterStrategy ìˆœì„œ: Standard=0, MeleeFocus=1, RangedFocus=2
+        // ì˜µì…˜ ë¬¸ìì—´ ìˆœì„œë„ ë°˜ë“œì‹œ ì´ ìˆœì„œì™€ ì¼ì¹˜í•´ì•¼ í•¨ (ìˆœì„œê°€ ì–´ê¸‹ë‚˜ë©´ ì—‰ëš±í•œ ì „ëµì´ ì„ íƒë¨)
+        aiStrategyDropdown.AddOptions(new List<string> { "í‘œì¤€", "ê·¼ê±°ë¦¬ ìœ„ì£¼", "ì›ê±°ë¦¬ ìœ„ì£¼" });
 
         aiStrategyDropdown.value = (int)rosterManager.aiStrategy;
         aiStrategyDropdown.onValueChanged.AddListener(OnAIStrategyChanged);
@@ -427,7 +430,7 @@ public class RosterUIController : MonoBehaviour
     private void SetupAIDispositionDropdown()
     {
         aiDispositionDropdown.ClearOptions();
-        aiDispositionDropdown.AddOptions(new List<string> { "°ø°İÀû", "¹æ¾îÀû", "°Å¸® À¯Áö" });
+        aiDispositionDropdown.AddOptions(new List<string> { "ê³µê²©ì ", "ë°©ì–´ì ", "ê±°ë¦¬ ìœ ì§€" });
 
         aiDispositionDropdown.value = (int)rosterManager.aiDisposition;
         aiDispositionDropdown.onValueChanged.AddListener(OnAIDispositionChanged);

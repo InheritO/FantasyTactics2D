@@ -42,7 +42,15 @@ public class TileVisualizer : MonoBehaviour
 
     private void CreateTileObject(TileInstance tile)
     {
-        GameObject tileObj = new GameObject($"Tile_{tile.GridCoord.x}_{tile.GridCoord.y}_{tile.TypeData.tileName}");
+        // TypeData가 null이면(타일 타입 설정 누락) tile.TypeData.xxx에서 바로 NullReferenceException이 났었음.
+        // 여기서는 크래시 대신 눈에 띄는 마젠타색으로 표시해서 설정 누락을 알아챌 수 있게 한다.
+        bool hasTypeData = tile.TypeData != null;
+        string tileTypeName = hasTypeData ? tile.TypeData.tileName : "MISSING";
+
+        if (!hasTypeData)
+            Debug.LogError($"[TileVisualizer] {tile.GridCoord} 타일에 TypeData가 없습니다. GridManager의 Tile Types 설정을 확인하세요.");
+
+        GameObject tileObj = new GameObject($"Tile_{tile.GridCoord.x}_{tile.GridCoord.y}_{tileTypeName}");
         tileObj.transform.parent = this.transform;
         tileObj.transform.position = gridManager.GridToWorld(tile.GridCoord);
         tileObj.transform.localScale = Vector3.one * tileVisualSize;
@@ -50,14 +58,15 @@ public class TileVisualizer : MonoBehaviour
         SpriteRenderer sr = tileObj.AddComponent<SpriteRenderer>();
         sr.sortingOrder = tileSortOrder;
 
-        if (tile.TypeData.icon != null)
+        if (hasTypeData && tile.TypeData.icon != null)
         {
             sr.sprite = tile.TypeData.icon; // 실제 타일 스프라이트가 있으면 사용
         }
         else
         {
             sr.sprite = GetDefaultSquareSprite(); // 없으면 기본 흰색 사각형 스프라이트 + 색상
-            sr.color = ApplyZoneTint(tile.TypeData.previewColor, tile.Zone);
+            Color baseColor = hasTypeData ? tile.TypeData.previewColor : Color.magenta;
+            sr.color = ApplyZoneTint(baseColor, tile.Zone);
         }
 
         tileObjects[tile.GridCoord.x, tile.GridCoord.y] = tileObj;

@@ -30,12 +30,21 @@ public class UnitSelectionController : MonoBehaviour
 
     void Start()
     {
+        if (rangeVisualizer == null || gridManager == null)
+        {
+            Debug.LogError($"[{name}] gridManager 또는 rangeVisualizer가 연결되지 않았습니다.", this);
+            return;
+        }
+
         rangeVisualizer.Setup(gridManager);
     }
 
 
     void Update()
     {
+        if (phaseManager == null || gridManager == null || turnManager == null)
+            return;
+
         if (phaseManager.CurrentPhase != BattlePhase.Battle)
             return;
 
@@ -45,8 +54,11 @@ public class UnitSelectionController : MonoBehaviour
 
     private void HandleClick()
     {
-        Vector2Int clickedCoord = GetClickedGridCoord();
-        TileInstance clickedTile = gridManager.GetTile(clickedCoord);
+        Vector2Int? clickedCoord = GetClickedGridCoord();
+        if (clickedCoord == null)
+            return;
+
+        TileInstance clickedTile = gridManager.GetTile(clickedCoord.Value);
 
         if (clickedTile == null)
             return;
@@ -57,12 +69,20 @@ public class UnitSelectionController : MonoBehaviour
         }
         else
         {
-            HandleClickWhileUnitSelected(clickedTile, clickedCoord);
+            HandleClickWhileUnitSelected(clickedTile, clickedCoord.Value);
         }
     }
 
-    private Vector2Int GetClickedGridCoord()
+    private Vector2Int? GetClickedGridCoord()
     {
+        // MainCamera 태그가 붙은 카메라가 씬에 없거나 일시적으로 비활성화되어 있으면 Camera.main이 null이 되어
+        // 클릭할 때마다 NullReferenceException이 났었음.
+        if (Camera.main == null)
+        {
+            Debug.LogError("[UnitSelectionController] Camera.main을 찾을 수 없습니다. MainCamera 태그가 붙은 카메라가 씬에 있는지 확인하세요.");
+            return null;
+        }
+
         Vector2 screenPos = controls.GamePlay.Point.ReadValue<Vector2>();
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(screenPos);
         mouseWorldPos.z = 0f;
@@ -142,6 +162,12 @@ public class UnitSelectionController : MonoBehaviour
         if (!selectedUnit.IsInAttackRange(target))
         {
             Debug.Log("사거리 밖입니다.");
+            return;
+        }
+
+        if (attackPanel == null)
+        {
+            Debug.LogError($"[{name}] attackPanel이 연결되지 않아 공격 UI를 표시할 수 없습니다.", this);
             return;
         }
 

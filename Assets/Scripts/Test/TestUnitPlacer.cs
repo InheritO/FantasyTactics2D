@@ -90,6 +90,13 @@ public class TestUnitPlacer : MonoBehaviour
             return;
         }
 
+        // MainCamera 태그가 붙은 카메라가 씬에 없으면 Camera.main이 null이 되어 NullReferenceException이 났었음.
+        if (Camera.main == null)
+        {
+            Debug.LogError($"[{name}] Camera.main을 찾을 수 없어 배치 위치를 계산할 수 없습니다.", this);
+            return;
+        }
+
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mouseWorldPos.z = 0f;
         Vector2Int coord = gridManager.WorldToGrid(mouseWorldPos);

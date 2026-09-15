@@ -57,9 +57,17 @@ public class MapGenerator
 
     private TileTypeData GetTileTypeFromNoise(float noiseValue)
     {
+        // GridManager의 Tile Types 배열(tileMappings)이 인스펙터에서 비어있으면
+        // 예전에는 mappings[mappings.Length - 1]에서 바로 IndexOutOfRangeException이 났음.
+        if (mappings == null || mappings.Length == 0)
+        {
+            Debug.LogError("MapGenerator: tileMappings이 비어있어 타일 타입을 결정할 수 없습니다. GridManager의 Tile Types 배열을 확인하세요.");
+            return null;
+        }
+
         foreach (var mapping in mappings)
         {
-            if (noiseValue < mapping.maxNoiseValue)
+            if (mapping.tileType != null && noiseValue < mapping.maxNoiseValue)
                 return mapping.tileType;
         }
         return mappings[mappings.Length - 1].tileType;

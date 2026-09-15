@@ -2,8 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// ÀüÅõ UIÀÇ ÃÖ»óÀ§ ¹öÆ°µé(ÀüÅõ ½ÃÀÛ, ÅÏ Á¾·á)À» °ü¸®ÇÑ´Ù.
-/// ÇöÀç ÆäÀÌÁî/ÅÏ¿¡ µû¶ó ¹öÆ°ÀÇ Ç¥½Ã ¿©ºÎ¿Í È°¼ºÈ­ ¿©ºÎ¸¦ ¸Å ÇÁ·¹ÀÓ °»½ÅÇÑ´Ù.
+/// ì „íˆ¬ UIì˜ ìµœìƒìœ„ ë²„íŠ¼ë“¤(ì „íˆ¬ ì‹œì‘, í„´ ì¢…ë£Œ)ì„ ê´€ë¦¬í•œë‹¤.
+/// í˜„ì¬ í˜ì´ì¦ˆ/í„´ì— ë”°ë¼ ë²„íŠ¼ì˜ í‘œì‹œ ì—¬ë¶€ì™€ í™œì„±í™” ì—¬ë¶€ë¥¼ ë§¤ í”„ë ˆì„ ê°±ì‹ í•œë‹¤.
 /// </summary>
 public class BattleUIController : MonoBehaviour
 {
@@ -18,6 +18,12 @@ public class BattleUIController : MonoBehaviour
 
     void OnEnable()
     {
+        if (startBattleButton == null || endTurnButton == null || playerDeployment == null)
+        {
+            Debug.LogError($"[{name}] í•„ìš”í•œ ì°¸ì¡°(startBattleButton/endTurnButton/playerDeployment)ê°€ ë¹„ì–´ìˆì–´ ì´ˆê¸°í™”ë¥¼ ê±´ë„ˆëœë‹ˆë‹¤.", this);
+            return;
+        }
+
         startBattleButton.interactable = false;
         playerDeployment.OnAllUnitsDeployed += HandleAllUnitsDeployed;
 
@@ -27,14 +33,21 @@ public class BattleUIController : MonoBehaviour
 
     void OnDisable()
     {
-        playerDeployment.OnAllUnitsDeployed -= HandleAllUnitsDeployed;
+        if (playerDeployment != null)
+            playerDeployment.OnAllUnitsDeployed -= HandleAllUnitsDeployed;
 
-        startBattleButton.onClick.RemoveListener(HandleStartBattleClicked);
-        endTurnButton.onClick.RemoveListener(HandleEndTurnClicked);
+        if (startBattleButton != null)
+            startBattleButton.onClick.RemoveListener(HandleStartBattleClicked);
+
+        if (endTurnButton != null)
+            endTurnButton.onClick.RemoveListener(HandleEndTurnClicked);
     }
 
     void Update()
     {
+        if (phaseManager == null || turnManager == null || startBattleButton == null || endTurnButton == null)
+            return;
+
         bool isPlacement = phaseManager.CurrentPhase == BattlePhase.Placement;
         bool isPlayerTurn = phaseManager.CurrentPhase == BattlePhase.Battle
             && turnManager.CurrentFaction != null

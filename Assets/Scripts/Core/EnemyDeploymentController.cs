@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 /// <summary>
-/// AI ¼¼·ÂÀÇ È®Á¤µÈ ·Î½ºÅÍ¸¦ Àû ¹èÄ¡ ±¸¿ª ¾È¿¡¼­ ¹«ÀÛÀ§ À§Ä¡¿¡ ÀÚµ¿ ¹èÄ¡ÇÑ´Ù.
+/// AI ì„¸ë ¥ì˜ í™•ì •ëœ ë¡œìŠ¤í„°ë¥¼ ì  ë°°ì¹˜ êµ¬ì—­ ì•ˆì—ì„œ ë¬´ì‘ìœ„ ìœ„ì¹˜ì— ìë™ ë°°ì¹˜í•œë‹¤.
 /// </summary>
 public class EnemyDeploymentController : MonoBehaviour
 {
@@ -16,11 +16,17 @@ public class EnemyDeploymentController : MonoBehaviour
   
 
 
-    // RosterPhaseManager°¡ UI¿¡¼­ ¼±ÅÃµÈ °ªÀ» °ü¸®ÇÏ°í, DeployRoster È£Ãâ ½Ã ³Ñ°Ü¹Ş´Â´Ù.
+    // RosterPhaseManagerê°€ UIì—ì„œ ì„ íƒëœ ê°’ì„ ê´€ë¦¬í•˜ê³ , DeployRoster í˜¸ì¶œ ì‹œ ë„˜ê²¨ë°›ëŠ”ë‹¤.
     public void DeployRoster(SkirmishParticipant participant, AICombatDisposition disposition)
     {
         if (participant == null)
             return;
+
+        if (gridManager == null)
+        {
+            Debug.LogError($"[{name}] gridManagerê°€ ì—°ê²°ë˜ì§€ ì•Šì•„ ì ì„ ë°°ì¹˜í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.", this);
+            return;
+        }
 
         List<Vector2Int> candidateCoords = GetEnemyZoneWalkableCoords();
         Shuffle(candidateCoords);
@@ -31,7 +37,7 @@ public class EnemyDeploymentController : MonoBehaviour
         {
             if (index >= candidateCoords.Count)
             {
-                Debug.LogWarning("Àû ¹èÄ¡ ±¸¿ª¿¡ ³²Àº ºó ÀÚ¸®°¡ ¾ø½À´Ï´Ù.");
+                Debug.LogWarning("ì  ë°°ì¹˜ êµ¬ì—­ì— ë‚¨ì€ ë¹ˆ ìë¦¬ê°€ ì—†ìŠµë‹ˆë‹¤.");
                 break;
             }
 

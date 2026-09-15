@@ -65,6 +65,11 @@ public class GridManager : MonoBehaviour
 
     public TileInstance GetTile(Vector2Int coord)
     {
+        // 맵이 아직 생성되지 않았거나(ClearMapAndVisuals 직후 등) GenerateNewMap이 호출되기 전이면
+        // tiles가 null일 수 있음. 범위 체크만으로는 이 경우를 걸러내지 못해 NullReferenceException이 났었음.
+        if (tiles == null)
+            return null;
+
         if (coord.x < 0 || coord.x >= width || coord.y < 0 || coord.y >= height)
             return null;
         return tiles[coord.x, coord.y];

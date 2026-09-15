@@ -21,12 +21,19 @@ public class BattlePhaseManager : MonoBehaviour
 
     void OnEnable()
     {
+        if (outcomeManager == null)
+        {
+            Debug.LogError($"[{name}] outcomeManager가 연결되지 않았습니다.", this);
+            return;
+        }
+
         outcomeManager.OnBattleEnded += HandleBattleEnded;
     }
 
     void OnDisable()
     {
-        outcomeManager.OnBattleEnded -= HandleBattleEnded;
+        if (outcomeManager != null)
+            outcomeManager.OnBattleEnded -= HandleBattleEnded;
     }
 
 
@@ -35,6 +42,12 @@ public class BattlePhaseManager : MonoBehaviour
     {
         if (CurrentPhase == BattlePhase.Battle)
             return;
+
+        if (turnManager == null)
+        {
+            Debug.LogError($"[{name}] turnManager가 연결되지 않아 전투를 시작할 수 없습니다.", this);
+            return;
+        }
 
         CurrentPhase = BattlePhase.Battle;
         Debug.Log("전투 시작. 배치 페이즈 종료.");

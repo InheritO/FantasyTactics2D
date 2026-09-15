@@ -2,8 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>
-/// È®Á¤µÈ ·Î½ºÅÍ(ConfirmedEntries)¸¦ ÇÃ·¹ÀÌ¾î ¹èÄ¡ ±¸¿ª ¾È¿¡¼­ ÇÏ³ª¾¿ Å¬¸¯À¸·Î ¹èÄ¡ÇÑ´Ù.
-/// ¸ğµç À¯´ÖÀ» ¹èÄ¡ÇÏ¸é ÀÚµ¿À¸·Î ÀüÅõ ½ÃÀÛÀÌ °¡´ÉÇÑ »óÅÂ°¡ µÈ´Ù.
+/// í™•ì •ëœ ë¡œìŠ¤í„°(ConfirmedEntries)ë¥¼ í”Œë ˆì´ì–´ ë°°ì¹˜ êµ¬ì—­ ì•ˆì—ì„œ í•˜ë‚˜ì”© í´ë¦­ìœ¼ë¡œ ë°°ì¹˜í•œë‹¤.
+/// ëª¨ë“  ìœ ë‹›ì„ ë°°ì¹˜í•˜ë©´ ìë™ìœ¼ë¡œ ì „íˆ¬ ì‹œì‘ì´ ê°€ëŠ¥í•œ ìƒíƒœê°€ ëœë‹¤.
 /// </summary>
 public class PlayerDeploymentController : MonoBehaviour
 {
@@ -12,10 +12,10 @@ public class PlayerDeploymentController : MonoBehaviour
     public BattlePhaseManager phaseManager;
     public BattleOutcomeManager outcomeManager;
     public CombatLogger combatLogger;
-    public RosterPhaseManager rosterManager; // ¼¼·Â/Á¾Á·/·Î½ºÅÍ Á¤º¸¸¦ ÀüºÎ ¿©±â¼­ °¡Á®¿È
+    public RosterPhaseManager rosterManager; // ì„¸ë ¥/ì¢…ì¡±/ë¡œìŠ¤í„° ì •ë³´ë¥¼ ì „ë¶€ ì—¬ê¸°ì„œ ê°€ì ¸ì˜´
 
     private SkirmishParticipant participant;
-    public TestUnit unitPrefab; // ³ªÁß¿¡ Á¾Á·º° ÇÁ¸®ÆÕÀÌ »ı±â¸é ±³Ã¼µÉ ÀÚ¸®
+    public TestUnit unitPrefab; // ë‚˜ì¤‘ì— ì¢…ì¡±ë³„ í”„ë¦¬íŒ¹ì´ ìƒê¸°ë©´ êµì²´ë  ìë¦¬
 
     public event System.Action OnAllUnitsDeployed;
 
@@ -32,6 +32,13 @@ public class PlayerDeploymentController : MonoBehaviour
     void OnEnable()
     {
         controls.GamePlay.Enable();
+
+        if (rosterManager == null)
+        {
+            Debug.LogError($"[{name}] rosterManagerê°€ ì—°ê²°ë˜ì§€ ì•Šì•„ ë°°ì¹˜ë¥¼ ì¤€ë¹„í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.", this);
+            return;
+        }
+
         participant = rosterManager.BuildPlayerParticipant();
         BuildPendingQueue();
     }
@@ -45,7 +52,7 @@ public class PlayerDeploymentController : MonoBehaviour
 
         if (rosterManager.ConfirmedEntries == null)
         {
-            Debug.LogWarning("È®Á¤µÈ ·Î½ºÅÍ°¡ ¾ø½À´Ï´Ù.");
+            Debug.LogWarning("í™•ì •ëœ ë¡œìŠ¤í„°ê°€ ì—†ìŠµë‹ˆë‹¤.");
             return;
         }
 
@@ -55,6 +62,9 @@ public class PlayerDeploymentController : MonoBehaviour
 
     void Update()
     {
+        if (phaseManager == null || gridManager == null)
+            return;
+
         if (phaseManager.CurrentPhase != BattlePhase.Placement)
             return;
 
@@ -69,7 +79,14 @@ public class PlayerDeploymentController : MonoBehaviour
     {
         if (participant == null)
         {
-            Debug.LogWarning("Âü°¡ÀÚ Á¤º¸°¡ ¾ø¾î ¹èÄ¡ÇÒ ¼ö ¾ø½À´Ï´Ù.");
+            Debug.LogWarning("ì°¸ê°€ì ì •ë³´ê°€ ì—†ì–´ ë°°ì¹˜í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
+            return;
+        }
+
+        // MainCamera íƒœê·¸ê°€ ë¶™ì€ ì¹´ë©”ë¼ê°€ ì”¬ì— ì—†ìœ¼ë©´ Camera.mainì´ nullì´ ë˜ì–´ NullReferenceExceptionì´ ë‚¬ì—ˆìŒ.
+        if (Camera.main == null)
+        {
+            Debug.LogError($"[{name}] Camera.mainì„ ì°¾ì„ ìˆ˜ ì—†ì–´ ë°°ì¹˜ ìœ„ì¹˜ë¥¼ ê³„ì‚°í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.", this);
             return;
         }
 
@@ -82,13 +99,13 @@ public class PlayerDeploymentController : MonoBehaviour
 
         if (tile == null || tile.Zone != DeploymentZone.PlayerZone)
         {
-            Debug.Log("ÇÃ·¹ÀÌ¾î ¹èÄ¡ ±¸¿ªÀÌ ¾Æ´Õ´Ï´Ù.");
+            Debug.Log("í”Œë ˆì´ì–´ ë°°ì¹˜ êµ¬ì—­ì´ ì•„ë‹™ë‹ˆë‹¤.");
             return;
         }
 
         if (!tile.IsWalkable())
         {
-            Debug.Log("ÀÌµ¿ ºÒ°¡ Å¸ÀÏ¿¡´Â ¹èÄ¡ÇÒ ¼ö ¾ø½À´Ï´Ù.");
+            Debug.Log("ì´ë™ ë¶ˆê°€ íƒ€ì¼ì—ëŠ” ë°°ì¹˜í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
             return;
         }
 
