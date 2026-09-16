@@ -6,7 +6,12 @@ public struct CombatResult
 {
     public bool IsHit;
     public int DamageDealt;
+    public StatusEffectType InflictedEffect;
 
     public static CombatResult Miss() => new CombatResult { IsHit = false, DamageDealt = 0 };
     public static CombatResult Hit(int damage) => new CombatResult { IsHit = true, DamageDealt = damage };
+
+    public static CombatResult HitWithEffect(int damage, StatusEffectType effect) =>
+        new CombatResult { IsHit = true, DamageDealt = damage, InflictedEffect = effect };
 }
+

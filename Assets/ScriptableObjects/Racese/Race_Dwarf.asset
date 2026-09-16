@@ -27,6 +27,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: da7a84c917a20e54da48616e1c89448e, type: 2}
   - {fileID: 11400000, guid: 0cdb76c0455d8df4aab5bf20fbacd409, type: 2}
   - {fileID: 11400000, guid: deee1cdf10f37ac4eb978e70e7a73328, type: 2}
+  - {fileID: 11400000, guid: 54cefef6164d11e43bef866e65421d7c, type: 2}
   availableArmors:
   - {fileID: 11400000, guid: fe93229c0386ab7478e7a7f29f1851bb, type: 2}
   - {fileID: 11400000, guid: 5e907f84f06e98f48aea036b98e33bc7, type: 2}

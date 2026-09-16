@@ -21,9 +21,9 @@ public abstract class UnitBase : MonoBehaviour
 
     [Header("Capabilities")]
     [field: SerializeField] public bool CanMove { get; protected set; } = true;
-    [field: SerializeField]public bool CanAttack { get; protected set; } = true;
+    [field: SerializeField] public bool CanAttack { get; protected set; } = true;
 
-    [field:SerializeField]    public int CurrentHealth { get; protected set; }
+    [field: SerializeField] public int CurrentHealth { get; protected set; }
     public IUnitAIBehavior AIBehavior { get; set; }
     [Header("AI 확인용")]
     public AICombatDisposition AssignedDisposition;
@@ -56,7 +56,9 @@ public abstract class UnitBase : MonoBehaviour
 
     // Defense를 두 요소로 분리: 관통력이 ArmorDefense에만 영향을 주기 위함
     public int ConstitutionDefense => Race != null ? Race.baseConstitution : 0;
-    public int ArmorDefense => (EquippedArmor?.defenseBonus ?? 0) + (EquippedShield?.defenseBonus ?? 0);
+    public int ArmorDefense =>
+    (ArmorBroken ? 0 : (EquippedArmor?.defenseBonus ?? 0)) +
+    (ShieldBroken ? 0 : (EquippedShield?.defenseBonus ?? 0));
     public int Defense => ConstitutionDefense + ArmorDefense; // 관통력 미반영 총 방어력 (UI 표시 등에 사용)
 
     public int BaseAttackRange = 1;
@@ -76,6 +78,13 @@ public abstract class UnitBase : MonoBehaviour
     // 지금 이 유닛이 뭔가 더 할 수 있는지 (이동 or 공격 중 하나라도 안 했으면 true)
 
     public bool CanStillAct => !HasMoved || AttacksUsedThisTurn < MaxAttacksPerTurn;
+
+    // 상태이상
+    private List<StatusEffectInstance> activeEffects = new List<StatusEffectInstance>();
+    // 기절 상태인지 여부 (이동/공격 가능 여부 판정에 사용)
+    public bool IsStunned => activeEffects.Exists(e => e.Type == StatusEffectType.Stun);
+    public bool ShieldBroken { get; private set; }
+    public bool ArmorBroken { get; private set; }
 
 
     //이벤트
@@ -154,16 +163,16 @@ public abstract class UnitBase : MonoBehaviour
 
     // 세력의 기본 종족과 무관하게, 스폰 시점에 실제 종족을 명시적으로 지정
     public void OverrideRace(RaceData race)
-{
-    if (race == null)
     {
-        Debug.LogWarning($"[{name}] OverrideRace에 null이 전달되었습니다.");
-        return;
-    }
+        if (race == null)
+        {
+            Debug.LogWarning($"[{name}] OverrideRace에 null이 전달되었습니다.");
+            return;
+        }
 
-    Race = race;
-    CurrentHealth = MaxHealth;
-}
+        Race = race;
+        CurrentHealth = MaxHealth;
+    }
 
     //장비
 
@@ -287,6 +296,13 @@ public abstract class UnitBase : MonoBehaviour
         if (!CanMove || HasMoved)
             return false;
 
+        if (IsStunned)
+        {
+            Debug.Log($"[{name}] 기절 상태라 이동할 수 없습니다.");
+            return false;
+        }
+
+
         if (gridManager == null)
         {
             Debug.LogError($"[{name}] gridManager가 설정되지 않은 채로 TryMoveTo가 호출되었습니다. PlaceOnGrid가 먼저 호출되었는지 확인하세요.");
@@ -335,12 +351,19 @@ public abstract class UnitBase : MonoBehaviour
         if (!CanAttack || AttacksUsedThisTurn >= MaxAttacksPerTurn)
             return false;
 
+
+        if (IsStunned)
+        {
+            Debug.Log($"[{name}] 기절 상태라 공격할 수 없습니다.");
+            return false;
+        }
+
         if (!IsInAttackRange(target))
             return false;
 
         WeaponAttack attack = chosenAttack ?? MainHandWeapon?.GetDefaultAttack();
 
-        List<CombatResult> results = CombatResolver.ResolveFullAttack(this, target, attack);
+        List<CombatResult> results = CombatResolver.ResolveFullAttack(this, target, chosenAttack ?? MainHandWeapon?.GetDefaultAttack());
         OnAttackPerformed?.Invoke(this, target);
 
         foreach (var result in results)
@@ -351,7 +374,23 @@ public abstract class UnitBase : MonoBehaviour
             OnAttackResult?.Invoke(this, target, result);
 
             if (result.IsHit)
+            {
                 target.TakeDamage(result.DamageDealt);
+
+                // 상태이상이 발동했다면 대상에게 적용
+                if (result.InflictedEffect != StatusEffectType.None)
+                {
+                    WeaponAttack attackUsed = chosenAttack ?? MainHandWeapon?.GetDefaultAttack();
+                    if (attackUsed != null)
+                    {
+                        if (attackUsed.inflictedEffect == StatusEffectType.ArmorBreak)
+                            target.BreakEquipment();
+                        else
+                            target.ApplyStatusEffect(attackUsed.inflictedEffect, attackUsed.effectDuration, attackUsed.effectMagnitude);
+
+                    }
+                }
+            }
         }
 
         AttacksUsedThisTurn++;
@@ -392,6 +431,60 @@ public abstract class UnitBase : MonoBehaviour
 
         Destroy(gameObject);
     }
+
+    // 상태이상
+    public void ApplyStatusEffect(StatusEffectType type, int duration, int magnitude)
+    {
+        StatusEffectInstance existing = activeEffects.Find(e => e.Type == type);
+
+        if (existing != null)
+        {
+            // 지속시간: 항상 새로 거는 값으로 갱신 (계속 공격하면 "덧입혀서" 유지되는 느낌)
+            // 데미지: 더 강한 공격으로 걸었다면 그 값으로, 약한 공격이면 기존 값 유지
+            int strongerMagnitude = Mathf.Max(existing.Magnitude, magnitude);
+            activeEffects.Remove(existing);
+            activeEffects.Add(new StatusEffectInstance(type, duration, strongerMagnitude));
+        }
+        else
+        {
+            activeEffects.Add(new StatusEffectInstance(type, duration, magnitude));
+        }
+    }
+
+    // 턴 시작 시 호출: 출혈 데미지 적용, 지속시간 감소, 만료된 효과 제거
+    public void ProcessStatusEffectsOnTurnStart()
+    {
+        foreach (var effect in activeEffects)
+        {
+            if (effect.Type == StatusEffectType.Bleed)
+            {
+                TakeDamage(effect.Magnitude);
+                Debug.Log($"[{name}] 출혈로 {effect.Magnitude} 데미지");
+            }
+
+            effect.DecrementTurn();
+        }
+
+        activeEffects.RemoveAll(e => e.IsExpired);
+    }
+
+    public void BreakEquipment()
+    {
+        if (EquippedShield != null && !ShieldBroken)
+        {
+            ShieldBroken = true;
+            Debug.Log($"[{name}]의 방패가 파괴되었습니다!");
+            return;
+        }
+
+        if (!ArmorBroken)
+        {
+            ArmorBroken = true;
+            Debug.Log($"[{name}]의 방어구가 파괴되었습니다!");
+        }
+    }
+
+
 
     // 특성 계산
 
@@ -451,6 +544,9 @@ public abstract class UnitBase : MonoBehaviour
     {
         HasMoved = false;
         AttacksUsedThisTurn = 0;
+
+        ProcessStatusEffectsOnTurnStart();
+
         OnTurnReset?.Invoke(this);
     }
 

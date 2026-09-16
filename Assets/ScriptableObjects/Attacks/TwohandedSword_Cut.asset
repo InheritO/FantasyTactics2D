@@ -16,3 +16,7 @@ MonoBehaviour:
   basePower: 8
   armorPenetration: 0
   accuracyBonus: 0
+  inflictedEffect: 1
+  disruption: 20
+  effectDuration: 5
+  effectMagnitude: 4
