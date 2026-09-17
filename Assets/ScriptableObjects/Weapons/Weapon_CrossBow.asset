@@ -18,8 +18,10 @@ MonoBehaviour:
   slotType: 1
   isRanged: 1
   attackRangeOverride: 2
-  basePower: 1
+  basePower: 24
   damageScaling: 1
+  baseArmorPenetration: 4
+  baseAccuracyBonus: 10
   attacks:
   - {fileID: 11400000, guid: ab2fdd6852d93924880fd4fe45acadff, type: 2}
   description: 

@@ -15,12 +15,13 @@ MonoBehaviour:
   raceName: Dwarf
   maxHealth: 44
   baseMoveRange: 5
-  baseMeleeSkill: 23
-  baseRangedSkill: 19
+  baseMeleeSkill: 20
+  baseRangedSkill: 16
+  baseDefenseSkill: 28
   baseStrength: 22
-  baseConstitution: 26
-  baseAgility: 12
-  unitCost: 13
+  baseConstitution: 24
+  baseAgility: 14
+  unitCost: 14
   traits:
   - {fileID: 11400000, guid: fe9af019769691142a0fc88e3b373754, type: 2}
   availableWeapons:

@@ -15,11 +15,12 @@ MonoBehaviour:
   raceName: Orc
   maxHealth: 42
   baseMoveRange: 6
-  baseMeleeSkill: 14
+  baseMeleeSkill: 13
   baseRangedSkill: 12
-  baseStrength: 24
-  baseConstitution: 23
-  baseAgility: 14
+  baseDefenseSkill: 15
+  baseStrength: 25
+  baseConstitution: 22
+  baseAgility: 15
   unitCost: 8
   traits:
   - {fileID: 11400000, guid: 78fea78f85c60e94d875f7783c0cf76b, type: 2}

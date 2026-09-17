@@ -50,6 +50,7 @@ public abstract class UnitBase : MonoBehaviour
         : 0;
     public int MeleeSkill => Race != null ? Race.baseMeleeSkill : 0;
     public int RangedSkill => Race != null ? Race.baseRangedSkill : 0;
+    public int DefenseSkill => Race != null ? Race.baseDefenseSkill : 0;
     public int Strength => Race != null ? Race.baseStrength : 0;
     public int Agility => Race != null ? Race.baseAgility : 0;
 

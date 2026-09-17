@@ -5,10 +5,14 @@
 public struct CombatResult
 {
     public bool IsHit;
+    public bool IsBlocked;
     public int DamageDealt;
     public StatusEffectType InflictedEffect;
 
     public static CombatResult Miss() => new CombatResult { IsHit = false, DamageDealt = 0 };
+    public static CombatResult Blocked() =>
+       new CombatResult { IsHit = true, IsBlocked = true, DamageDealt = 0, InflictedEffect = StatusEffectType.None };
+
     public static CombatResult Hit(int damage) => new CombatResult { IsHit = true, DamageDealt = damage };
 
     public static CombatResult HitWithEffect(int damage, StatusEffectType effect) =>

@@ -5,14 +5,15 @@ public class WeaponAttack : ScriptableObject
 {
     public string attackName;
 
-    [Header("Damage")]
-    public int basePower;
+    [Header("Bonus (무기 기본값에 더해짐)")]
+    [Tooltip("무기의 기본 위력에 더해지는 보너스")]
+    public int powerBonus;
 
-    [Header("Armor Interaction")]
-    public int armorPenetration;  // 상대 방어구 보너스를 깎는 수치 (맷집에는 영향 없음)
+    [Tooltip("무기의 기본 관통력에 더해지는 보너스")]
+    public int armorPenetrationBonus;
 
-    [Header("Accuracy")]
-    public int accuracyBonus; // 명중률 보정 (기계식 무기 등에 유용)
+    [Tooltip("무기의 기본 명중 보정에 더해지는 보너스")]
+    public int accuracyBonusModifier;
 
     [Header("Status Effect (선택 사항)")]
     public StatusEffectType inflictedEffect = StatusEffectType.None;

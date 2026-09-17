@@ -13,13 +13,14 @@ MonoBehaviour:
   m_Name: Race_Elf
   m_EditorClassIdentifier: Assembly-CSharp::RaceData
   raceName: Elf
-  maxHealth: 32
+  maxHealth: 38
   baseMoveRange: 8
   baseMeleeSkill: 24
-  baseRangedSkill: 26
-  baseStrength: 18
-  baseConstitution: 15
-  baseAgility: 25
+  baseRangedSkill: 28
+  baseDefenseSkill: 18
+  baseStrength: 16
+  baseConstitution: 19
+  baseAgility: 26
   unitCost: 14
   traits:
   - {fileID: 11400000, guid: 3a7186c1711c86a43808490bc4af5fda, type: 2}

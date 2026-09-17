@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1050f7542d569f44b91956003876231, type: 3}
   m_Name: Mace_Smite
   m_EditorClassIdentifier: Assembly-CSharp::WeaponAttack
-  attackName: Basic Attack
-  basePower: 8
-  armorPenetration: 2
-  accuracyBonus: -5
+  attackName: Smite
+  powerBonus: 1
+  armorPenetrationBonus: 0
+  accuracyBonusModifier: -3
   inflictedEffect: 2
-  disruption: 100
-  effectDuration: 2
+  disruption: 10
+  effectDuration: 1
   effectMagnitude: 1

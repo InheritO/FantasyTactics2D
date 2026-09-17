@@ -10,13 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d1050f7542d569f44b91956003876231, type: 3}
-  m_Name: TwohandedAxe_Split
+  m_Name: GreatSword_Cut
   m_EditorClassIdentifier: Assembly-CSharp::WeaponAttack
-  attackName: Basic Attack
-  basePower: 8
-  armorPenetration: 2
-  accuracyBonus: -5
-  inflictedEffect: 3
-  disruption: 100
-  effectDuration: 5
-  effectMagnitude: 4
+  attackName: Cut
+  powerBonus: 2
+  armorPenetrationBonus: 0
+  accuracyBonusModifier: 0
+  inflictedEffect: 1
+  disruption: 10
+  effectDuration: 3
+  effectMagnitude: 3

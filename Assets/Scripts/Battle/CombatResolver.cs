@@ -7,7 +7,6 @@ using System.Collections.Generic;
 /// </summary>
 public static class CombatResolver
 {
-    private const int BaseHitChance = 70; // 기술과 회피가 같을 때의 기본 명중률(%)
 
     public static List<CombatResult> ResolveFullAttack(UnitBase attacker, UnitBase defender, WeaponAttack chosenAttack)
     {
@@ -43,12 +42,21 @@ public static class CombatResolver
             return CombatResult.Miss();
         }
 
+        // 1단계: 명중/회피 (민첩 vs 민첩)
         int hitChance = CalculateHitChance(attacker, defender, weapon, attack);
         bool isHit = Random.Range(0, 100) < hitChance;
 
         if (!isHit)
             return CombatResult.Miss();
 
+        // 2단계: 막기 (공격 기술 vs 방어 기술, 방패 있을 때만)
+        if (TryResolveBlock(attacker, defender, weapon))
+        {
+            Debug.Log($"[{defender.name}] 방패로 막아냈습니다!");
+            return CombatResult.Blocked();
+        }
+
+        // 3단계: 데미지 (힘/무기 vs 맷집/방어구)
         int damage = CalculateDamage(attacker, defender, weapon, attack);
 
         // 명중했을 때만 상태이상 판정 시도
@@ -65,10 +73,10 @@ public static class CombatResolver
 
     public static int CalculateHitChance(UnitBase attacker, UnitBase defender, WeaponData weapon, WeaponAttack attack)
     {
-        int attackSkill = (weapon != null && weapon.isRanged) ? attacker.RangedSkill : attacker.MeleeSkill;
-        int accuracyBonus = attack?.accuracyBonus ?? 0;
+        //공격자와 방어자의 순발력을 비교
+        int totalAccuracyBonus = (weapon?.baseAccuracyBonus ?? 0) + (attack?.accuracyBonusModifier ?? 0);
 
-        int chance = BaseHitChance + (attackSkill - defender.Agility) * 5 + accuracyBonus;
+        int chance = 70 + (attacker.Agility - defender.Agility) * 5 + totalAccuracyBonus;
         return Mathf.Clamp(chance, 5, 95);
     }
 
@@ -78,15 +86,16 @@ public static class CombatResolver
         bool isMelee = weapon == null || !weapon.isRanged;
         int effectiveStrength = attacker.GetEffectiveStrength(isMelee);
 
-        int rawDamage = attack == null
-            ? effectiveStrength
-            : (weapon.damageScaling == DamageScaling.Strength
-                ? attack.basePower + effectiveStrength
-                : attack.basePower);
+
+        int totalPower = (weapon?.basePower ?? 0) + (attack?.powerBonus ?? 0);
+        int rawDamage = (weapon != null && weapon.damageScaling == DamageScaling.Strength)
+        ? totalPower + effectiveStrength
+        : totalPower;
 
         rawDamage = Mathf.Max(0, rawDamage);
 
-        int armorPenetration = Mathf.Max(0, attack?.armorPenetration ?? 0);
+        int armorPenetration = Mathf.Max(0, (weapon?.baseArmorPenetration ?? 0) + (attack?.armorPenetrationBonus ?? 0));
+
         int effectiveArmorDefense = Mathf.Max(0, defender.ArmorDefense - armorPenetration);
         int effectiveDefense = defender.ConstitutionDefense + effectiveArmorDefense;
 
@@ -94,6 +103,22 @@ public static class CombatResolver
         return Mathf.Max(1, finalDamage);
     }
 
+    private static bool TryResolveBlock(UnitBase attacker, UnitBase defender, WeaponData attackerWeapon)
+    {
+        if (defender.EquippedShield == null || defender.ShieldBroken)
+            return false;
+
+        // 막기는 공격자의 무기 숙련도(근접/원거리)와, 방어자의 방어 기술이 대결
+        bool isRangedAttack = attackerWeapon != null && attackerWeapon.isRanged;
+        int attackerSkill = isRangedAttack ? attacker.RangedSkill : attacker.MeleeSkill;
+
+        int totalBlockSkill = defender.DefenseSkill + defender.EquippedShield.blockSkillBonus;
+
+        int blockChance = 20 + (totalBlockSkill - attackerSkill) * 2;
+        blockChance = Mathf.Clamp(blockChance, 5, 60);
+
+        return Random.Range(0, 100) < blockChance;
+    }
 
     // 상태이상 적중 여부만 판정 (별도 함수로 분리해서, 나중에 UI 등에서 "적중 확률 미리보기"로도 재사용 가능하게)
     private static bool TryResolveStatusEffect(WeaponAttack attack, UnitBase defender)

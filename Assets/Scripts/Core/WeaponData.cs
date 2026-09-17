@@ -35,9 +35,17 @@ public class WeaponData : ScriptableObject
     public bool isRanged;
     public int attackRangeOverride = -1; // -1이면 유닛 기본 사거리 유지
 
-    [Header("Damage")]
+    [Header("Base Combat Stats")]
+
+    [Tooltip("이 공격의 기본 위력. 힘 기반 무기는 여기에 캐릭터 힘이 더해짐")]
     public int basePower;
     public DamageScaling damageScaling = DamageScaling.Strength;
+
+    [Tooltip("무기 자체의 기본 관통력")]
+    public int baseArmorPenetration;
+
+    [Tooltip("무기 자체의 기본 명중 보정")]
+    public int baseAccuracyBonus;
 
     [Header("Attacks (최소 1개 이상)")]
     public WeaponAttack[] attacks = new WeaponAttack[1];

@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1050f7542d569f44b91956003876231, type: 3}
   m_Name: Sword_Cut
   m_EditorClassIdentifier: Assembly-CSharp::WeaponAttack
-  attackName: Sword_Cut
-  basePower: 5
-  armorPenetration: 0
-  accuracyBonus: 0
+  attackName: Cut
+  powerBonus: 1
+  armorPenetrationBonus: 0
+  accuracyBonusModifier: 0
   inflictedEffect: 1
-  disruption: 100
-  effectDuration: 4
-  effectMagnitude: 4
+  disruption: 8
+  effectDuration: 2
+  effectMagnitude: 2

@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: Sword_Pierce
   m_EditorClassIdentifier: Assembly-CSharp::WeaponAttack
   attackName: Pierce
-  basePower: 3
-  armorPenetration: 3
-  accuracyBonus: -8
-  inflictedEffect: 1
-  disruption: 4
-  effectDuration: 2
-  effectMagnitude: 1
+  powerBonus: -1
+  armorPenetrationBonus: 3
+  accuracyBonusModifier: -8
+  inflictedEffect: 0
+  disruption: 0
+  effectDuration: 0
+  effectMagnitude: 0

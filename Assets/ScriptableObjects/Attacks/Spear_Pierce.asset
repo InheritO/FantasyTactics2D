@@ -12,7 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1050f7542d569f44b91956003876231, type: 3}
   m_Name: Spear_Pierce
   m_EditorClassIdentifier: Assembly-CSharp::WeaponAttack
-  attackName: Basic Attack
-  basePower: 6
-  armorPenetration: 2
-  accuracyBonus: 0
+  attackName: Pierce
+  powerBonus: 1
+  armorPenetrationBonus: 0
+  accuracyBonusModifier: 0
+  inflictedEffect: 0
+  disruption: 4
+  effectDuration: 2
+  effectMagnitude: 1

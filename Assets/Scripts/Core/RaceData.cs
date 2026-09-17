@@ -27,13 +27,22 @@ public class RaceData : ScriptableObject
     public string raceName;
 
     [Header("Base Stats")]
+    [Tooltip("최대 체력")]
     public int maxHealth = 10;
-    public int baseMoveRange = 3;
-    public int baseMeleeSkill = 3;
-    public int baseRangedSkill = 3;
-    public int baseStrength = 3;
-    public int baseConstitution = 3;
-    public int baseAgility = 3;
+    [Tooltip("한 턴에 이동 가능한 칸 수")]
+    public int baseMoveRange = 20;
+    [Tooltip("근접 공격 시 막기 무력화 판정에 사용 (공격자 근접기술 vs 방어자 방어기술)")]
+    public int baseMeleeSkill = 20;
+    [Tooltip("원거리 공격 시 막기 무력화 판정에 사용 (공격자 원거리기술 vs 방어자 방어기술)")]
+    public int baseRangedSkill = 20;
+    [Tooltip("방패를 착용했을 때 막기 성공률에 사용 (방어자 방어기술 vs 공격자 근접/원거리기술)")]
+    public int baseDefenseSkill = 20;
+    [Tooltip("힘 기반 무기의 데미지에 영향")]
+    public int baseStrength = 20;
+    [Tooltip("받는 데미지 감소(방어구로 무시되지 않음), 상태이상 저항 판정에도 사용")]
+    public int baseConstitution = 20;
+    [Tooltip("명중/회피 판정에 사용 (공격자 민첩 vs 방어자 민첩)")]
+    public int baseAgility = 20;
 
     [Header("Roster Cost")]
     public int unitCost = 10; // 대전 편성 시 이 종족 유닛 한 기의 기본 비용

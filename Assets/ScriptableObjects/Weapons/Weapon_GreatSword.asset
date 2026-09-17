@@ -10,17 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fc61bf8a40e02f64ca24985d6fff5a1c, type: 3}
-  m_Name: Weapon_TwohandedAxe
+  m_Name: Weapon_GreatSword
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
-  weaponName: LargeAxe
-  icon: {fileID: 21300000, guid: 172774604c1bee84185a69041576525b, type: 3}
+  weaponName: GreatSword
+  icon: {fileID: 21300000, guid: 5fd50594014b70e48bd6993443d46b32, type: 3}
   handedness: 1
-  slotType: -1
+  slotType: 1
   isRanged: 0
   attackRangeOverride: -1
-  basePower: 4
+  basePower: 6
   damageScaling: 0
+  baseArmorPenetration: 2
+  baseAccuracyBonus: 3
   attacks:
-  - {fileID: 11400000, guid: ab2fdd6852d93924880fd4fe45acadff, type: 2}
+  - {fileID: 11400000, guid: f7f1c1dd021875f47a02f2b75f46fc14, type: 2}
+  - {fileID: 11400000, guid: aff40e04350f48143a351f5eca8886b8, type: 2}
   description: 
-  cost: 2
+  cost: 6
