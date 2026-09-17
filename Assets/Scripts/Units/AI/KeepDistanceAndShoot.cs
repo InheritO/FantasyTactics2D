@@ -51,6 +51,13 @@ public class KeepDistanceAndShoot : IUnitAIBehavior
             return;
         }
 
+        // 재장전 확인
+        if (unit.MainHandWeapon != null && unit.MainHandWeapon.requiresReload && !unit.IsLoaded)
+        {
+            unit.PerformReload();
+            return;
+        }
+
         // 여기 도달했다는 건 "너무 가깝지 않다" = 딱 맞거나 먼 거리
         if (unit.IsInAttackRange(target))
         {

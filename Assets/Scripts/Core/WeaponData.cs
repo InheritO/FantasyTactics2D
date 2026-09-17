@@ -59,6 +59,12 @@ public class WeaponData : ScriptableObject
     [Header("Roster Cost")]
     public int cost = 2; // 기본 비용. 종족별로 다르게 하려면 RaceData의 weaponCostOverrides에 등록
 
+    [Header("Reload (선택 사항)")]
+    [Tooltip("체크하면, 공격 후 다음 턴엔 재장전 행동만 가능해짐")]
+    public bool requiresReload;
+
+    [Tooltip("재장전 시 사용할 행동 에셋. 보통 공용 ReloadAction 에셋 하나를 여러 무기가 공유")]
+    public ReloadAction reloadAction;
 
     public WeaponAttack GetDefaultAttack()
     {

@@ -1,9 +1,8 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "NewWeaponAttack", menuName = "Strategy/Equipment/Weapon Attack")]
-public class WeaponAttack : ScriptableObject
+public class WeaponAttack : UnitAction
 {
-    public string attackName;
 
     [Header("Bonus (무기 기본값에 더해짐)")]
     [Tooltip("무기의 기본 위력에 더해지는 보너스")]
@@ -23,4 +22,24 @@ public class WeaponAttack : ScriptableObject
     public int disruption; // 상태이상 적중 판정에 쓰이는 값 (대상 맷집과 대결)
     public int effectDuration = 1; // 몇 턴 지속되는지
     public int effectMagnitude; // 출혈의 턴당 데미지량 등, 효과 종류에 따라 의미가 다름
+
+    public override bool IsAvailable(UnitBase actor, UnitBase target)
+    {
+        if (target == null || actor == null)
+            return false;
+
+        // 재장전이 필요한 무기인데 장전 안 됐으면, 공격 자체를 선택 불가능하게
+        if (actor.MainHandWeapon != null && actor.MainHandWeapon.requiresReload && !actor.IsLoaded)
+            return false;
+
+        return actor.IsInAttackRange(target);
+    }
+
+    public override void Execute(UnitBase actor, UnitBase target)
+    {
+        bool attacked = actor.TryAttack(target, this);
+
+        if (attacked && actor.MainHandWeapon != null && actor.MainHandWeapon.requiresReload)
+            actor.ConsumeAmmo();
+    }
 }

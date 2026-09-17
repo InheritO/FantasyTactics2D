@@ -17,6 +17,14 @@ public class AggressiveMoveTowardEnemy : IUnitAIBehavior
             return;
 
         Debug.Log($"[AI-TakeTurn] {unit.name} → 최근접 적: {nearestEnemy.name}, 거리: {gridManager.GetDistance(unit.GridCoord, nearestEnemy.GridCoord)}");
+        
+        // 재장전 확인
+        if (unit.MainHandWeapon != null && unit.MainHandWeapon.requiresReload && !unit.IsLoaded)
+        {
+            unit.PerformReload();
+            return;
+        }
+
 
         // 이미 사거리 안이면 이동하지 않고 바로 공격
         if (unit.IsInAttackRange(nearestEnemy))

@@ -15,6 +15,13 @@ public class DefensiveHoldPosition : IUnitAIBehavior
         if (target == null)
             return;
 
+        // 재장전 확인
+        if (unit.MainHandWeapon != null && unit.MainHandWeapon.requiresReload && !unit.IsLoaded)
+        {
+            unit.PerformReload();
+            return;
+        }
+
         if (unit.IsInAttackRange(target))
             unit.TryAttack(target);
 

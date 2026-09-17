@@ -87,6 +87,12 @@ public abstract class UnitBase : MonoBehaviour
     public bool ShieldBroken { get; private set; }
     public bool ArmorBroken { get; private set; }
 
+    [field: SerializeField, Tooltip("재장전이 필요한 무기의 현재 장전 상태")]
+    public bool IsLoaded { get; private set; } = true;
+
+    public void Reload() => IsLoaded = true;
+    public void ConsumeAmmo() => IsLoaded = false;
+
 
     //이벤트
 
@@ -555,5 +561,14 @@ public abstract class UnitBase : MonoBehaviour
     {
         AIBehavior = behavior;
         AssignedDisposition = disposition;
+    }
+    public void PerformReload()
+    {
+        Reload();
+        AttacksUsedThisTurn++;
+        HasMoved = true;
+
+        if (AttacksUsedThisTurn >= MaxAttacksPerTurn)
+            OnActionsExhausted?.Invoke(this);
     }
 }
