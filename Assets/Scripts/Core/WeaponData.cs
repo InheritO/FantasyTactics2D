@@ -47,6 +47,9 @@ public class WeaponData : ScriptableObject
     [Tooltip("무기 자체의 기본 명중 보정")]
     public int baseAccuracyBonus;
 
+    [Tooltip("무기 자체의 기본 치명타 성향. 치명타 판정에 사용되는 값(방어자 맷집과 대결)")]
+    public int baseCritRating = 10;
+
     [Header("Attacks (최소 1개 이상)")]
     public WeaponAttack[] attacks = new WeaponAttack[1];
 

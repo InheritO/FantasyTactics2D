@@ -15,6 +15,9 @@ public class WeaponAttack : ScriptableObject
     [Tooltip("무기의 기본 명중 보정에 더해지는 보너스")]
     public int accuracyBonusModifier;
 
+    [Tooltip("무기의 기본 치명타 성향에 더해지는 보너스")]
+    public int critRatingBonus;
+
     [Header("Status Effect (선택 사항)")]
     public StatusEffectType inflictedEffect = StatusEffectType.None;
     public int disruption; // 상태이상 적중 판정에 쓰이는 값 (대상 맷집과 대결)

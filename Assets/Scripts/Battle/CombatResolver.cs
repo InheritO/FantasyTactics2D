@@ -7,6 +7,8 @@ using System.Collections.Generic;
 /// </summary>
 public static class CombatResolver
 {
+    private const int MinimumCritRating = 5; // 모든 무기가 최소한 가지는 치명타 확률. 여기 숫자만 바꾸면 전체에 즉시 반영됨
+    private const float CriticalDamageMultiplier = 1.5f;
 
     public static List<CombatResult> ResolveFullAttack(UnitBase attacker, UnitBase defender, WeaponAttack chosenAttack)
     {
@@ -59,14 +61,22 @@ public static class CombatResolver
         // 3단계: 데미지 (힘/무기 vs 맷집/방어구)
         int damage = CalculateDamage(attacker, defender, weapon, attack);
 
-        // 명중했을 때만 상태이상 판정 시도
+        // 3-1단계: 치명타 (데미지 확정 후 배율 적용)
+        bool isCritical = TryResolveCritical(weapon, attack, defender);
+        if (isCritical)
+        {
+            damage = Mathf.RoundToInt(damage * CriticalDamageMultiplier);
+            Debug.Log($"[{attacker.name}] 치명타! 데미지 {damage}");
+        }
+
+        // 4단계: 상태이상 (disruption vs 맷집)
         if (attack != null && attack.inflictedEffect != StatusEffectType.None)
         {
             bool effectLands = TryResolveStatusEffect(attack, defender);
-
             if (effectLands)
-                return CombatResult.HitWithEffect(damage, attack.inflictedEffect);
+                return CombatResult.HitWithEffect(damage, attack.inflictedEffect, isCritical);
         }
+
 
         return CombatResult.Hit(damage);
     }
@@ -118,6 +128,15 @@ public static class CombatResolver
         blockChance = Mathf.Clamp(blockChance, 5, 60);
 
         return Random.Range(0, 100) < blockChance;
+    }
+
+    // 치명타 판정: 방어자 저항 없이, 무기(+공격 보너스)의 확률값을 그대로 사용
+    private static bool TryResolveCritical(WeaponData weapon, WeaponAttack attack, UnitBase defender)
+    {
+        int totalCritRating = (weapon?.baseCritRating ?? 0) + (attack?.critRatingBonus ?? 0);
+        totalCritRating = Mathf.Max(totalCritRating, MinimumCritRating); // 하한선 적용
+
+        return Random.Range(0, 100) < totalCritRating;
     }
 
     // 상태이상 적중 여부만 판정 (별도 함수로 분리해서, 나중에 UI 등에서 "적중 확률 미리보기"로도 재사용 가능하게)

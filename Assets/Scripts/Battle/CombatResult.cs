@@ -6,6 +6,7 @@ public struct CombatResult
 {
     public bool IsHit;
     public bool IsBlocked;
+    public bool IsCritical;
     public int DamageDealt;
     public StatusEffectType InflictedEffect;
 
@@ -13,9 +14,10 @@ public struct CombatResult
     public static CombatResult Blocked() =>
        new CombatResult { IsHit = true, IsBlocked = true, DamageDealt = 0, InflictedEffect = StatusEffectType.None };
 
-    public static CombatResult Hit(int damage) => new CombatResult { IsHit = true, DamageDealt = damage };
+    public static CombatResult Hit(int damage, bool isCritical = false) =>
+        new CombatResult { IsHit = true, IsBlocked = false, IsCritical = isCritical, DamageDealt = damage, InflictedEffect = StatusEffectType.None };
 
-    public static CombatResult HitWithEffect(int damage, StatusEffectType effect) =>
-        new CombatResult { IsHit = true, DamageDealt = damage, InflictedEffect = effect };
+    public static CombatResult HitWithEffect(int damage, StatusEffectType effect, bool isCritical = false) =>
+        new CombatResult { IsHit = true, IsBlocked = false, IsCritical = isCritical, DamageDealt = damage, InflictedEffect = effect };
 }
 
