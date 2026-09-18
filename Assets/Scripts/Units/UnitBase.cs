@@ -1,100 +1,18 @@
-using UnityEngine;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 /// <summary>
 /// 모든 유닛(캐릭터)의 기반이 되는 추상 클래스.
 /// 종족 기본 스탯(Base 접두사)은 절대 직접 변경되지 않으며,
 /// 장비로 인한 보정은 계산 프로퍼티(MoveRange, AttackPower 등)를 통해서만 반영된다.
+///
+/// 장비 슬롯 관리는 UnitEquipmentState, 상태이상 관리는 UnitStatusEffectTracker에
+/// 위임되어 있다. 이 클래스는 이동/전투/행동력 관리라는 핵심 로직에 집중한다.
 /// </summary>
 public abstract class UnitBase : MonoBehaviour
 {
-
-    [Header("Grid Position")]
-    [field: SerializeField] public Vector2Int GridCoord { get; private set; }
-
-    [Header("Faction")]
-    [field: SerializeField] public FactionData Faction { get; private set; }
-    [field: SerializeField] public RaceData Race { get; private set; }
-
-
-
-    [Header("Capabilities")]
-    [field: SerializeField] public bool CanMove { get; protected set; } = true;
-    [field: SerializeField] public bool CanAttack { get; protected set; } = true;
-
-    [field: SerializeField] public int CurrentHealth { get; protected set; }
-    public IUnitAIBehavior AIBehavior { get; set; }
-    [Header("AI 확인용")]
-    public AICombatDisposition AssignedDisposition;
-
-
-    /// <summary>
-    /// 장비 슬롯
-    /// </summary>
-    [field: SerializeField] public WeaponData MainHandWeapon { get; private set; }
-    [field: SerializeField] public WeaponData OffHandWeapon { get; private set; } // 두 번째 한손무기일 수도 있음
-    [field: SerializeField] public ShieldData EquippedShield { get; private set; }
-
-    [field: SerializeField] public ArmorData EquippedArmor { get; private set; }
-
-    protected GridManager gridManager;
-    protected SpriteRenderer spriteRenderer;
-    private static Sprite defaultSquareSprite;
-
-    // ---- 계산 스탯 (종족 기본치 + 장비 보정) ----
-
-    public int MaxHealth => Race != null ? Race.maxHealth : 1;
-    public int MoveRange => Race != null
-        ? Mathf.Max(0, Race.baseMoveRange - (EquippedArmor?.moveRangePenalty ?? 0))
-        : 0;
-    public int MeleeSkill => Race != null ? Race.baseMeleeSkill : 0;
-    public int RangedSkill => Race != null ? Race.baseRangedSkill : 0;
-    public int DefenseSkill => Race != null ? Race.baseDefenseSkill : 0;
-    public int Strength => Race != null ? Race.baseStrength : 0;
-    public int Agility => Race != null ? Race.baseAgility : 0;
-
-
-    // Defense를 두 요소로 분리: 관통력이 ArmorDefense에만 영향을 주기 위함
-    public int ConstitutionDefense => Race != null ? Race.baseConstitution : 0;
-    public int ArmorDefense =>
-    (ArmorBroken ? 0 : (EquippedArmor?.defenseBonus ?? 0)) +
-    (ShieldBroken ? 0 : (EquippedShield?.defenseBonus ?? 0));
-    public int Defense => ConstitutionDefense + ArmorDefense; // 관통력 미반영 총 방어력 (UI 표시 등에 사용)
-
-    public int BaseAttackRange = 1;
-    public int AttackRange =>
-        (MainHandWeapon != null && MainHandWeapon.attackRangeOverride >= 0)
-            ? MainHandWeapon.attackRangeOverride
-            : BaseAttackRange;
-
-    // 행동 관련
-    public bool HasMoved { get; private set; }
-    public bool HasAttacked { get; private set; }
-
-    // ---- 공격 횟수 전환: HasAttacked(bool) -> AttacksUsedThisTurn(int) ----
-    public int AttacksUsedThisTurn { get; private set; }
-
-
-    // 지금 이 유닛이 뭔가 더 할 수 있는지 (이동 or 공격 중 하나라도 안 했으면 true)
-
-    public bool CanStillAct => !HasMoved || AttacksUsedThisTurn < MaxAttacksPerTurn;
-
-    // 상태이상
-    private List<StatusEffectInstance> activeEffects = new List<StatusEffectInstance>();
-    // 기절 상태인지 여부 (이동/공격 가능 여부 판정에 사용)
-    public bool IsStunned => activeEffects.Exists(e => e.Type == StatusEffectType.Stun);
-    public bool ShieldBroken { get; private set; }
-    public bool ArmorBroken { get; private set; }
-
-    [field: SerializeField, Tooltip("재장전이 필요한 무기의 현재 장전 상태")]
-    public bool IsLoaded { get; private set; } = true;
-
-    public void Reload() => IsLoaded = true;
-    public void ConsumeAmmo() => IsLoaded = false;
-
-
-    //이벤트
+    #region Events
 
     public event Action<UnitBase, int> OnDamaged;
     public event Action<UnitBase> OnDied;
@@ -104,8 +22,187 @@ public abstract class UnitBase : MonoBehaviour
     public event Action<UnitBase> OnActionsExhausted;
     public event Action<UnitBase> OnTurnReset;
 
-    public event Action<UnitBase> OnEquipmentChanged;
-    private int unitSortOrder = 2;
+    #endregion
+
+    #region Identity
+
+    [Header("Grid Position")]
+    [field: SerializeField] public Vector2Int GridCoord { get; private set; }
+
+    [Header("Faction")]
+    [field: SerializeField] public FactionData Faction { get; private set; }
+    [field: SerializeField] public RaceData Race { get; private set; }
+
+    #endregion
+
+    #region Capabilities & Turn State
+
+    // 이 유닛이 "이동"/"공격"이라는 행위 자체를 할 수 있는지 (포탑, 바리케이드 등에서 false로 고정)
+    [SerializeField] private bool canMoveInnately = true;
+    [SerializeField] private bool canAttackInnately = true;
+    public bool CanAttack => canAttackInnately;
+
+    [field: SerializeField] public int CurrentHealth { get; protected set; }
+    [field: SerializeField] public bool HasMoved { get; private set; }
+    [field: SerializeField] public int ActionsUsedThisTurn { get; private set; }
+    [field: SerializeField, Tooltip("이번 턴에 방어 태세(Steady)를 취해서 반격 가능한 상태인지")]
+    public bool IsBraced { get; private set; }
+
+    [field: SerializeField, Tooltip("AI 유닛의 교전 성향. 플레이어 유닛은 null(None)")]
+    public AICombatDisposition? AssignedDisposition { get; private set; }
+    public IUnitAIBehavior AIBehavior { get; set; }
+
+    public void SetAIBehavior(IUnitAIBehavior behavior, AICombatDisposition disposition)
+    {
+        AIBehavior = behavior;
+        AssignedDisposition = disposition;
+    }
+
+    #endregion
+
+    #region Equipment (delegated to UnitEquipmentState)
+
+    private readonly UnitEquipmentState equipment = new UnitEquipmentState();
+
+    public WeaponData MainHandWeapon => equipment.MainHandWeapon;
+    public WeaponData OffHandWeapon => equipment.OffHandWeapon;
+    public ShieldData EquippedShield => equipment.EquippedShield;
+    public ArmorData EquippedArmor => equipment.EquippedArmor;
+    public bool ShieldBroken => equipment.ShieldBroken;
+    public bool ArmorBroken => equipment.ArmorBroken;
+    public bool IsLoaded => equipment.IsLoaded;
+
+    public bool EquipMainHandWeapon(WeaponData weapon) => equipment.EquipMainHandWeapon(weapon);
+    public bool EquipOffHandWeapon(WeaponData weapon) => equipment.EquipOffHandWeapon(weapon);
+    public bool EquipShield(ShieldData shield) => equipment.EquipShield(shield);
+    public void EquipArmor(ArmorData armor) => equipment.EquipArmor(armor);
+    public void BreakEquipment() => equipment.BreakEquipment();
+    public void Reload() => equipment.Reload();
+    public void ConsumeAmmo() => equipment.ConsumeAmmo();
+    public int ArmorDefense => equipment.ArmorDefense;
+
+    // RosterEntry의 장비 구성을 그대로 적용
+    public void ApplyLoadout(RosterEntry entry)
+    {
+        if (entry == null)
+            return;
+
+        EquipMainHandWeapon(entry.mainHandWeapon);
+        EquipOffHandWeapon(entry.offHandWeapon);
+        EquipShield(entry.shield);
+        EquipArmor(entry.armor);
+    }
+
+    // 보조무기가 있으면 자동으로 추가공격 어빌리티를 발동시킨다
+    public IEnumerable<IWeaponAbility> GetActiveAbilities()
+    {
+        if (OffHandWeapon != null)
+            yield return new ExtraAttackAbility(OffHandWeapon);
+    }
+
+    #endregion
+
+    #region Status Effects (delegated to UnitStatusEffectTracker)
+
+    private readonly UnitStatusEffectTracker statusEffects = new UnitStatusEffectTracker();
+
+    public bool IsStunned => statusEffects.IsStunned;
+
+    public void ApplyStatusEffect(StatusEffectType type, int duration, int magnitude) =>
+        statusEffects.Apply(type, duration, magnitude);
+
+    #endregion
+
+    #region Calculated Stats (종족 기본치 + 장비 보정)
+
+    public int MaxHealth => Race != null ? Race.maxHealth : 1;
+
+    public int MoveRange => Race != null
+        ? Mathf.Max(0, Race.baseMoveRange - (EquippedArmor?.moveRangePenalty ?? 0))
+        : 0;
+
+    public int MeleeSkill => Race != null ? Race.baseMeleeSkill : 0;
+    public int RangedSkill => Race != null ? Race.baseRangedSkill : 0;
+    public int Strength => Race != null ? Race.baseStrength : 0;
+    public int Agility => Race != null ? Race.baseAgility : 0;
+    public int DefenseSkill => Race != null ? Race.baseDefenseSkill : 0;
+
+    public int ConstitutionDefense => Race != null ? Race.baseConstitution : 0;
+    public int Defense => ConstitutionDefense + ArmorDefense; // 관통력 미반영 총 방어력 (UI 표시 등에 사용)
+
+    public int BaseAttackRange = 1;
+    public int AttackRange =>
+        (MainHandWeapon != null && MainHandWeapon.attackRangeOverride >= 0)
+            ? MainHandWeapon.attackRangeOverride
+            : BaseAttackRange;
+
+    #endregion
+
+    #region Racial Traits
+
+    // 이동 비용 계산 시 특성 반영 (드워프의 지형 할인 등)
+    public int GetEffectiveMoveCost(TileInstance tile)
+    {
+        int cost = tile.GetMovementCost();
+
+        if (Race?.traits != null)
+        {
+            foreach (var trait in Race.traits)
+                if (trait != null)
+                    cost = trait.ModifyMoveCost(tile, cost);
+        }
+
+        return cost;
+    }
+
+    // 턴당 최대 행동 횟수 (엘프의 ExtraAttackTrait 등, 기본값 1)
+    public int MaxActionsPerTurn
+    {
+        get
+        {
+            int max = 1;
+
+            if (Race?.traits != null)
+            {
+                foreach (var trait in Race.traits)
+                    if (trait != null)
+                        max = trait.ModifyMaxActions(max);
+            }
+
+            return max;
+        }
+    }
+
+    // isMeleeContext가 true일 때만 근접 특성(오크의 힘 보너스 등)이 적용된 힘 반환
+    public int GetEffectiveStrength(bool isMeleeContext)
+    {
+        int strength = Strength;
+
+        if (isMeleeContext && Race?.traits != null)
+        {
+            foreach (var trait in Race.traits)
+                if (trait != null)
+                    strength = trait.ModifyMeleeStrength(strength);
+        }
+
+        return strength;
+    }
+
+    #endregion
+
+    #region Action Availability
+
+    public bool CanMove => canMoveInnately && !HasMoved;
+    public bool HasActionsRemaining => ActionsUsedThisTurn < MaxActionsPerTurn;
+    public bool CanStillAct => !HasMoved || HasActionsRemaining;
+
+    #endregion
+
+    #region Lifecycle
+
+    protected GridManager gridManager;
+    protected SpriteRenderer spriteRenderer;
+    private static Sprite defaultSquareSprite;
 
     protected virtual void Awake()
     {
@@ -116,8 +213,9 @@ public abstract class UnitBase : MonoBehaviour
         if (spriteRenderer.sprite == null)
             spriteRenderer.sprite = GetDefaultSquareSprite();
 
-        if (spriteRenderer.sortingOrder < unitSortOrder)
-            spriteRenderer.sortingOrder = unitSortOrder;
+        // 타일(0), 이동범위 하이라이트(1)보다 항상 위에 그려지도록
+        if (spriteRenderer.sortingOrder < 2)
+            spriteRenderer.sortingOrder = 2;
     }
 
     private static Sprite GetDefaultSquareSprite()
@@ -132,8 +230,10 @@ public abstract class UnitBase : MonoBehaviour
         return defaultSquareSprite;
     }
 
+    #endregion
 
-    // 세력 지정 (스폰 시 호출)
+    #region Faction / Race Assignment
+
     public virtual void SetFaction(FactionData faction)
     {
         if (faction == null)
@@ -168,118 +268,10 @@ public abstract class UnitBase : MonoBehaviour
         CurrentHealth = MaxHealth; // 종족이 바뀌면 최대체력도 바뀌므로 재초기화
     }
 
-    // 세력의 기본 종족과 무관하게, 스폰 시점에 실제 종족을 명시적으로 지정
-    public void OverrideRace(RaceData race)
-    {
-        if (race == null)
-        {
-            Debug.LogWarning($"[{name}] OverrideRace에 null이 전달되었습니다.");
-            return;
-        }
+    #endregion
 
-        Race = race;
-        CurrentHealth = MaxHealth;
-    }
+    #region Movement
 
-    //장비
-
-    public bool EquipMainHandWeapon(WeaponData weapon)
-    {
-        if (weapon == null)
-        {
-            MainHandWeapon = null;
-            return true;
-        }
-
-        if ((weapon.slotType & WeaponSlotType.MainHand) == 0)
-        {
-            Debug.Log($"{weapon.weaponName}은(는) 주 무기로 장착할 수 없습니다.");
-            return false;
-        }
-
-        MainHandWeapon = weapon;
-
-        if (weapon.handedness == WeaponHandedness.TwoHanded)
-        {
-            // 양손 무기는 보조 슬롯을 전부 비움
-            OffHandWeapon = null;
-            EquippedShield = null;
-        }
-
-        OnEquipmentChanged?.Invoke(this);
-        return true;
-    }
-
-    public bool EquipOffHandWeapon(WeaponData weapon)
-    {
-        if (weapon == null)
-        {
-            OffHandWeapon = null;
-            return true;
-        }
-
-        if ((weapon.slotType & WeaponSlotType.OffHand) == 0)
-        {
-            Debug.Log($"{weapon.weaponName}은(는) 보조 무기로 장착할 수 없습니다.");
-            return false;
-        }
-
-        if (MainHandWeapon != null && MainHandWeapon.handedness == WeaponHandedness.TwoHanded)
-        {
-            Debug.Log("양손 무기를 장착 중이라 보조 무기를 장착할 수 없습니다.");
-            return false;
-        }
-
-        OffHandWeapon = weapon;
-        EquippedShield = null; // 방패와 보조무기는 함께 착용 불가함
-
-        OnEquipmentChanged?.Invoke(this);
-        return true;
-    }
-
-    public bool EquipShield(ShieldData shield)
-    {
-        if (shield == null)
-        {
-            EquippedShield = null;
-            return true;
-        }
-
-        if (MainHandWeapon != null && MainHandWeapon.handedness == WeaponHandedness.TwoHanded)
-        {
-            Debug.Log("양손 무기를 장착 중이라 방패를 장착할 수 없습니다.");
-            return false;
-        }
-
-        EquippedShield = shield;
-        OffHandWeapon = null;
-
-        OnEquipmentChanged?.Invoke(this);
-        return true;
-    }
-
-    public void EquipArmor(ArmorData armor) => EquippedArmor = armor;
-
-    // 무기 어빌리티
-    public IEnumerable<IWeaponAbility> GetActiveAbilities()
-    {
-        if (OffHandWeapon != null)
-            yield return new ExtraAttackAbility(OffHandWeapon);
-    }
-
-    // RosterEntry의 장비 구성을 그대로 적용
-    public void ApplyLoadout(RosterEntry entry)
-    {
-        if (entry == null)
-            return;
-
-        EquipMainHandWeapon(entry.mainHandWeapon);
-        EquipOffHandWeapon(entry.offHandWeapon);
-        EquipShield(entry.shield);
-        EquipArmor(entry.armor);
-    }
-
-    // 유닛을 특정 그리드 좌표에 배치 (최초 배치, 순간이동 등에 사용)
     public virtual void PlaceOnGrid(Vector2Int coord, GridManager grid)
     {
         gridManager = grid;
@@ -296,23 +288,20 @@ public abstract class UnitBase : MonoBehaviour
             newTile.OccupyingUnit = this;
     }
 
-
-    // 인접한 한 칸으로 이동 시도 (이동 가능하면 true 반환)
     public virtual bool TryMoveTo(Vector2Int targetCoord)
     {
-        if (!CanMove || HasMoved)
+        if (!CanMove)
             return false;
-
-        if (IsStunned)
-        {
-            Debug.Log($"[{name}] 기절 상태라 이동할 수 없습니다.");
-            return false;
-        }
-
 
         if (gridManager == null)
         {
             Debug.LogError($"[{name}] gridManager가 설정되지 않은 채로 TryMoveTo가 호출되었습니다. PlaceOnGrid가 먼저 호출되었는지 확인하세요.");
+            return false;
+        }
+
+        if (IsStunned)
+        {
+            Debug.Log($"[{name}] 기절 상태라 이동할 수 없습니다.");
             return false;
         }
 
@@ -338,7 +327,42 @@ public abstract class UnitBase : MonoBehaviour
         return true;
     }
 
-    // 대상이 공격 사거리 안에 있는지 확인
+    #endregion
+
+    #region Action Point Consumption
+
+    // 공격/재장전/방어태세 등 "행동"에 해당하는 모든 것이 이 함수를 거침
+    public void ConsumeAction()
+    {
+        ActionsUsedThisTurn++;
+        HasMoved = true; // 행동하면 이동도 함께 봉인 (기존 규칙 유지)
+
+        if (!CanStillAct)
+            OnActionsExhausted?.Invoke(this);
+    }
+
+    public void PerformReload()
+    {
+        if (!HasActionsRemaining)
+            return;
+
+        Reload();
+        ConsumeAction();
+    }
+
+    public void EnterBracedStance()
+    {
+        if (!HasActionsRemaining)
+            return;
+
+        IsBraced = true;
+        ConsumeAction();
+    }
+
+    #endregion
+
+    #region Combat
+
     public bool IsInAttackRange(UnitBase target)
     {
         if (target == null || gridManager == null)
@@ -348,16 +372,13 @@ public abstract class UnitBase : MonoBehaviour
         return distance <= AttackRange;
     }
 
-
-    // 대상을 공격 시도 (사거리 밖이면 실패)
     public virtual bool TryAttack(UnitBase target, WeaponAttack chosenAttack = null)
     {
         if (target == null)
             return false;
 
-        if (!CanAttack || AttacksUsedThisTurn >= MaxAttacksPerTurn)
+        if (!CanAttack || !HasActionsRemaining)
             return false;
-
 
         if (IsStunned)
         {
@@ -370,7 +391,7 @@ public abstract class UnitBase : MonoBehaviour
 
         WeaponAttack attack = chosenAttack ?? MainHandWeapon?.GetDefaultAttack();
 
-        List<CombatResult> results = CombatResolver.ResolveFullAttack(this, target, chosenAttack ?? MainHandWeapon?.GetDefaultAttack());
+        List<CombatResult> results = CombatResolver.ResolveFullAttack(this, target, attack);
         OnAttackPerformed?.Invoke(this, target);
 
         foreach (var result in results)
@@ -380,46 +401,60 @@ public abstract class UnitBase : MonoBehaviour
 
             OnAttackResult?.Invoke(this, target, result);
 
+            if (result.IsBlocked)
+                continue;
+
             if (result.IsHit)
             {
-                target.TakeDamage(result.DamageDealt);
+                target.TakeDamage(result.DamageDealt, this);
 
-                // 상태이상이 발동했다면 대상에게 적용
-                if (result.InflictedEffect != StatusEffectType.None)
+                if (result.InflictedEffect != StatusEffectType.None && attack != null)
                 {
-                    WeaponAttack attackUsed = chosenAttack ?? MainHandWeapon?.GetDefaultAttack();
-                    if (attackUsed != null)
-                    {
-                        if (attackUsed.inflictedEffect == StatusEffectType.ArmorBreak)
-                            target.BreakEquipment();
-                        else
-                            target.ApplyStatusEffect(attackUsed.inflictedEffect, attackUsed.effectDuration, attackUsed.effectMagnitude);
-
-                    }
+                    if (attack.inflictedEffect == StatusEffectType.ArmorBreak)
+                        target.BreakEquipment();
+                    else
+                        target.ApplyStatusEffect(attack.inflictedEffect, attack.effectDuration, attack.effectMagnitude);
                 }
             }
         }
 
-        AttacksUsedThisTurn++;
-        HasMoved = true; // 기존 규칙 유지: 공격하면 이동도 함께 봉인
+        if (attack != null && MainHandWeapon != null && MainHandWeapon.requiresReload)
+            ConsumeAmmo();
 
-        // 남은 공격 횟수를 다 썼을 때만 "행동 종료" 이벤트 발동 (엘프처럼 여러 번 공격 가능하면 아직 안 끝났을 수 있음)
-        if (AttacksUsedThisTurn >= MaxAttacksPerTurn)
-            OnActionsExhausted?.Invoke(this);
+        ConsumeAction();
 
         return true;
     }
 
     // amount는 CombatResolver에서 이미 방어력이 반영된 최종 데미지
-    public virtual void TakeDamage(int amount)
+    // attacker가 있으면(누군가 직접 때린 경우) 반격 판정을 시도한다. 출혈 등 공격자 없는 데미지는 null.
+    public virtual void TakeDamage(int amount, UnitBase attacker = null)
     {
         CurrentHealth = Mathf.Max(0, CurrentHealth - amount);
         OnDamaged?.Invoke(this, amount);
 
         if (CurrentHealth <= 0)
+        {
             Die();
+            return;
+        }
+
+        if (IsBraced && attacker != null && IsInAttackRange(attacker))
+        {
+            Debug.Log($"[{name}] 반격!");
+            PerformCounterattack(attacker);
+        }
     }
 
+    private void PerformCounterattack(UnitBase attacker)
+    {
+        WeaponAttack counterAttack = MainHandWeapon?.GetDefaultAttack();
+
+        CombatResult result = CombatResolver.Resolve(this, attacker, MainHandWeapon, counterAttack);
+
+        if (result.IsHit && !result.IsBlocked)
+            attacker.TakeDamage(result.DamageDealt); // attacker 인자 생략 -> 반격에 또 반격하지 않음
+    }
 
     protected virtual void Die()
     {
@@ -439,136 +474,20 @@ public abstract class UnitBase : MonoBehaviour
         Destroy(gameObject);
     }
 
-    // 상태이상
-    public void ApplyStatusEffect(StatusEffectType type, int duration, int magnitude)
-    {
-        StatusEffectInstance existing = activeEffects.Find(e => e.Type == type);
+    #endregion
 
-        if (existing != null)
-        {
-            // 지속시간: 항상 새로 거는 값으로 갱신 (계속 공격하면 "덧입혀서" 유지되는 느낌)
-            // 데미지: 더 강한 공격으로 걸었다면 그 값으로, 약한 공격이면 기존 값 유지
-            int strongerMagnitude = Mathf.Max(existing.Magnitude, magnitude);
-            activeEffects.Remove(existing);
-            activeEffects.Add(new StatusEffectInstance(type, duration, strongerMagnitude));
-        }
-        else
-        {
-            activeEffects.Add(new StatusEffectInstance(type, duration, magnitude));
-        }
-    }
-
-    // 턴 시작 시 호출: 출혈 데미지 적용, 지속시간 감소, 만료된 효과 제거
-    public void ProcessStatusEffectsOnTurnStart()
-    {
-        foreach (var effect in activeEffects)
-        {
-            if (effect.Type == StatusEffectType.Bleed)
-            {
-                TakeDamage(effect.Magnitude);
-                Debug.Log($"[{name}] 출혈로 {effect.Magnitude} 데미지");
-            }
-
-            effect.DecrementTurn();
-        }
-
-        activeEffects.RemoveAll(e => e.IsExpired);
-    }
-
-    public void BreakEquipment()
-    {
-        if (EquippedShield != null && !ShieldBroken)
-        {
-            ShieldBroken = true;
-            Debug.Log($"[{name}]의 방패가 파괴되었습니다!");
-            return;
-        }
-
-        if (!ArmorBroken)
-        {
-            ArmorBroken = true;
-            Debug.Log($"[{name}]의 방어구가 파괴되었습니다!");
-        }
-    }
-
-
-
-    // 특성 계산
-
-    // 이동 비용 계산 시 특성 반영 (드워프의 지형 할인 등)
-    public int GetEffectiveMoveCost(TileInstance tile)
-    {
-        int cost = tile.GetMovementCost();
-
-        if (Race?.traits != null)
-        {
-            foreach (var trait in Race.traits)
-                if (trait != null)
-                    cost = trait.ModifyMoveCost(tile, cost);
-        }
-
-        return cost;
-    }
-
-    // 턴당 최대 공격 횟수 (엘프의 추가 공격 등, 기본값 1)
-    public int MaxAttacksPerTurn
-    {
-        get
-        {
-            int max = 1;
-
-            if (Race?.traits != null)
-            {
-                foreach (var trait in Race.traits)
-                    if (trait != null)
-                        max = trait.ModifyMaxAttacks(max);
-            }
-
-            return max;
-        }
-    }
-
-    // isMeleeContext가 true일 때만 근접 특성(오크의 힘 보너스 등)이 적용된 힘 반환
-    public int GetEffectiveStrength(bool isMeleeContext)
-    {
-        int strength = Strength; // 종족 기본 힘 (계산 프로퍼티, 기존 그대로)
-
-        if (isMeleeContext && Race?.traits != null)
-        {
-            foreach (var trait in Race.traits)
-                if (trait != null)
-                    strength = trait.ModifyMeleeStrength(strength);
-        }
-
-        return strength;
-    }
-
-
-
-    // ---- 턴 상태 ----
+    #region Turn State
 
     public void ResetTurnState()
     {
         HasMoved = false;
-        AttacksUsedThisTurn = 0;
+        ActionsUsedThisTurn = 0;
+        IsBraced = false;
 
-        ProcessStatusEffectsOnTurnStart();
+        statusEffects.ProcessTurnStart(damage => TakeDamage(damage));
 
         OnTurnReset?.Invoke(this);
     }
 
-    public void SetAIBehavior(IUnitAIBehavior behavior, AICombatDisposition disposition)
-    {
-        AIBehavior = behavior;
-        AssignedDisposition = disposition;
-    }
-    public void PerformReload()
-    {
-        Reload();
-        AttacksUsedThisTurn++;
-        HasMoved = true;
-
-        if (AttacksUsedThisTurn >= MaxAttacksPerTurn)
-            OnActionsExhausted?.Invoke(this);
-    }
+    #endregion
 }

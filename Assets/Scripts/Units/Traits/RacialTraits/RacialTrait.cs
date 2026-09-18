@@ -12,6 +12,6 @@ public abstract class RacialTrait : ScriptableObject
     [TextArea] public string description;
 
     public virtual int ModifyMoveCost(TileInstance tile, int baseCost) => baseCost;
-    public virtual int ModifyMaxAttacks(int baseMaxAttacks) => baseMaxAttacks;
+    public virtual int ModifyMaxActions(int baseMaxActions) => baseMaxActions;
     public virtual int ModifyMeleeStrength(int baseStrength) => baseStrength;
 }

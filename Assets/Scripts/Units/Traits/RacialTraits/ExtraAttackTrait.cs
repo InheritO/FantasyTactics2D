@@ -6,7 +6,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "ExtraAttack", menuName = "Strategy/Traits/Extra Attack")]
 public class ExtraAttackTrait : RacialTrait
 {
-    public int bonusAttacks = 1;
+    public int bonusActions = 1;
 
-    public override int ModifyMaxAttacks(int baseMaxAttacks) => baseMaxAttacks + bonusAttacks;
+    public override int ModifyMaxActions(int baseMaxAttacks) => baseMaxAttacks + bonusActions;
 }
