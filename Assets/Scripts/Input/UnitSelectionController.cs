@@ -210,6 +210,12 @@ public class UnitSelectionController : MonoBehaviour
 
     private void RefreshSelectionDisplay()
     {
+        if (selectedUnit == null)
+        {
+            DeselectUnit();
+            return;
+        }
+
         if (!selectedUnit.CanStillAct)
         {
             DeselectUnit();

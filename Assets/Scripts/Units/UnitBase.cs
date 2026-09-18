@@ -318,6 +318,16 @@ public abstract class UnitBase : MonoBehaviour
         if (targetTile == null || !targetTile.IsWalkable())
             return false;
 
+        // ZOC 판정: 적 인접 상태에서 벗어나는 이동이면, 벗어나기 직전에 기회공격을 맞는다.
+        // 기회공격으로 죽으면 실제 좌표 이동은 일어나지 않는다 (제자리에서 사망 처리).
+        PerformOpportunityAttacks(GridCoord, targetCoord);
+
+        if (CurrentHealth <= 0)
+        {
+            Debug.Log($"[{name}] 기회공격에 쓰러져 이동하지 못했습니다.");
+            return true;
+        }
+
         TileInstance currentTile = gridManager.GetTile(GridCoord);
         if (currentTile != null)
             currentTile.OccupyingUnit = null;
@@ -389,6 +399,9 @@ public abstract class UnitBase : MonoBehaviour
 
     public virtual bool TryAttack(UnitBase target, WeaponAttack chosenAttack = null)
     {
+        if (CurrentHealth <= 0)
+            return false;
+
         if (target == null)
             return false;
 
@@ -494,6 +507,29 @@ public abstract class UnitBase : MonoBehaviour
             attacker.TakeDamage(result.DamageDealt); // attacker 인자 생략 -> 반격에 또 반격하지 않음
     }
 
+    // ZoneOfControlResolver로 판정한 기회공격 대상들에게 순서대로 공격을 적용한다.
+    // 반격(PerformCounterattack)과 동일하게 CombatResolver.Resolve()를 재사용하고,
+    // attacker 인자 없이 데미지를 적용해 반격이 연쇄되지 않게 한다.
+    private void PerformOpportunityAttacks(Vector2Int startCoord, Vector2Int targetCoord)
+    {
+        UnitBase[] allUnits = FindObjectsByType<UnitBase>();
+        List<UnitBase> attackers = ZoneOfControlResolver.GetOpportunityAttackers(
+            this, startCoord, targetCoord, gridManager, allUnits);
+
+        foreach (var attacker in attackers)
+        {
+            if (CurrentHealth <= 0)
+                break; // 이미 쓰러졌으면 남은 기회공격은 처리하지 않음
+
+            WeaponAttack attack = attacker.MainHandWeapon?.GetDefaultAttack();
+            CombatResult result = CombatResolver.Resolve(attacker, this, attacker.MainHandWeapon, attack);
+
+            Debug.Log($"[{attacker.name}] {name}의 이탈에 기회공격!");
+
+            if (result.IsHit && !result.IsBlocked)
+                TakeDamage(result.DamageDealt); // attacker 인자 생략 -> 반격 연쇄 없음
+        }
+    }
     protected virtual void Die()
     {
         if (gridManager != null)
