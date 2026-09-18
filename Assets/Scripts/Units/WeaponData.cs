@@ -47,7 +47,7 @@ public class WeaponData : ScriptableObject
     [Tooltip("무기 자체의 기본 명중 보정")]
     public int baseAccuracyBonus;
 
-    [Tooltip("무기 자체의 기본 치명타 성향. 치명타 판정에 사용되는 값(방어자 맷집과 대결)")]
+    [Tooltip("무기 자체의 기본 치명타 성향. 치명타 판정에 사용되는 확률")]
     public int baseCritRating = 10;
 
     [Header("Attacks (최소 1개 이상)")]
@@ -65,6 +65,11 @@ public class WeaponData : ScriptableObject
 
     [Tooltip("재장전 시 사용할 행동 에셋. 보통 공용 ReloadAction 에셋 하나를 여러 무기가 공유")]
     public ReloadAction reloadAction;
+
+    [Header("Counterattack (선택 사항)")]
+    [Tooltip("체크하면, 이 무기를 든 상태로 근접 사거리 안에서 공격받았을 때 자동으로 반격한다. " +
+    "방어태세(Steady)와는 무관하게 상시 적용됨 — 방어태세는 막기 확률에만 관여한다.")]
+    public bool grantsCounterattack = false;
 
     public WeaponAttack GetDefaultAttack()
     {

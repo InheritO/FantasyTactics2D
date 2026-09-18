@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 
 public class UnitSelectionController : MonoBehaviour
@@ -50,6 +50,10 @@ public class UnitSelectionController : MonoBehaviour
 
         if (controls.GamePlay.Click.WasPressedThisFrame())
             HandleClick();
+
+        // 이동 범위 타일을 가릴 때 잠깐 치워두고 싶을 수 있어서, 패널을 껐다 켰다 하는 토글 단축키.
+        if (controls.GamePlay.ToggleActions.WasPressedThisFrame())
+            ToggleActionsPanel();
     }
 
     private void HandleClick()
@@ -174,6 +178,25 @@ public class UnitSelectionController : MonoBehaviour
         attackPanel.Show(selectedUnit, target, HandleAttackExecuted);
     }
 
+    // 패널이 열려있으면 닫고, 닫혀있으면(대상 없이, 방어태세 등 공용 행동만) 연다.
+    // R키(ToggleActions)와 BattleUIController의 토글 버튼 양쪽에서 호출되므로 public.
+    public void ToggleActionsPanel()
+    {
+        if (selectedUnit == null || attackPanel == null)
+            return;
+
+        if (attackPanel.IsShown)
+        {
+            attackPanel.Hide();
+            return;
+        }
+
+        if (!selectedUnit.CanStillAct)
+            return;
+
+        attackPanel.Show(selectedUnit, null, HandleAttackExecuted);
+    }
+
     private void HandleAttackExecuted()
     {
         DeselectUnit();
@@ -204,6 +227,11 @@ public class UnitSelectionController : MonoBehaviour
             // 아직 이동 전 (유닛을 막 선택한 직후 매번 여기로 들어옴)
             RefreshSelection();
         }
+
+        // 대상 없이도 쓸 수 있는 공용 행동(방어태세 등)을 선택과 동시에 보여준다.
+        // 이미 열려있으면(예: 적을 클릭해서 공격 옵션을 보고 있는 중) 다시 채우지 않고 그대로 둔다.
+        if (attackPanel != null && !attackPanel.IsShown)
+            attackPanel.Show(selectedUnit, null, HandleAttackExecuted);
     }
 
     private void SelectUnit(UnitBase unit)

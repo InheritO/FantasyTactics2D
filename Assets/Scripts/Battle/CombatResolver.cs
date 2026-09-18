@@ -9,6 +9,7 @@ public static class CombatResolver
 {
     private const int MinimumCritRating = 5; // 모든 무기가 최소한 가지는 치명타 확률. 여기 숫자만 바꾸면 전체에 즉시 반영됨
     private const float CriticalDamageMultiplier = 1.5f;
+    private const int BracedBlockBonus = 15; // 방어태세(Steady) 중일 때 막기 확률에 더해지는 보너스(%p)
 
     public static List<CombatResult> ResolveFullAttack(UnitBase attacker, UnitBase defender, WeaponAttack chosenAttack)
     {
@@ -125,6 +126,11 @@ public static class CombatResolver
         int totalBlockSkill = defender.DefenseSkill + defender.EquippedShield.blockSkillBonus;
 
         int blockChance = 20 + (totalBlockSkill - attackerSkill) * 2;
+
+        // 방어태세(Steady) 중이면 방패로 막을 확률이 추가로 올라간다
+        if (defender.IsBraced)
+            blockChance += BracedBlockBonus;
+
         blockChance = Mathf.Clamp(blockChance, 5, 60);
 
         return Random.Range(0, 100) < blockChance;

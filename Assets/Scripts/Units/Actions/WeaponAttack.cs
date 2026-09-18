@@ -37,9 +37,6 @@ public class WeaponAttack : UnitAction
 
     public override void Execute(UnitBase actor, UnitBase target)
     {
-        bool attacked = actor.TryAttack(target, this);
 
-        if (attacked && actor.MainHandWeapon != null && actor.MainHandWeapon.requiresReload)
-            actor.ConsumeAmmo();
     }
 }

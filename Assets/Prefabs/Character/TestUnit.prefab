@@ -45,8 +45,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0559766a73ed8ef499b1b9dee3a64b75, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TestUnit
-  MaxHealth: 10
-  MoveRange: 3
+  <GridCoord>k__BackingField: {x: 0, y: 0}
+  <Faction>k__BackingField: {fileID: 0}
+  <Race>k__BackingField: {fileID: 0}
+  canMoveInnately: 1
+  canAttackInnately: 1
+  <CurrentHealth>k__BackingField: 0
+  <HasMoved>k__BackingField: 0
+  <ActionsUsedThisTurn>k__BackingField: 0
+  <IsBraced>k__BackingField: 0
+  universalActions:
+  - {fileID: 11400000, guid: 1a7fbf29fd3f9884e8ab1617a8f3c04d, type: 2}
+  BaseAttackRange: 1
 --- !u!212 &4064294667334559200
 SpriteRenderer:
   serializedVersion: 3

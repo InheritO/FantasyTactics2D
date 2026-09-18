@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using TMPro;
 
 /// <summary>
-/// ¼±ÅÃµÈ À¯´ÖÀÌ ´ë»ó¿¡°Ô ½ÇÇàÇÒ ¼ö ÀÖ´Â °ø°İ ¹æ½ÄµéÀ» ¹öÆ° ¸ñ·ÏÀ¸·Î º¸¿©ÁØ´Ù.
+/// ì„ íƒëœ ìœ ë‹›ì´ ëŒ€ìƒì—ê²Œ ì‹¤í–‰í•  ìˆ˜ ìˆëŠ” ê³µê²© ë°©ì‹ë“¤ì„ ë²„íŠ¼ ëª©ë¡ìœ¼ë¡œ ë³´ì—¬ì¤€ë‹¤.
 /// </summary>
 public class BattleAttackPanel : MonoBehaviour
 {
@@ -17,6 +17,9 @@ public class BattleAttackPanel : MonoBehaviour
     private List<GameObject> spawnedButtons = new List<GameObject>();
     private List<AttackOption> currentOptions = new List<AttackOption>();
     private Action currentOnOptionExecuted;
+
+    // ì§€ê¸ˆ íŒ¨ë„ì´ í™”ë©´ì— ì—´ë ¤ ìˆëŠ”ì§€. UnitSelectionControllerê°€ í† ê¸€(ì—´ê¸°/ë‹«ê¸°) íŒë‹¨ì— ì‚¬ìš©í•œë‹¤.
+    public bool IsShown => panelRoot != null && panelRoot.activeSelf;
 
 
     private static readonly Key[] NumberKeys =
@@ -74,7 +77,7 @@ public class BattleAttackPanel : MonoBehaviour
             TMP_Text label = buttonObj.GetComponentInChildren<TMP_Text>();
             if (label != null)
             {
-                // ´ÜÃàÅ° ¼ıÀÚ¸¦ ¶óº§¿¡ °°ÀÌ Ç¥½Ã (¿¹: "1. º£±â")
+                // ë‹¨ì¶•í‚¤ ìˆ«ìë¥¼ ë¼ë²¨ì— ê°™ì´ í‘œì‹œ (ì˜ˆ: "1. ë² ê¸°")
                 string keyHint = (i < NumberKeys.Length) ? $"{i + 1}. " : "";
                 label.text = keyHint + option.Label;
             }
@@ -82,6 +85,8 @@ public class BattleAttackPanel : MonoBehaviour
             Button button = buttonObj.GetComponent<Button>();
             if (button != null)
                 button.onClick.AddListener(() => ExecuteOption(option));
+
+            buttonObj.SetActive(true);
         }
 
         if (panelRoot != null)

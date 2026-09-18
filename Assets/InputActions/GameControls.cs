@@ -151,6 +151,16 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""initialStateCheck"": true,
                     ""priority"": 0
+                },
+                {
+                    ""name"": ""ToggleActions"",
+                    ""type"": ""Button"",
+                    ""id"": ""e9f147b7-e712-43fc-90d7-9cdd3ad8db5b"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false,
+                    ""priority"": 0
                 }
             ],
             ""bindings"": [
@@ -263,6 +273,17 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
                     ""action"": ""Zoom"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d192564b-aacc-4677-a20b-46e395d4122c"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ToggleActions"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -277,6 +298,7 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
         m_GamePlay_EndTurn = m_GamePlay.FindAction("EndTurn", throwIfNotFound: true);
         m_GamePlay_Cancel = m_GamePlay.FindAction("Cancel", throwIfNotFound: true);
         m_GamePlay_Zoom = m_GamePlay.FindAction("Zoom", throwIfNotFound: true);
+        m_GamePlay_ToggleActions = m_GamePlay.FindAction("ToggleActions", throwIfNotFound: true);
     }
 
     ~@GameControls()
@@ -363,6 +385,7 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_GamePlay_EndTurn;
     private readonly InputAction m_GamePlay_Cancel;
     private readonly InputAction m_GamePlay_Zoom;
+    private readonly InputAction m_GamePlay_ToggleActions;
     /// <summary>
     /// Provides access to input actions defined in input action map "GamePlay".
     /// </summary>
@@ -398,6 +421,10 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "GamePlay/Zoom".
         /// </summary>
         public InputAction @Zoom => m_Wrapper.m_GamePlay_Zoom;
+        /// <summary>
+        /// Provides access to the underlying input action "GamePlay/ToggleActions".
+        /// </summary>
+        public InputAction @ToggleActions => m_Wrapper.m_GamePlay_ToggleActions;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -442,6 +469,9 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
             @Zoom.started += instance.OnZoom;
             @Zoom.performed += instance.OnZoom;
             @Zoom.canceled += instance.OnZoom;
+            @ToggleActions.started += instance.OnToggleActions;
+            @ToggleActions.performed += instance.OnToggleActions;
+            @ToggleActions.canceled += instance.OnToggleActions;
         }
 
         /// <summary>
@@ -471,6 +501,9 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
             @Zoom.started -= instance.OnZoom;
             @Zoom.performed -= instance.OnZoom;
             @Zoom.canceled -= instance.OnZoom;
+            @ToggleActions.started -= instance.OnToggleActions;
+            @ToggleActions.performed -= instance.OnToggleActions;
+            @ToggleActions.canceled -= instance.OnToggleActions;
         }
 
         /// <summary>
@@ -553,5 +586,12 @@ public partial class @GameControls: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnZoom(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ToggleActions" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnToggleActions(InputAction.CallbackContext context);
     }
 }

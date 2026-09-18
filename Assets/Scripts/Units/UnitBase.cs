@@ -45,7 +45,8 @@ public abstract class UnitBase : MonoBehaviour
     [field: SerializeField] public int CurrentHealth { get; protected set; }
     [field: SerializeField] public bool HasMoved { get; private set; }
     [field: SerializeField] public int ActionsUsedThisTurn { get; private set; }
-    [field: SerializeField, Tooltip("이번 턴에 방어 태세(Steady)를 취해서 반격 가능한 상태인지")]
+
+    [field: SerializeField, Tooltip("이번 턴에 방어 태세(Steady)를 취해서 막기 확률이 올라간 상태인지")]
     public bool IsBraced { get; private set; }
 
     [field: SerializeField, Tooltip("AI 유닛의 교전 성향. 플레이어 유닛은 null(None)")]
@@ -102,6 +103,14 @@ public abstract class UnitBase : MonoBehaviour
 
     #endregion
 
+    #region Universal Actions (무기와 무관하게 항상 후보가 되는 행동)
+
+    [Header("Universal Actions (방어태세 등, 무기와 무관하게 항상 선택 가능)")]
+    [SerializeField] private UnitAction[] universalActions = new UnitAction[0];
+    public IReadOnlyList<UnitAction> UniversalActions => universalActions;
+
+    #endregion
+
     #region Status Effects (delegated to UnitStatusEffectTracker)
 
     private readonly UnitStatusEffectTracker statusEffects = new UnitStatusEffectTracker();
@@ -118,7 +127,7 @@ public abstract class UnitBase : MonoBehaviour
     public int MaxHealth => Race != null ? Race.maxHealth : 1;
 
     public int MoveRange => Race != null
-        ? Mathf.Max(0, Race.baseMoveRange - (EquippedArmor?.moveRangePenalty ?? 0))
+        ? Mathf.Max(0, Race.baseMoveRange - (EquippedArmor?.moveRangePenalty ?? 0) - (EquippedShield?.moveRangePenalty ?? 0))
         : 0;
 
     public int MeleeSkill => Race != null ? Race.baseMeleeSkill : 0;
@@ -355,6 +364,12 @@ public abstract class UnitBase : MonoBehaviour
         if (!HasActionsRemaining)
             return;
 
+        if (IsStunned)
+        {
+            Debug.Log($"[{name}] 기절 상태라 방어태세를 취할 수 없습니다.");
+            return;
+        }
+
         IsBraced = true;
         ConsumeAction();
     }
@@ -383,6 +398,15 @@ public abstract class UnitBase : MonoBehaviour
         if (IsStunned)
         {
             Debug.Log($"[{name}] 기절 상태라 공격할 수 없습니다.");
+            return false;
+        }
+
+        // 재장전이 필요한 무기가 장전 안 된 상태면 어떤 경로로 호출되든(플레이어/AI/반격) 여기서 막는다.
+        // WeaponAttack.IsAvailable()이 UI 후보에서는 이미 걸러내지만, TryAttack이 직접 호출되는
+        // 다른 경로(AI 등)에서도 동일하게 보장되도록 실행 지점 자체에 둔다.
+        if (MainHandWeapon != null && MainHandWeapon.requiresReload && !IsLoaded)
+        {
+            Debug.Log($"[{name}] 재장전이 필요해 공격할 수 없습니다.");
             return false;
         }
 
@@ -439,7 +463,11 @@ public abstract class UnitBase : MonoBehaviour
             return;
         }
 
-        if (IsBraced && attacker != null && IsInAttackRange(attacker))
+
+        //반격 태세 중일 시 반격
+        bool canCounter = !IsStunned && MainHandWeapon != null && MainHandWeapon.grantsCounterattack;
+
+        if (canCounter && attacker != null && IsInAttackRange(attacker))
         {
             Debug.Log($"[{name}] 반격!");
             PerformCounterattack(attacker);
@@ -448,9 +476,19 @@ public abstract class UnitBase : MonoBehaviour
 
     private void PerformCounterattack(UnitBase attacker)
     {
+        // 반격도 TryAttack과 동일하게 재장전 상태를 지켜야 한다 (탄약 없는 석궁이 계속 반격하는 걸 방지)
+        if (MainHandWeapon != null && MainHandWeapon.requiresReload && !IsLoaded)
+        {
+            Debug.Log($"[{name}] 재장전이 필요해 반격할 수 없습니다.");
+            return;
+        }
+
         WeaponAttack counterAttack = MainHandWeapon?.GetDefaultAttack();
 
         CombatResult result = CombatResolver.Resolve(this, attacker, MainHandWeapon, counterAttack);
+
+        if (MainHandWeapon != null && MainHandWeapon.requiresReload)
+            ConsumeAmmo(); // 반격도 발사인 건 마찬가지이므로 일반 공격과 동일하게 탄약을 소모시킨다
 
         if (result.IsHit && !result.IsBlocked)
             attacker.TakeDamage(result.DamageDealt); // attacker 인자 생략 -> 반격에 또 반격하지 않음

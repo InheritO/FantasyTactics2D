@@ -22,8 +22,12 @@ MonoBehaviour:
   damageScaling: 0
   baseArmorPenetration: 2
   baseAccuracyBonus: 3
+  baseCritRating: 10
   attacks:
   - {fileID: 11400000, guid: f7f1c1dd021875f47a02f2b75f46fc14, type: 2}
   - {fileID: 11400000, guid: aff40e04350f48143a351f5eca8886b8, type: 2}
   description: 
   cost: 6
+  requiresReload: 0
+  reloadAction: {fileID: 0}
+  grantsCounterattack: 1

@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 
 /// <summary>
-/// ¿ø°Å¸® À¯´Ö¿ë AI Çàµ¿. ÀûÀÌ »ç°Å¸® ¹ÛÀÌ¸é ´Ù°¡°¡°í,
-/// ÀûÀÌ ³Ê¹« °¡±îÀÌ ºÙÀ¸¸é »ç°Å¸®¸¦ À¯ÁöÇÒ ¼ö ÀÖ´Â Å¸ÀÏ·Î ¹°·¯³­´Ù.
-/// ±ÙÁ¢¹«±â¸¦ µç À¯´ÖÀÌ ÀÌ Çàµ¿À» ¹ŞÀ¸¸é(¿ø°Å¸® ºÎ´ë¿¡ ¼¯¿© µé¾î¿Â °æ¿ì),
-/// ÈÄÅğ ·ÎÁ÷ÀÌ ÀÇ¹Ì ¾øÀ¸¹Ç·Î ¹æ¾îÇü(DefensiveHoldPosition)À¸·Î ´ëÃ¼ÇÑ´Ù.
+/// ì›ê±°ë¦¬ ìœ ë‹›ìš© AI í–‰ë™. ì ì´ ì‚¬ê±°ë¦¬ ë°–ì´ë©´ ë‹¤ê°€ê°€ê³ ,
+/// ì ì´ ë„ˆë¬´ ê°€ê¹Œì´ ë¶™ìœ¼ë©´ ì‚¬ê±°ë¦¬ë¥¼ ìœ ì§€í•  ìˆ˜ ìˆëŠ” íƒ€ì¼ë¡œ ë¬¼ëŸ¬ë‚œë‹¤.
+/// ê·¼ì ‘ë¬´ê¸°ë¥¼ ë“  ìœ ë‹›ì´ ì´ í–‰ë™ì„ ë°›ìœ¼ë©´(ì›ê±°ë¦¬ ë¶€ëŒ€ì— ì„ì—¬ ë“¤ì–´ì˜¨ ê²½ìš°),
+/// í›„í‡´ ë¡œì§ì´ ì˜ë¯¸ ì—†ìœ¼ë¯€ë¡œ ë°©ì–´í˜•(DefensiveHoldPosition)ìœ¼ë¡œ ëŒ€ì²´í•œë‹¤.
 /// </summary>
 public class KeepDistanceAndShoot : IUnitAIBehavior
 {
@@ -27,7 +27,7 @@ public class KeepDistanceAndShoot : IUnitAIBehavior
 
         int distance = gridManager.GetDistance(unit.GridCoord, target.GridCoord);
 
-        // "³Ê¹« °¡±î¿ò"À» ¸ÕÀú ÆÇ´Ü (°ø°İ °¡´É ¿©ºÎº¸´Ù ¿ì¼±)
+        // "ë„ˆë¬´ ê°€ê¹Œì›€"ì„ ë¨¼ì € íŒë‹¨ (ê³µê²© ê°€ëŠ¥ ì—¬ë¶€ë³´ë‹¤ ìš°ì„ )
         bool tooClose = distance < unit.AttackRange;
 
         if (tooClose)
@@ -44,28 +44,36 @@ public class KeepDistanceAndShoot : IUnitAIBehavior
                 unit.TryMoveTo(retreatTile);
             }
 
-            // ÈÄÅğ ÈÄ(È¤Àº ÈÄÅğÇÒ °÷ÀÌ ¾ø¾î¼­ Á¦ÀÚ¸®µç) ¿©ÀüÈ÷ »ç°Å¸® ¾ÈÀÌ¸é ½ô
+            // ì¬ì¥ì „ì´ í•„ìš”í•œ ìƒíƒœë©´ ì˜ëŠ” ëŒ€ì‹  ì¬ì¥ì „í•œë‹¤.
+            // (TryAttack ìì²´ê°€ ì´ì œ ì¬ì¥ì „ ì—¬ë¶€ë¥¼ ë§‰ì•„ì£¼ì§€ë§Œ, ì•„ë¬´ê²ƒë„ ì•ˆ í•˜ëŠ” ê²ƒë³´ë‹¨ ì¬ì¥ì „í•˜ëŠ” ê²Œ ë‚«ë‹¤)
+            if (unit.MainHandWeapon != null && unit.MainHandWeapon.requiresReload && !unit.IsLoaded)
+            {
+                unit.PerformReload();
+                return;
+            }
+
+            // í›„í‡´ í›„(í˜¹ì€ í›„í‡´í•  ê³³ì´ ì—†ì–´ì„œ ì œìë¦¬ë“ ) ì—¬ì „íˆ ì‚¬ê±°ë¦¬ ì•ˆì´ë©´ ì¨
             if (unit.IsInAttackRange(target))
                 unit.TryAttack(target);
 
             return;
         }
 
-        // ÀçÀåÀü È®ÀÎ
+        // ì¬ì¥ì „ í™•ì¸
         if (unit.MainHandWeapon != null && unit.MainHandWeapon.requiresReload && !unit.IsLoaded)
         {
             unit.PerformReload();
             return;
         }
 
-        // ¿©±â µµ´ŞÇß´Ù´Â °Ç "³Ê¹« °¡±õÁö ¾Ê´Ù" = µü ¸Â°Å³ª ¸Õ °Å¸®
+        // ì—¬ê¸° ë„ë‹¬í–ˆë‹¤ëŠ” ê±´ "ë„ˆë¬´ ê°€ê¹ì§€ ì•Šë‹¤" = ë”± ë§ê±°ë‚˜ ë¨¼ ê±°ë¦¬
         if (unit.IsInAttackRange(target))
         {
             unit.TryAttack(target);
             return;
         }
 
-        // »ç°Å¸® ¹Û ¡æ Á¢±Ù
+        // ì‚¬ê±°ë¦¬ ë°– â†’ ì ‘ê·¼
         Dictionary<Vector2Int, int> approachReachable =
             MovementRangeCalculator.CalculateReachableTiles(gridManager, unit);
 
