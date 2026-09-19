@@ -2,14 +2,14 @@ using UnityEngine;
 
 /// <summary>
 /// 보조무기(off-hand)로 인한 추가 공격. 쌍검처럼 두 번째 무기를 든 경우 발동한다.
-/// 원래 공격보다는 약화된 확률/위력으로 적용한다.
+/// 원래 공격보다는 약화된 확률로 적용한다 (accuracyMultiplier로 CombatResolver.Resolve에 전달).
 /// </summary>
 public class ExtraAttackAbility : IWeaponAbility
 {
     private readonly WeaponData offHandWeapon;
-    private readonly float accuracyMultiplier;
+    private readonly float accuracyMultiplier = 0.75f;
 
-    public ExtraAttackAbility(WeaponData offHandWeapon, float accuracyMultiplier = 0.7f)
+    public ExtraAttackAbility(WeaponData offHandWeapon, float accuracyMultiplier = 0.8f)
     {
         this.offHandWeapon = offHandWeapon;
         this.accuracyMultiplier = accuracyMultiplier;
@@ -18,15 +18,6 @@ public class ExtraAttackAbility : IWeaponAbility
     public CombatResult? TryTrigger(UnitBase attacker, UnitBase defender)
     {
         WeaponAttack attack = offHandWeapon.GetDefaultAttack();
-
-        int baseChance = CombatResolver.CalculateHitChance(attacker, defender, offHandWeapon, attack);
-        int adjustedChance = Mathf.RoundToInt(baseChance * accuracyMultiplier);
-
-        bool isHit = Random.Range(0, 100) < adjustedChance;
-        if (!isHit)
-            return CombatResult.Miss();
-
-        int damage = CombatResolver.CalculateDamage(attacker, defender, offHandWeapon, attack);
-        return CombatResult.Hit(damage);
+        return CombatResolver.Resolve(attacker, defender, offHandWeapon, attack, accuracyMultiplier);
     }
 }

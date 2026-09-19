@@ -44,7 +44,7 @@ public static class CombatResolver
         return results;
     }
 
-    public static CombatResult Resolve(UnitBase attacker, UnitBase defender, WeaponData weapon, WeaponAttack attack)
+    public static CombatResult Resolve(UnitBase attacker, UnitBase defender, WeaponData weapon, WeaponAttack attack, float accuracyMultiplier = 1f)
     {
         if (attacker == null || defender == null)
         {
@@ -53,7 +53,7 @@ public static class CombatResolver
         }
 
         // 1단계: 명중/회피 (민첩 vs 민첩)
-        int hitChance = CalculateHitChance(attacker, defender, weapon, attack);
+        int hitChance = Mathf.RoundToInt(CalculateHitChance(attacker, defender, weapon, attack) * accuracyMultiplier);
         bool isHit = Random.Range(0, 100) < hitChance;
 
         if (!isHit)
