@@ -17,5 +17,6 @@ MonoBehaviour:
   movementCost: 3
   isWalkable: 1
   blocksLineOfSight: 0
-  defenseBonus: 1
+  defenseBonus: 2
+  providesCover: 0
   previewColor: {r: 0.5283019, g: 0.5283019, b: 0.5283019, a: 1}

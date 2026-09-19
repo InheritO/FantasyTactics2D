@@ -40,7 +40,10 @@ public abstract class UnitBase : MonoBehaviour
     // 이 유닛이 "이동"/"공격"이라는 행위 자체를 할 수 있는지 (포탑, 바리케이드 등에서 false로 고정)
     [SerializeField] private bool canMoveInnately = true;
     [SerializeField] private bool canAttackInnately = true;
+    [SerializeField] private bool providesCoverInnately = false;
     public bool CanAttack => canAttackInnately;
+    public bool ProvidesCover => providesCoverInnately;
+
 
     [field: SerializeField] public int CurrentHealth { get; protected set; }
     [field: SerializeField] public bool HasMoved { get; private set; }
@@ -210,6 +213,7 @@ public abstract class UnitBase : MonoBehaviour
     #region Lifecycle
 
     protected GridManager gridManager;
+    public GridManager GridManager => gridManager;
     protected SpriteRenderer spriteRenderer;
     private static Sprite defaultSquareSprite;
 

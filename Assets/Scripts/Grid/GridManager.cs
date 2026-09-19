@@ -13,6 +13,9 @@ public class GridManager : MonoBehaviour
     [Header("Visualizer Reference (선택)")]
     public TileVisualizer tileVisualizer;
 
+    [Header("Obstacle Spawning (선택)")]
+    public ObstacleSpawner obstacleSpawner;
+
     [Header("Grid Settings")]
     public int width = 10;
     public int height = 10;
@@ -47,6 +50,7 @@ public class GridManager : MonoBehaviour
     {
         tiles = mapGenerator.GenerateMap(width, height);
         ApplyDeploymentZones();
+        obstacleSpawner?.SpawnObstacles(this);
     }
 
     [Button]
@@ -56,6 +60,8 @@ public class GridManager : MonoBehaviour
 
         if (tileVisualizer != null)
             tileVisualizer.ClearVisuals();
+
+        obstacleSpawner?.ClearObstacles();
     }
 
     private void ClearMap()

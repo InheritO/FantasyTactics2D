@@ -7,9 +7,16 @@ using System.Collections.Generic;
 /// </summary>
 public static class CombatResolver
 {
-    private const int MinimumCritRating = 5; // 모든 무기가 최소한 가지는 치명타 확률. 여기 숫자만 바꾸면 전체에 즉시 반영됨
+    [Tooltip("모든 무기가 최소한 가지는 치명타 확률.")]
+    private const int MinimumCritRating = 5;
     private const float CriticalDamageMultiplier = 1.5f;
-    private const int BracedBlockBonus = 15; // 방어태세(Steady) 중일 때 막기 확률에 더해지는 보너스(%p)
+
+    [Tooltip("방어태세(Steady) 중일 때 막기 확률에 더해지는 보너스(%p)")]
+    private const int BracedBlockBonus = 15;
+
+    [Tooltip("엄폐 상태가 제공하는 원거리 공격 명중률 감소 보너스")]
+    private const int CoverHitChancePenalty = 20;
+
 
     public static List<CombatResult> ResolveFullAttack(UnitBase attacker, UnitBase defender, WeaponAttack chosenAttack)
     {
@@ -88,6 +95,11 @@ public static class CombatResolver
         int totalAccuracyBonus = (weapon?.baseAccuracyBonus ?? 0) + (attack?.accuracyBonusModifier ?? 0);
 
         int chance = 70 + (attacker.Agility - defender.Agility) * 5 + totalAccuracyBonus;
+
+        bool isRangedAttack = weapon != null && weapon.isRanged;
+        if (isRangedAttack && HasAdjacentCover(defender))
+            chance -= CoverHitChancePenalty;
+
         return Mathf.Clamp(chance, 5, 95);
     }
 
@@ -152,5 +164,30 @@ public static class CombatResolver
         chance = Mathf.Clamp(chance, 5, 80);
 
         return Random.Range(0, 100) < chance;
+    }
+
+    private static readonly Vector2Int[] AdjacentOffsets =
+{
+    new Vector2Int(1, 0), new Vector2Int(-1, 0), new Vector2Int(0, 1), new Vector2Int(0, -1)
+};
+
+    private static bool HasAdjacentCover(UnitBase defender)
+    {
+        GridManager gridManager = defender.GridManager;
+        if (gridManager == null)
+            return false;
+
+        foreach (var offset in AdjacentOffsets)
+        {
+            TileInstance neighbor = gridManager.GetTile(defender.GridCoord + offset);
+
+            if (neighbor != null && neighbor.ProvidesCover())
+                return true;
+
+            if (neighbor.OccupyingUnit != null && neighbor.OccupyingUnit.ProvidesCover)
+                return true;
+        }
+
+        return false;
     }
 }

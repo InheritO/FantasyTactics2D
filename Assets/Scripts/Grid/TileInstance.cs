@@ -41,4 +41,6 @@ public class TileInstance
     public bool BlocksLineOfSight() => TypeData != null && TypeData.blocksLineOfSight;
 
     public int GetDefenseBonus() => TypeData != null ? TypeData.defenseBonus : 0;
+
+    public bool ProvidesCover() => TypeData != null && TypeData.providesCover;
 }
