@@ -12,6 +12,13 @@ public class BattleUIController : MonoBehaviour
     public TurnManager turnManager;
     public PlayerDeploymentController playerDeployment;
     public UnitSelectionController selectionController;
+    public Button optionsButton;
+    public Button abandonBattleButton;
+
+    [Header("Popups")]
+    public UIPopup optionsPopup;
+    public ConfirmationPopup abandonConfirmPopup;
+    public SkirmishFlowController skirmishFlow;
 
     [Header("Buttons")]
     public Button startBattleButton;
@@ -22,7 +29,7 @@ public class BattleUIController : MonoBehaviour
     void OnEnable()
     {
         if (startBattleButton == null || endTurnButton == null || actionsButton == null
-            || playerDeployment == null || selectionController == null)
+            || playerDeployment == null || selectionController == null || optionsButton == null || abandonBattleButton == null)
         {
             Debug.LogError($"[{name}] 필요한 참조(startBattleButton/endTurnButton/actionsButton/playerDeployment/selectionController)가 비어있어 초기화를 건너뜁니다.", this);
             return;
@@ -34,6 +41,8 @@ public class BattleUIController : MonoBehaviour
         startBattleButton.onClick.AddListener(HandleStartBattleClicked);
         endTurnButton.onClick.AddListener(HandleEndTurnClicked);
         actionsButton.onClick.AddListener(HandleActionsClicked);
+        optionsButton.onClick.AddListener(HandleOptionsClicked);
+        abandonBattleButton.onClick.AddListener(HandleAbandonClicked);
     }
 
     void OnDisable()
@@ -49,6 +58,12 @@ public class BattleUIController : MonoBehaviour
 
         if (actionsButton != null)
             actionsButton.onClick.RemoveListener(HandleActionsClicked);
+
+        if (optionsButton != null)
+            optionsButton.onClick.RemoveListener(HandleOptionsClicked);
+
+        if (abandonBattleButton != null)
+            abandonBattleButton.onClick.RemoveListener(HandleAbandonClicked);
     }
 
     void Update()
@@ -69,6 +84,10 @@ public class BattleUIController : MonoBehaviour
         UnitBase selected = selectionController.SelectedUnit;
         bool canToggleActions = isPlayerTurn && selected != null && selected.CanStillAct;
         actionsButton.gameObject.SetActive(canToggleActions);
+
+        bool isBattlePhase = phaseManager.CurrentPhase == BattlePhase.Battle;
+        optionsButton.gameObject.SetActive(isBattlePhase);
+        abandonBattleButton.gameObject.SetActive(isBattlePhase);
     }
 
     private void HandleAllUnitsDeployed()
@@ -79,4 +98,7 @@ public class BattleUIController : MonoBehaviour
     private void HandleStartBattleClicked() => phaseManager.StartBattle();
     private void HandleEndTurnClicked() => turnManager.EndTurn();
     private void HandleActionsClicked() => selectionController.ToggleActionsPanel();
+
+    private void HandleOptionsClicked() => PopupCoordinator.Instance.Open(optionsPopup);
+    private void HandleAbandonClicked() => abandonConfirmPopup.Open(skirmishFlow.AbandonBattle);
 }

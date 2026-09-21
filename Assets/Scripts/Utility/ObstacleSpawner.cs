@@ -28,7 +28,7 @@ public class ObstacleSpawner : MonoBehaviour
 
         foreach (var coord in placements)
         {
-            GameObject obj = Instantiate(obstaclePrefab);
+            GameObject obj = Instantiate(obstaclePrefab, gridManager.transform);
             UnitBase unit = obj.GetComponent<UnitBase>();
 
             if (unit == null)

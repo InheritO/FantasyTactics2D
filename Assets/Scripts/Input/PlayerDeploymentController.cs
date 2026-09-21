@@ -27,6 +27,8 @@ public class PlayerDeploymentController : MonoBehaviour
     void Awake()
     {
         controls = new GameControls();
+
+        InputBindingUtility.LoadOverrides(controls.asset);
     }
 
     void OnEnable()

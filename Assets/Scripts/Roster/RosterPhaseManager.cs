@@ -87,10 +87,19 @@ public class RosterPhaseManager : MonoBehaviour
     }
     public void ResetRoster()
     {
-        SelectedRace = null;
-        Builder = null;
         ConfirmedEntries = null;
-        OnRosterChanged?.Invoke(); // UI가 목록/포인트 표시를 비우도록
+
+        if (availableRaces != null && availableRaces.Length > 0)
+        {
+            SelectRace(availableRaces[0]);
+        }
+        else
+        {
+            SelectedRace = null;
+            Builder = null;
+            Debug.LogWarning($"[{name}] availableRaces가 비어있어 리셋 후 기본 종족을 선택할 수 없습니다.");
+            OnRosterChanged?.Invoke();
+        }
     }
 
     public void ConfirmRoster()

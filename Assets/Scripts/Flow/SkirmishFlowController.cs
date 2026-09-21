@@ -1,5 +1,7 @@
 using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
+using NaughtyAttributes;
 
 /// <summary>
 /// 대전 플레이의 최상위 흐름(편성 → 전투)을 오브젝트 활성화로 제어한다.
@@ -18,10 +20,15 @@ public class SkirmishFlowController : MonoBehaviour
     public GridManager gridManager;
     public TileVisualizer tileVisualizer;
     public BattleResultPanel resultPanel;
+    public MainMenuController mainMenuController;
+
 
     [Header("UI Panels (같은 Canvas 하위)")]
     public GameObject rosterUIPanel;
     public GameObject battleUIPanel;
+
+    [Header("Buttons")]
+    public Button returnToMainMenuButton;
 
     [Header("World Objects")]
     public GameObject battleRoot;   // GridManager, TileVisualizer, 배치/전투 관련 오브젝트 전부
@@ -35,7 +42,7 @@ public class SkirmishFlowController : MonoBehaviour
         if (!isValid)
             return;
 
-        rosterUIPanel.SetActive(true);
+        rosterUIPanel.SetActive(false);
         battleUIPanel.SetActive(false);
         battleRoot.SetActive(false);
     }
@@ -48,6 +55,9 @@ public class SkirmishFlowController : MonoBehaviour
         rosterManager.OnRosterConfirmed += HandleRosterConfirmed;
         outcomeManager.OnBattleEnded += HandleBattleEnded;
         resultPanel.OnReturnRequested += HandleReturnRequested;
+
+        if (returnToMainMenuButton != null)
+            returnToMainMenuButton.onClick.AddListener(ReturnToMainMenu);
     }
 
     void OnDisable()
@@ -58,6 +68,18 @@ public class SkirmishFlowController : MonoBehaviour
         rosterManager.OnRosterConfirmed -= HandleRosterConfirmed;
         outcomeManager.OnBattleEnded -= HandleBattleEnded;
         resultPanel.OnReturnRequested -= HandleReturnRequested;
+
+        if (returnToMainMenuButton != null)
+            returnToMainMenuButton.onClick.RemoveListener(ReturnToMainMenu);
+    }
+
+    [Button]
+    public void StartSkirmish()
+    {
+        if (!isValid)
+            return;
+
+        rosterUIPanel.SetActive(true);
     }
 
     private void HandleRosterConfirmed()
@@ -68,6 +90,47 @@ public class SkirmishFlowController : MonoBehaviour
 
         StartCoroutine(DeployAfterActivation());
     }
+
+    // 로스터 단계에서 '메인 메뉴로' 버튼이 호출
+    public void ReturnToMainMenu()
+    {
+        if (!isValid)
+            return;
+
+        rosterManager.ResetRoster();
+        rosterUIPanel.SetActive(false);
+        mainMenuController.Show();
+    }
+
+    // 전투 단계에서 '전투 중단' 확인 후 호출됨 (BattleUIController가 호출)
+    public void AbandonBattle()
+    {
+        if (!isValid)
+            return;
+
+        CleanupBattle();
+        mainMenuController.Show();
+    }
+
+    // 결과 화면 '돌아가기'와 전투 중단 둘 다 쓰는 공용 정리 로직
+    private void CleanupBattle()
+    {
+        UnitBase[] units = FindObjectsByType<UnitBase>();
+        foreach (var unit in units)
+            Destroy(unit.gameObject);
+
+        turnManager.ResetState();
+        phaseManager.ReturnToPlacement();
+        rosterManager.ResetRoster();
+
+        gridManager.GenerateNewMap();
+        tileVisualizer.ClearVisuals();
+        tileVisualizer.VisualizeMap();
+
+        battleUIPanel.SetActive(false);
+        battleRoot.SetActive(false);
+    }
+
 
     private bool ValidateReferences()
     {

@@ -7,6 +7,10 @@ using UnityEngine.InputSystem.Controls;
 /// </summary>
 public class SimpleCameraController : MonoBehaviour
 {
+    [Header("Reference")]
+    public BattlePhaseManager phaseManager;
+
+    [Header("Value")]
     public float moveSpeed = 5f;
 
     [Header("Zoom")]
@@ -21,6 +25,7 @@ public class SimpleCameraController : MonoBehaviour
     void Awake()
     {
         controls = new GameControls();
+        InputBindingUtility.LoadOverrides(controls.asset);
 
         cam = GetComponent<Camera>();
 
@@ -31,8 +36,17 @@ public class SimpleCameraController : MonoBehaviour
     void OnEnable() => controls.GamePlay.Enable();
     void OnDisable() => controls.GamePlay.Disable();
 
-    void Update()
+    private void Update()
     {
+        if (phaseManager == null)
+            return;
+
+        bool isGridVisible = phaseManager.CurrentPhase == BattlePhase.Placement
+            || phaseManager.CurrentPhase == BattlePhase.Battle;
+
+        if (!isGridVisible)
+            return;
+
         Vector2 moveInput = controls.GamePlay.Move.ReadValue<Vector2>();
         Vector3 moveDir = new Vector3(moveInput.x, moveInput.y, 0f).normalized;
         transform.position += moveDir * moveSpeed * Time.deltaTime;

@@ -23,6 +23,7 @@ public class UnitSelectionController : MonoBehaviour
     void Awake()
     {
         controls = new GameControls();
+        InputBindingUtility.LoadOverrides(controls.asset);
     }
 
     void OnEnable() => controls.GamePlay.Enable();
@@ -48,11 +49,11 @@ public class UnitSelectionController : MonoBehaviour
         if (phaseManager.CurrentPhase != BattlePhase.Battle)
             return;
 
-        if (controls.GamePlay.Click.WasPressedThisFrame())
+        if (controls.GamePlay.Click.WasPressedThisFrame() && !PopupCoordinator.IsAnyPopupOpen)
             HandleClick();
 
         // 이동 범위 타일을 가릴 때 잠깐 치워두고 싶을 수 있어서, 패널을 껐다 켰다 하는 토글 단축키.
-        if (controls.GamePlay.ToggleActions.WasPressedThisFrame())
+        if (controls.GamePlay.ToggleActions.WasPressedThisFrame() && !PopupCoordinator.IsAnyPopupOpen)
             ToggleActionsPanel();
     }
 
