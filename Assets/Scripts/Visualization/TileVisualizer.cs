@@ -11,6 +11,7 @@ public class TileVisualizer : MonoBehaviour
 
     [Header("Visual Settings")]
     public float tileVisualSize = 0.9f; // tileSize보다 살짝 작게 해서 타일 사이 경계선이 보이게 함
+    private string tileSortingLayerName = "Terrain";
     private int tileSortOrder = 0;
    
     private GameObject[,] tileObjects;
@@ -56,6 +57,7 @@ public class TileVisualizer : MonoBehaviour
         tileObj.transform.localScale = Vector3.one * tileVisualSize;
 
         SpriteRenderer sr = tileObj.AddComponent<SpriteRenderer>();
+        sr.sortingLayerName = SortingLayers.Terrain;
         sr.sortingOrder = tileSortOrder;
 
         if (hasTypeData && tile.TypeData.icon != null)

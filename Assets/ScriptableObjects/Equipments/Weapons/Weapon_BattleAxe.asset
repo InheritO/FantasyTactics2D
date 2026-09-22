@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
   weaponName: BattleAxe
   icon: {fileID: 21300000, guid: 172774604c1bee84185a69041576525b, type: 3}
+  visualSet: {fileID: 11400000, guid: c0839bfa302d8a84297e5da9b3860e22, type: 2}
   handedness: 1
   slotType: 1
   isRanged: 0
@@ -22,7 +23,11 @@ MonoBehaviour:
   damageScaling: 0
   baseArmorPenetration: 3
   baseAccuracyBonus: 0
+  baseCritRating: 10
   attacks:
   - {fileID: 11400000, guid: d1901ae6bfe318a4aa27ed0d08bc1b9f, type: 2}
   description: 
   cost: 2
+  requiresReload: 0
+  reloadAction: {fileID: 0}
+  grantsCounterattack: 0

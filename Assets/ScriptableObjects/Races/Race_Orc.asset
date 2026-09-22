@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: Race_Orc
   m_EditorClassIdentifier: Assembly-CSharp::RaceData
   raceName: Orc
+  visualSet: {fileID: 11400000, guid: 6951691894d0dbd49a78459ed47c8baa, type: 2}
+  headVisualSet: {fileID: 11400000, guid: 719de4a55dd5d2e4ab31cbc7f8c194bf, type: 2}
+  unarmoredArmor: {fileID: 11400000, guid: ccdb04e36ff92ff469a552a9678132e3, type: 2}
   maxHealth: 42
   baseMoveRange: 6
   baseMeleeSkill: 13
@@ -26,7 +29,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 78fea78f85c60e94d875f7783c0cf76b, type: 2}
   availableWeapons:
   - {fileID: 11400000, guid: dc963449c64ea4446b7fbadc00359c89, type: 2}
-  - {fileID: 11400000, guid: da7a84c917a20e54da48616e1c89448e, type: 2}
   - {fileID: 11400000, guid: f3922a591a085da4795bf93d62336427, type: 2}
   - {fileID: 11400000, guid: 54cefef6164d11e43bef866e65421d7c, type: 2}
   availableArmors:

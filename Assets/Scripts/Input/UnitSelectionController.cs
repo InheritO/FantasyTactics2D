@@ -272,7 +272,6 @@ public class UnitSelectionController : MonoBehaviour
         rangeVisualizer.ClearRange();
     }
 
-
     //전투 시스템 고도화 + UI 준비될 때까지 사용할 로그 뭉탱이
     private void LogUnitStatus(UnitBase unit)
     {
@@ -284,4 +283,5 @@ public class UnitSelectionController : MonoBehaviour
         Debug.Log($"[{unit.name}] 주무기: {mainHand} | 보조무기: {offHand} | 방패: {shield} | 방어구: {armor}\n" +
                   $"이동력: {unit.MoveRange} | 사거리: {unit.AttackRange} | 방어력: {unit.Defense}(맷집{unit.ConstitutionDefense}+장비{unit.ArmorDefense})");
     }
+
 }

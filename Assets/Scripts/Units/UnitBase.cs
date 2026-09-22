@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 /// <summary>
 /// 모든 유닛(캐릭터)의 기반이 되는 추상 클래스.
 /// 종족 기본 스탯(Base 접두사)은 절대 직접 변경되지 않으며,
@@ -216,6 +217,8 @@ public abstract class UnitBase : MonoBehaviour
     public GridManager GridManager => gridManager;
     protected SpriteRenderer spriteRenderer;
     private static Sprite defaultSquareSprite;
+    [field: SerializeField]
+    public FacingDirection FacingDirection { get; private set; } = FacingDirection.Down;
 
     protected virtual void Awake()
     {
@@ -227,8 +230,7 @@ public abstract class UnitBase : MonoBehaviour
             spriteRenderer.sprite = GetDefaultSquareSprite();
 
         // 타일(0), 이동범위 하이라이트(1)보다 항상 위에 그려지도록
-        if (spriteRenderer.sortingOrder < 2)
-            spriteRenderer.sortingOrder = 2;
+        spriteRenderer.sortingLayerName = SortingLayers.Units;
     }
 
     private static Sprite GetDefaultSquareSprite()
@@ -262,9 +264,6 @@ public abstract class UnitBase : MonoBehaviour
             Debug.LogWarning($"[{faction.factionName}] 세력에 Race가 설정되지 않았습니다. 스탯이 기본값(0)으로 처리됩니다.");
 
         CurrentHealth = MaxHealth; // Race가 확정된 시점에 체력 초기화
-
-        if (spriteRenderer != null)
-            spriteRenderer.color = faction.factionColor;
     }
 
     // 대전 모드에서 사용: 이 유닛의 종족을 명시적으로 지정한다.
@@ -337,6 +336,7 @@ public abstract class UnitBase : MonoBehaviour
             currentTile.OccupyingUnit = null;
 
         Vector2Int previousCoord = GridCoord;
+        UpdateFacingDirection(GridCoord, targetCoord);
         GridCoord = targetCoord;
         transform.position = gridManager.GridToWorld(targetCoord);
         targetTile.OccupyingUnit = this;
@@ -348,6 +348,18 @@ public abstract class UnitBase : MonoBehaviour
             OnActionsExhausted?.Invoke(this);
 
         return true;
+    }
+
+    private void UpdateFacingDirection(Vector2Int fromCoord, Vector2Int towardCoord)
+    {
+        Vector2Int delta = towardCoord - fromCoord;
+        if (delta == Vector2Int.zero)
+            return;
+
+        if (Mathf.Abs(delta.x) >= Mathf.Abs(delta.y))
+            FacingDirection = delta.x > 0 ? FacingDirection.Right : FacingDirection.Left;
+        else
+            FacingDirection = delta.y > 0 ? FacingDirection.Up : FacingDirection.Down;
     }
 
     #endregion
@@ -429,6 +441,8 @@ public abstract class UnitBase : MonoBehaviour
 
         if (!IsInAttackRange(target))
             return false;
+
+        UpdateFacingDirection(GridCoord, target.GridCoord);
 
         WeaponAttack attack = chosenAttack ?? MainHandWeapon?.GetDefaultAttack();
 

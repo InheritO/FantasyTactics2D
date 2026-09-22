@@ -5,6 +5,10 @@ public class ShieldData : ScriptableObject
 {
     public string shieldName;
     public Sprite icon;
+
+    [Header("Visuals")]
+    public CharacterAnimationSet visualSet;
+
     public int defenseBonus;
     public int moveRangePenalty;
 

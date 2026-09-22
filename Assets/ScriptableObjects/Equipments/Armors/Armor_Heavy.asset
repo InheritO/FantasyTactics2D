@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ArmorData
   armorName: Heavy
   icon: {fileID: 21300000, guid: fd6e4fc32c78509458fc45ea4a478ba8, type: 3}
+  visualSet: {fileID: 11400000, guid: c92e386ee87549c45afaae9b62eb147b, type: 2}
+  headVisualSet: {fileID: 0}
   defenseBonus: 8
   moveRangePenalty: 2
   description: 

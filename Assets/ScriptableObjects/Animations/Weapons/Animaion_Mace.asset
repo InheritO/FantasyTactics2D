@@ -1,0 +1,111 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b81e5b09ce897334aaab237778cc930b, type: 3}
+  m_Name: Animaion_Mace
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterAnimationSet
+  idle:
+    up:
+    - {fileID: 1844255302, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: 722817001, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    down:
+    - {fileID: -1834802254, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: 1541819894, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    left:
+    - {fileID: -320021653, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: 413501214, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    right:
+    - {fileID: 1898383500, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: -111404707, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+  combatIdle:
+    up: []
+    down: []
+    left: []
+    right: []
+  walk:
+    up:
+    - {fileID: 1844255302, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: 722817001, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: 2145283437, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: -1761153689, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: 924271618, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: 139579712, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: -1283302746, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: 1870714226, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: 1502128225, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    down:
+    - {fileID: -1834802254, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: 1541819894, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: -1333363098, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: 1503251726, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: -693770603, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: 1456258308, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: -1722321357, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: -1587620491, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: 533884398, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    left:
+    - {fileID: -320021653, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: 413501214, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: 441627683, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: 1688929745, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: -671314502, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: -599538192, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: 92415205, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: -625409641, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: -2063318498, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    right:
+    - {fileID: 1898383500, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: -111404707, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: 1491522868, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: -1110222645, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: -1727653267, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: -1071642347, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: -674351724, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: 1664185453, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+    - {fileID: -877480965, guid: 5a4a6b6b9353a594daa97f5e6e078286, type: 3}
+  slash:
+    up:
+    - {fileID: 3135445491439152490, guid: 3c24b5c364b44d248bc9e85aeef6fc5a, type: 3}
+    - {fileID: 1292651756373783932, guid: 3c24b5c364b44d248bc9e85aeef6fc5a, type: 3}
+    - {fileID: 6507606284510176013, guid: 3c24b5c364b44d248bc9e85aeef6fc5a, type: 3}
+    - {fileID: 6879791002002361628, guid: 3c24b5c364b44d248bc9e85aeef6fc5a, type: 3}
+    - {fileID: 4124531738108296769, guid: 3c24b5c364b44d248bc9e85aeef6fc5a, type: 3}
+    - {fileID: 3486549137225422394, guid: 3c24b5c364b44d248bc9e85aeef6fc5a, type: 3}
+    down:
+    - {fileID: -6393807438878902649, guid: 3c24b5c364b44d248bc9e85aeef6fc5a, type: 3}
+    - {fileID: 5739212911923232517, guid: 3c24b5c364b44d248bc9e85aeef6fc5a, type: 3}
+    - {fileID: -7339675682292933991, guid: 3c24b5c364b44d248bc9e85aeef6fc5a, type: 3}
+    - {fileID: 7383039989675808682, guid: 3c24b5c364b44d248bc9e85aeef6fc5a, type: 3}
+    - {fileID: -2590620949499697445, guid: 3c24b5c364b44d248bc9e85aeef6fc5a, type: 3}
+    - {fileID: -7200987625744391104, guid: 3c24b5c364b44d248bc9e85aeef6fc5a, type: 3}
+    left:
+    - {fileID: -3808626632405232372, guid: 3c24b5c364b44d248bc9e85aeef6fc5a, type: 3}
+    - {fileID: -7779232049103802358, guid: 3c24b5c364b44d248bc9e85aeef6fc5a, type: 3}
+    - {fileID: -3628680148778799812, guid: 3c24b5c364b44d248bc9e85aeef6fc5a, type: 3}
+    - {fileID: -5839679136081437280, guid: 3c24b5c364b44d248bc9e85aeef6fc5a, type: 3}
+    - {fileID: 5335824666346643282, guid: 3c24b5c364b44d248bc9e85aeef6fc5a, type: 3}
+    - {fileID: -1340961486153546644, guid: 3c24b5c364b44d248bc9e85aeef6fc5a, type: 3}
+    right:
+    - {fileID: 1575319916124575625, guid: 3c24b5c364b44d248bc9e85aeef6fc5a, type: 3}
+    - {fileID: 3757016497155426724, guid: 3c24b5c364b44d248bc9e85aeef6fc5a, type: 3}
+    - {fileID: -6316643133835765223, guid: 3c24b5c364b44d248bc9e85aeef6fc5a, type: 3}
+    - {fileID: -3678055170991468522, guid: 3c24b5c364b44d248bc9e85aeef6fc5a, type: 3}
+    - {fileID: 7722908284331791771, guid: 3c24b5c364b44d248bc9e85aeef6fc5a, type: 3}
+  thrust:
+    up: []
+    down: []
+    left: []
+    right: []
+  shoot:
+    up: []
+    down: []
+    left: []
+    right: []

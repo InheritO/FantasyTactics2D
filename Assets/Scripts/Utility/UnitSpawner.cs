@@ -24,6 +24,10 @@ public static class UnitSpawner
         {
             unit.AssignRace(participant.Race);
             unit.ApplyLoadout(entry);
+
+            UnitVisualController visualController = unit.GetComponent<UnitVisualController>();
+            if (visualController != null)
+                visualController.RefreshVisuals();
         }
 
         return unit;
@@ -87,8 +91,18 @@ public static class UnitSpawner
         if (combatLogger != null)
             combatLogger.RegisterUnit(unit);
 
+        UnitVisualController visualController = unit.GetComponent<UnitVisualController>();
+
         UnitActionVisual visual = unit.gameObject.AddComponent<UnitActionVisual>();
-        visual.Initialize(unit, faction.factionColor);
+        if (visualController != null)
+        {
+            SpriteRenderer bodyRenderer = visualController.GetRenderer(VisualLayerSource.Body);
+            if (bodyRenderer != null)
+                visual.Initialize(unit, bodyRenderer);
+        }
+
+        UnitFactionMarker marker = new GameObject("FactionMarker").AddComponent<UnitFactionMarker>();
+        marker.Initialize(unit, faction.factionColor);
 
         UnitHealthBar healthBar = new GameObject("HealthBar").AddComponent<UnitHealthBar>();
         healthBar.Initialize(unit);

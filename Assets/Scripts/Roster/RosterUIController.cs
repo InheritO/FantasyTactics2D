@@ -297,7 +297,7 @@ public class RosterUIController : MonoBehaviour
         if (armorIndex >= race.availableArmors.Length)
             armorIndex = -1;
 
-        draft.armor = armorIndex == -1 ? null : race.availableArmors[armorIndex];
+        draft.armor = armorIndex == -1 ? race.unarmoredArmor : race.availableArmors[armorIndex];
         RefreshDraftLabels();
     }
 

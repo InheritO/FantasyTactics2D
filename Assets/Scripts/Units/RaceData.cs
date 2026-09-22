@@ -26,6 +26,12 @@ public class RaceData : ScriptableObject
 {
     public string raceName;
 
+    [Header("Visuals")]
+    public CharacterAnimationSet visualSet;      // 몸
+    public CharacterAnimationSet headVisualSet;  // 머리 (머리카락/모자 포함)
+    [Tooltip("갑옷을 장착하지 않았을 때 기본으로 쓸 ArmorData (맨몸 상태)")]
+    public ArmorData unarmoredArmor;
+
     [Header("Base Stats")]
     [Tooltip("최대 체력")]
     public int maxHealth = 10;

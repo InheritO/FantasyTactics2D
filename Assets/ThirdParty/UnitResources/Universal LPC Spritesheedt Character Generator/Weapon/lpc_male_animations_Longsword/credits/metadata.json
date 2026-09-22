@@ -1,0 +1,59 @@
+{
+  "exportTimestamp": "2026-09-22T02-10-20",
+  "bodyType": "male",
+  "standardAnimations": {
+    "exported": [
+      "spellcast",
+      "thrust",
+      "walk",
+      "slash",
+      "shoot",
+      "hurt",
+      "climb",
+      "idle",
+      "jump",
+      "sit",
+      "emote",
+      "run",
+      "watering",
+      "combat",
+      "1h_slash",
+      "1h_backslash",
+      "1h_halfslash"
+    ],
+    "failed": []
+  },
+  "customAnimations": {
+    "exported": [
+      "slash_oversize",
+      "slash_reverse_oversize",
+      "thrust_oversize"
+    ],
+    "failed": []
+  },
+  "frameSize": 64,
+  "frameCounts": {},
+  "performance": {
+    "exportKind": "splitAnimations",
+    "totalMs": 311,
+    "phasesMs": {
+      "render_composite_extractAnimationFromCanvas": 14.9,
+      "pngEncode": 253.1,
+      "zipFile": 2.1,
+      "drawAndSlice": 38.9,
+      "staticFiles": 0.6
+    },
+    "counters": {
+      "pngEncodeCount": 20,
+      "totalPngBytes": 197088,
+      "drawAndSliceCount": 3,
+      "zipFileEntryCount": 20,
+      "renderExtractAnimationFromCanvasCalls": 17,
+      "renderSingleItemCalls": 0,
+      "renderSingleItemAnimationCalls": 0,
+      "extractFramesFromAnimationBatchCount": 0,
+      "renderSliceCanvasForCustomAnimCalls": 0
+    },
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.0.0 Whale/4.39.410.14 Safari/537.36"
+  }
+}

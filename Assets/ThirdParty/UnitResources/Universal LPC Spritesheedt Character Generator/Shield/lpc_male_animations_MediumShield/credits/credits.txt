@@ -1,0 +1,34 @@
+head/faces/${head}/neutral/walk.png
+	- Note: Original by Redshrike, Expressions by ElizaWy, mapped to all frames by JaidynReiman
+	- Licenses:
+		- OGA-BY 3.0
+	- Authors:
+		- JaidynReiman
+		- ElizaWy
+		- Stephen Challener (Redshrike)
+	- Links:
+		- https://github.com/ElizaWy/LPC/tree/main/Characters/Head
+		- https://opengameart.org/content/ulpc-expanded-expressions
+
+shield/heater/revised/wood/bg/walk.png
+	- Licenses:
+		- OGA-BY 3.0
+	- Authors:
+		- bluecarrot16
+		- Sander Frenken (castelonia)
+		- ElizaWy
+		- JaidynReiman
+	- Links:
+		- https://opengameart.org/content/lpc-shields
+
+shield/heater/revised/trim/bg/walk.png
+	- Licenses:
+		- OGA-BY 3.0
+	- Authors:
+		- bluecarrot16
+		- Sander Frenken (castelonia)
+		- ElizaWy
+		- JaidynReiman
+	- Links:
+		- https://opengameart.org/content/lpc-shields
+

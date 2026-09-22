@@ -26,6 +26,9 @@ public class WeaponData : ScriptableObject
     public string weaponName;
     public Sprite icon;
 
+    [Header("Visuals")]
+    public CharacterAnimationSet visualSet;
+
 
     [Header("Handedness")]
     public WeaponHandedness handedness = WeaponHandedness.OneHanded;

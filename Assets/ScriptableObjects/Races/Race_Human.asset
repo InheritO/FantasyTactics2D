@@ -13,10 +13,14 @@ MonoBehaviour:
   m_Name: Race_Human
   m_EditorClassIdentifier: Assembly-CSharp::RaceData
   raceName: Human
+  visualSet: {fileID: 11400000, guid: 6951691894d0dbd49a78459ed47c8baa, type: 2}
+  headVisualSet: {fileID: 11400000, guid: 719de4a55dd5d2e4ab31cbc7f8c194bf, type: 2}
+  unarmoredArmor: {fileID: 11400000, guid: ccdb04e36ff92ff469a552a9678132e3, type: 2}
   maxHealth: 40
   baseMoveRange: 6
   baseMeleeSkill: 20
   baseRangedSkill: 20
+  baseDefenseSkill: 20
   baseStrength: 20
   baseConstitution: 20
   baseAgility: 20
@@ -26,7 +30,6 @@ MonoBehaviour:
   availableWeapons:
   - {fileID: 11400000, guid: dc963449c64ea4446b7fbadc00359c89, type: 2}
   - {fileID: 11400000, guid: 0cdb76c0455d8df4aab5bf20fbacd409, type: 2}
-  - {fileID: 11400000, guid: da7a84c917a20e54da48616e1c89448e, type: 2}
   - {fileID: 11400000, guid: f3922a591a085da4795bf93d62336427, type: 2}
   - {fileID: 11400000, guid: f8732838b8def0e44a678b88ff75e57b, type: 2}
   - {fileID: 11400000, guid: 4485e6101459f3048bd82f80347165a4, type: 2}

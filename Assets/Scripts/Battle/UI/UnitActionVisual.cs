@@ -9,37 +9,38 @@ using UnityEngine;
 public class UnitActionVisual : MonoBehaviour
 {
     [Tooltip("데미지를 받았을 때 깜빡이는 색")]
-    public Color damageFlashColor = Color.white;
+    public Color damageFlashColor = Color.red;
 
     [Tooltip("깜빡임이 지속되는 시간(초)")]
     public float damageFlashDuration = 0.15f;
 
+    [Tooltip("행동완료 시 밝기 배율 (1 = 원래 밝기)")]
+    [Range(0f, 1f)] public float actionsExhaustedBrightness = 0.5f;
+
     private UnitBase unit;
     private SpriteRenderer spriteRenderer;
-    private Color factionColor;
     private Coroutine flashRoutine;
 
-    public void Initialize(UnitBase targetUnit, Color originalFactionColor)
+    public void Initialize(UnitBase targetUnit, SpriteRenderer targetRenderer)
     {
         unit = targetUnit;
-        spriteRenderer = unit.GetComponent<SpriteRenderer>();
-        factionColor = originalFactionColor;
+        spriteRenderer = targetRenderer;
 
         unit.OnActionsExhausted += HandleActionsExhausted;
         unit.OnTurnReset += HandleTurnReset;
-        unit.OnDamaged += HandleDamaged; // 추가
+        unit.OnDamaged += HandleDamaged;
     }
 
     private void HandleActionsExhausted(UnitBase u)
     {
         if (spriteRenderer != null)
-            spriteRenderer.color = factionColor * 0.5f;
+            spriteRenderer.color = new Color(actionsExhaustedBrightness, actionsExhaustedBrightness, actionsExhaustedBrightness, 1f);
     }
 
     private void HandleTurnReset(UnitBase u)
     {
         if (spriteRenderer != null)
-            spriteRenderer.color = factionColor;
+            spriteRenderer.color = Color.white;
     }
 
     private void HandleDamaged(UnitBase u, int amount)
@@ -47,7 +48,6 @@ public class UnitActionVisual : MonoBehaviour
         if (spriteRenderer == null)
             return;
 
-        // 이미 깜빡이는 중이면 새로 시작 (연속 피격 시 자연스럽게 갱신됨)
         if (flashRoutine != null)
             StopCoroutine(flashRoutine);
 
@@ -58,12 +58,12 @@ public class UnitActionVisual : MonoBehaviour
     {
         // 지금 색(행동완료로 어두워진 상태일 수도 있음)을 기준으로 삼아,
         // 깜빡임이 끝나면 "원래 상태"가 아니라 "지금 있어야 할 상태"로 복귀시켜야 함
-        Color colorBeforeFlash = unit.CanStillAct ? factionColor : factionColor * 0.5f;
+        Color colorBeforeFlash = unit.CanStillAct
+            ? Color.white
+            : new Color(actionsExhaustedBrightness, actionsExhaustedBrightness, actionsExhaustedBrightness, 1f);
 
         spriteRenderer.color = damageFlashColor;
-
         yield return new WaitForSeconds(damageFlashDuration);
-
         spriteRenderer.color = colorBeforeFlash;
         flashRoutine = null;
     }
@@ -74,7 +74,7 @@ public class UnitActionVisual : MonoBehaviour
         {
             unit.OnActionsExhausted -= HandleActionsExhausted;
             unit.OnTurnReset -= HandleTurnReset;
-            unit.OnDamaged -= HandleDamaged; // 추가
+            unit.OnDamaged -= HandleDamaged;
         }
     }
 }

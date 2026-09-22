@@ -58,7 +58,7 @@ public static class AIRosterGenerator
         {
             attempts++;
 
-            RosterEntry entry = CreateRandomEntry(mainHandCandidates, offHandCandidates, armorCandidates, shieldCandidates, strategy);
+            RosterEntry entry = CreateRandomEntry(mainHandCandidates, offHandCandidates, armorCandidates, shieldCandidates, strategy, race.unarmoredArmor);
             int cost = entry.GetTotalCost(race);
 
             if (cost <= builder.RemainingPoints)
@@ -69,7 +69,7 @@ public static class AIRosterGenerator
     }
 
     private static RosterEntry CreateRandomEntry(WeaponData[] mainHandCandidates, WeaponData[] offHandCandidates,
-       ArmorData[] armorCandidates, ShieldData[] shieldCandidates, AIRosterStrategy strategy)
+    ArmorData[] armorCandidates, ShieldData[] shieldCandidates, AIRosterStrategy strategy, ArmorData unarmoredArmor)
     {
         RosterEntry entry = new RosterEntry();
 
@@ -87,7 +87,7 @@ public static class AIRosterGenerator
         }
 
         int armorIndex = Random.Range(-1, armorCandidates.Length);
-        entry.armor = armorIndex >= 0 ? armorCandidates[armorIndex] : null;
+        entry.armor = armorIndex >= 0 ? armorCandidates[armorIndex] : unarmoredArmor;
 
         return entry;
     }

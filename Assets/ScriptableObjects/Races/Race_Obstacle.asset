@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: Race_Obstacle
   m_EditorClassIdentifier: Assembly-CSharp::RaceData
   raceName: Obstacle
+  visualSet: {fileID: 11400000, guid: 6951691894d0dbd49a78459ed47c8baa, type: 2}
+  headVisualSet: {fileID: 11400000, guid: 719de4a55dd5d2e4ab31cbc7f8c194bf, type: 2}
   maxHealth: 200
   baseMoveRange: 0
   baseMeleeSkill: 0

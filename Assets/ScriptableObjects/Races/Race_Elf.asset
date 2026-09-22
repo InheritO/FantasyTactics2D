@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: Race_Elf
   m_EditorClassIdentifier: Assembly-CSharp::RaceData
   raceName: Elf
+  visualSet: {fileID: 11400000, guid: 6951691894d0dbd49a78459ed47c8baa, type: 2}
+  headVisualSet: {fileID: 11400000, guid: 719de4a55dd5d2e4ab31cbc7f8c194bf, type: 2}
+  unarmoredArmor: {fileID: 11400000, guid: ccdb04e36ff92ff469a552a9678132e3, type: 2}
   maxHealth: 38
   baseMoveRange: 8
   baseMeleeSkill: 24
