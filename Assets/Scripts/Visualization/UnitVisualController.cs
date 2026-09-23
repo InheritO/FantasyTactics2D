@@ -20,6 +20,8 @@ public class UnitVisualController : MonoBehaviour
     private int frameIndex;
     private float frameTimer;
 
+    public Transform visualRoot;
+
     void Awake() => unit = GetComponent<UnitBase>();
 
     // 스폰 시점(Race/장비 확정 직후)에 UnitSpawner가 호출
@@ -27,6 +29,10 @@ public class UnitVisualController : MonoBehaviour
     {
         foreach (var layer in layers)
             layer.set = ResolveSet(layer.source);
+
+
+        if (visualRoot != null && unit.Race != null)
+            visualRoot.localScale = Vector3.one * unit.Race.visualScale;
     }
 
     private CharacterAnimationSet ResolveSet(VisualLayerSource source)

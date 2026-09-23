@@ -48,6 +48,7 @@ public class MovementRangeVisualizer : MonoBehaviour
         SpriteRenderer sr = obj.AddComponent<SpriteRenderer>();
         sr.sprite = CreateSquareSprite();
         sr.color = highlightColor;
+        sr.sortingLayerName = SortingLayers.Highlight;
         sr.sortingOrder = tileHighlightSortOrder; // 타일 위, 유닛 아래 정도로 조정 필요시 값 변경
 
         return obj;

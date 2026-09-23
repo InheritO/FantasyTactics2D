@@ -62,7 +62,8 @@ public class TileVisualizer : MonoBehaviour
 
         if (hasTypeData && tile.TypeData.icon != null)
         {
-            sr.sprite = tile.TypeData.icon; // 실제 타일 스프라이트가 있으면 사용
+            sr.sprite = tile.TypeData.icon;
+            sr.color = ApplyZoneTint(Color.white, tile.Zone);
         }
         else
         {

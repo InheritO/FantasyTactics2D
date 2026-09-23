@@ -7,6 +7,31 @@ using UnityEngine;
 public static class ProceduralSpriteUtility
 {
     private static Sprite cachedSquareSprite;
+    private static Sprite cachedOutlineSprite;
+
+    public static Sprite GetOutlineSprite(int size = 32, int borderThickness = 2)
+    {
+        if (cachedOutlineSprite == null)
+        {
+            Texture2D texture = new Texture2D(size, size);
+            Color[] pixels = new Color[size * size];
+
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    bool isBorder = x < borderThickness || x >= size - borderThickness
+                                  || y < borderThickness || y >= size - borderThickness;
+                    pixels[y * size + x] = isBorder ? Color.white : Color.clear;
+                }
+            }
+
+            texture.SetPixels(pixels);
+            texture.Apply();
+            cachedOutlineSprite = Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), size);
+        }
+        return cachedOutlineSprite;
+    }
 
     public static Sprite GetSquareSprite()
     {

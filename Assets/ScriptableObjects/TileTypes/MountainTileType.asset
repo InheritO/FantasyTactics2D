@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: MountainTileType
   m_EditorClassIdentifier: Assembly-CSharp::TileTypeData
   tileName: Plain
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 7ff419babb7ecc54e96b2fba7bd3f0ee, type: 3}
   movementCost: 3
   isWalkable: 1
   blocksLineOfSight: 0
