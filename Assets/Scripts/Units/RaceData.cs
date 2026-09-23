@@ -29,8 +29,12 @@ public class RaceData : ScriptableObject
     [Header("Visuals")]
     public CharacterAnimationSet visualSet;      // 몸
     public CharacterAnimationSet headVisualSet;  // 머리 (머리카락/모자 포함)
+
     [Tooltip("갑옷을 장착하지 않았을 때 기본으로 쓸 ArmorData (맨몸 상태)")]
     public ArmorData unarmoredArmor;
+
+    [Tooltip("체형 크기 배율. 1 = 기본 크기, 드워프처럼 작게 하려면 0.8~0.9 정도")]
+    public float visualScale = 1f;
 
     [Header("Base Stats")]
     [Tooltip("최대 체력")]

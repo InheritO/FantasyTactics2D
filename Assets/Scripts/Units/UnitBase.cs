@@ -215,35 +215,9 @@ public abstract class UnitBase : MonoBehaviour
 
     protected GridManager gridManager;
     public GridManager GridManager => gridManager;
-    protected SpriteRenderer spriteRenderer;
-    private static Sprite defaultSquareSprite;
+
     [field: SerializeField]
     public FacingDirection FacingDirection { get; private set; } = FacingDirection.Down;
-
-    protected virtual void Awake()
-    {
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        if (spriteRenderer == null)
-            spriteRenderer = gameObject.AddComponent<SpriteRenderer>();
-
-        if (spriteRenderer.sprite == null)
-            spriteRenderer.sprite = GetDefaultSquareSprite();
-
-        // 타일(0), 이동범위 하이라이트(1)보다 항상 위에 그려지도록
-        spriteRenderer.sortingLayerName = SortingLayers.Units;
-    }
-
-    private static Sprite GetDefaultSquareSprite()
-    {
-        if (defaultSquareSprite == null)
-        {
-            Texture2D texture = new Texture2D(1, 1);
-            texture.SetPixel(0, 0, Color.white);
-            texture.Apply();
-            defaultSquareSprite = Sprite.Create(texture, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1f);
-        }
-        return defaultSquareSprite;
-    }
 
     #endregion
 

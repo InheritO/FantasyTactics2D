@@ -193,6 +193,10 @@ public class RosterUIController : MonoBehaviour
         offHandIndex = -1;
         shieldIndex = -1;
         armorIndex = -1;
+
+        RaceData race = rosterManager.SelectedRace;
+        draft.armor = race != null ? race.unarmoredArmor : null;
+
         RefreshDraftLabels();
     }
 
