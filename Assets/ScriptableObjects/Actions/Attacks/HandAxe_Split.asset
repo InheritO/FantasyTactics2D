@@ -12,10 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1050f7542d569f44b91956003876231, type: 3}
   m_Name: HandAxe_Split
   m_EditorClassIdentifier: Assembly-CSharp::WeaponAttack
-  attackName: Split
+  actionName: Split
   powerBonus: 1
   armorPenetrationBonus: 2
   accuracyBonusModifier: -3
+  critRatingBonus: 0
   inflictedEffect: 3
   disruption: 2
   effectDuration: 5

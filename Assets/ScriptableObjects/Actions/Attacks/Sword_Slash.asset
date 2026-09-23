@@ -10,13 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d1050f7542d569f44b91956003876231, type: 3}
-  m_Name: Sword_Pierce
+  m_Name: Sword_Slash
   m_EditorClassIdentifier: Assembly-CSharp::WeaponAttack
-  attackName: Pierce
-  powerBonus: -1
-  armorPenetrationBonus: 3
-  accuracyBonusModifier: -8
-  inflictedEffect: 0
-  disruption: 0
-  effectDuration: 0
-  effectMagnitude: 0
+  actionName: Slash
+  powerBonus: 1
+  armorPenetrationBonus: 0
+  accuracyBonusModifier: 0
+  critRatingBonus: 0
+  inflictedEffect: 1
+  disruption: 8
+  effectDuration: 2
+  effectMagnitude: 2
