@@ -29,6 +29,15 @@ public class PopupCoordinator : MonoBehaviour
         Instance = this;
 
         if (popupLayer != null)
+            popupLayer.SetActive(true);
+
+        foreach (var popup in popups)
+        {
+            popup.gameObject.SetActive(true);
+        }
+
+
+        if (popupLayer != null)
             popupLayer.SetActive(false);
 
         SetBackdropVisible(false);
