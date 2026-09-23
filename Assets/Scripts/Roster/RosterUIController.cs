@@ -35,19 +35,15 @@ public class RosterUIController : MonoBehaviour
     public TMP_Dropdown aiDispositionDropdown;
 
     [Header("Draft Controls")]
-    public TMP_Text mainHandWeaponLabel;
-    public Button mainHandWeaponNextButton;
-    public TMP_Text offHandWeaponLabel;
-    public Button offHandWeaponNextButton;
-    public TMP_Text shieldLabel;
-    public Button shieldNextButton;
-    public TMP_Text armorLabel;
-    public Button armorNextButton;
+    public UILabledButton mainHandWeaponLabeleldButton;
+    public UILabledButton offHandWeaponLabeledButton;
+    public UILabledButton shieldLabeledButton;
+    public UILabledButton armorLabeledButton;
     public Button addUnitButton;
 
     [Header("Roster List")]
     public Transform rosterListContainer;
-    public GameObject rosterListItemPrefab; // 자식에 TMP_Text + Button(제거)
+    public RemovableListItem rosterListItemPrefab; // 자식에 TMP_Text + Button(제거)
 
     [Header("Points Display")]
     public TMP_Text pointsLabel;
@@ -76,10 +72,10 @@ public class RosterUIController : MonoBehaviour
         SetupAIStrategyDropdown();
         SetupAIDispositionDropdown();
 
-        mainHandWeaponNextButton.onClick.AddListener(CycleMainHandWeapon);
-        offHandWeaponNextButton.onClick.AddListener(CycleOffHandWeapon);
-        shieldNextButton.onClick.AddListener(CycleShield);
-        armorNextButton.onClick.AddListener(CycleArmor);
+        mainHandWeaponLabeleldButton.OnClicked += CycleMainHandWeapon;
+        offHandWeaponLabeledButton.OnClicked += CycleOffHandWeapon;
+        shieldLabeledButton.OnClicked += CycleShield;
+        armorLabeledButton.OnClicked += CycleArmor;
         addUnitButton.onClick.AddListener(AddDraftToRoster);
         confirmButton.onClick.AddListener(rosterManager.ConfirmRoster);
 
@@ -114,14 +110,10 @@ public class RosterUIController : MonoBehaviour
         (rosterManager, nameof(rosterManager)),
         (raceButtonContainer, nameof(raceButtonContainer)),
         (raceButtonPrefab, nameof(raceButtonPrefab)),
-        (mainHandWeaponLabel, nameof(mainHandWeaponLabel)),
-        (mainHandWeaponNextButton, nameof(mainHandWeaponNextButton)),
-        (offHandWeaponLabel, nameof(offHandWeaponLabel)),
-        (offHandWeaponNextButton, nameof(offHandWeaponNextButton)),
-        (shieldLabel, nameof(shieldLabel)),
-        (shieldNextButton, nameof(shieldNextButton)),
-        (armorLabel, nameof(armorLabel)),
-        (armorNextButton, nameof(armorNextButton)),
+        (mainHandWeaponLabeleldButton, nameof(mainHandWeaponLabeleldButton)),
+        (offHandWeaponLabeledButton, nameof(offHandWeaponLabeledButton)),
+        (shieldLabeledButton, nameof(shieldLabeledButton)),
+        (armorLabeledButton, nameof(armorLabeledButton)),
         (addUnitButton, nameof(addUnitButton)),
         (rosterListContainer, nameof(rosterListContainer)),
         (rosterListItemPrefab, nameof(rosterListItemPrefab)),
@@ -327,14 +319,14 @@ public class RosterUIController : MonoBehaviour
 
     private void RefreshDraftLabels()
     {
-        mainHandWeaponLabel.text = draft.mainHandWeapon != null ? draft.mainHandWeapon.weaponName : "비무장";
-        offHandWeaponLabel.text = draft.offHandWeapon != null ? draft.offHandWeapon.weaponName : "없음";
-        shieldLabel.text = draft.shield != null ? draft.shield.shieldName : "없음";
-        armorLabel.text = draft.armor != null ? draft.armor.armorName : "비무장";
+        mainHandWeaponLabeleldButton.SetText(draft.mainHandWeapon != null ? draft.mainHandWeapon.weaponName : "비무장");
+        offHandWeaponLabeledButton.SetText(draft.offHandWeapon != null ? draft.offHandWeapon.weaponName : "없음");
+        shieldLabeledButton.SetText(draft.shield != null ? draft.shield.shieldName : "없음");
+        armorLabeledButton.SetText(draft.armor != null ? draft.armor.armorName : "비무장");
 
         bool isTwoHanded = draft.mainHandWeapon != null && draft.mainHandWeapon.handedness == WeaponHandedness.TwoHanded;
-        offHandWeaponNextButton.interactable = !isTwoHanded;
-        shieldNextButton.interactable = !isTwoHanded;
+        offHandWeaponLabeledButton.ButtonInteractable(!isTwoHanded);
+        shieldLabeledButton.ButtonInteractable(!isTwoHanded);
     }
 
     // 슬라이더 값이 바뀔 때마다 총 포인트를 갱신하고, 편성 목록/라벨을 새로 고침
@@ -397,16 +389,11 @@ public class RosterUIController : MonoBehaviour
 
         foreach (var entry in rosterManager.Builder.GetEntries())
         {
-            GameObject itemObj = Instantiate(rosterListItemPrefab, rosterListContainer);
-            spawnedListItems.Add(itemObj);
+            RemovableListItem itemObj = Instantiate(rosterListItemPrefab, rosterListContainer);
+            spawnedListItems.Add(itemObj.gameObject);
 
-            TMP_Text label = itemObj.GetComponentInChildren<TMP_Text>();
-            if (label != null)
-                label.text = BuildEntryLabel(entry);
-
-            Button removeButton = itemObj.GetComponentInChildren<Button>();
-            if (removeButton != null)
-                removeButton.onClick.AddListener(() => rosterManager.RemoveEntry(entry));
+            itemObj.SetText(BuildEntryLabel(entry));
+            itemObj.OnRemoveClicked += () => rosterManager.RemoveEntry(entry);
         }
     }
 
