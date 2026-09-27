@@ -57,12 +57,17 @@ public static class CombatResolver
         bool isHit = Random.Range(0, 100) < hitChance;
 
         if (!isHit)
-            return CombatResult.Miss();
+        {
+            AudioManager.Instance.PlaySfx(AudioManager.Instance.library.missWhiff);
+            return CombatResult.Miss();            
+        }
+            
 
         // 2단계: 막기 (공격 기술 vs 방어 기술, 방패 있을 때만)
         if (TryResolveBlock(attacker, defender, weapon))
         {
             Debug.Log($"[{defender.name}] 방패로 막아냈습니다!");
+            AudioManager.Instance.PlaySfx(AudioManager.Instance.library.blockClang);
             return CombatResult.Blocked();
         }
 
@@ -76,6 +81,9 @@ public static class CombatResolver
             damage = Mathf.RoundToInt(damage * CriticalDamageMultiplier);
             Debug.Log($"[{attacker.name}] 치명타! 데미지 {damage}");
         }
+
+
+        AudioManager.Instance.PlaySfx(isCritical ? AudioManager.Instance.library.hitCritical : AudioManager.Instance.library.hitLight);
 
         // 4단계: 상태이상 (disruption vs 맷집)
         if (attack != null && attack.inflictedEffect != StatusEffectType.None)

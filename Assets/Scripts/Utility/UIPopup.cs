@@ -25,6 +25,7 @@ public class UIPopup : MonoBehaviour
         EnsureInitialized();
     }
 
+
     private void EnsureInitialized()
     {
         if (initialized)
@@ -99,6 +100,8 @@ public class UIPopup : MonoBehaviour
         float startAlpha = canvasGroup.alpha;
         float targetAlpha = opening ? 1f : 0f;
         float elapsed = 0f;
+
+        AudioManager.Instance.PlaySfx(opening ? AudioManager.Instance.library.popupOpen : AudioManager.Instance.library.popupClose);
 
         while (elapsed < animationDuration)
         {

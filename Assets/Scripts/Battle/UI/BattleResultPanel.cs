@@ -25,6 +25,8 @@ public class BattleResultPanel : MonoBehaviour
         if (resultLabel != null)
             resultLabel.text = playerWon ? "½Â¸®!" : "ÆÐ¹è...";
 
+        AudioManager.Instance.PlaySfx(playerWon ? AudioManager.Instance.library.victory : AudioManager.Instance.library.defeat);
+
         if (panelRoot != null)
             panelRoot.SetActive(true);
     }
