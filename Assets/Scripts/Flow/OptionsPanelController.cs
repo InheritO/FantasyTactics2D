@@ -8,40 +8,24 @@ using UnityEngine.UI;
 /// </summary>
 public class OptionsPanelController : MonoBehaviour
 {
-    private const string VolumePrefKey = "MasterVolume";
-    private const string MixerParam = "MasterVolume"; // 믹서에서 노출한 파라미터 이름과 정확히 일치해야 함
-
-    public AudioMixer audioMixer;
     public Slider masterVolumeSlider;
 
     void OnEnable()
     {
-        float savedVolume = PlayerPrefs.GetFloat(VolumePrefKey, 1f);
-        ApplyVolume(savedVolume);
+        if (AudioManager.Instance != null)
+            masterVolumeSlider.SetValueWithoutNotify(AudioManager.Instance.MasterVolume);
 
-        if (masterVolumeSlider != null)
-        {
-            masterVolumeSlider.SetValueWithoutNotify(savedVolume);
-            masterVolumeSlider.onValueChanged.AddListener(HandleVolumeChanged);
-        }
+        masterVolumeSlider.onValueChanged.AddListener(HandleVolumeChanged);
     }
 
     void OnDisable()
     {
-        if (masterVolumeSlider != null)
-            masterVolumeSlider.onValueChanged.RemoveListener(HandleVolumeChanged);
+        masterVolumeSlider.onValueChanged.RemoveListener(HandleVolumeChanged);
     }
 
     private void HandleVolumeChanged(float value)
     {
-        ApplyVolume(value);
-        PlayerPrefs.SetFloat(VolumePrefKey, value);
-    }
-
-    private void ApplyVolume(float linearValue)
-    {
-        float dB = linearValue > 0.0001f ? Mathf.Log10(linearValue) * 20f : -80f; // 0이면 사실상 무음(-80dB)
-        if (audioMixer != null)
-            audioMixer.SetFloat(MixerParam, dB);
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.SetMasterVolume(value);
     }
 }

@@ -37,6 +37,6 @@ public class WeaponAttack : UnitAction
 
     public override void Execute(UnitBase actor, UnitBase target)
     {
-
+        actor.TryAttack(target, this);
     }
 }
