@@ -925,7 +925,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -2, y: 0}
   m_SizeDelta: {x: 10, y: 0}
   m_Pivot: {x: 1, y: 1}
 --- !u!114 &238179252
@@ -1511,7 +1511,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 2}
   m_SizeDelta: {x: 0, y: 10}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &422389983
@@ -1558,7 +1558,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 698053903}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.9741181
+  m_Size: 0.9910502
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -2758,6 +2758,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: UIDropDown_ADisposition
       objectReference: {fileID: 0}
+    - target: {fileID: 5609397480849666471, guid: 48ad6317c03bf304e9a44d0fa81c8f44, type: 3}
+      propertyPath: m_PixelsPerUnitMultiplier
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5962826169611182221, guid: 48ad6317c03bf304e9a44d0fa81c8f44, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 7002027585050157396, guid: 48ad6317c03bf304e9a44d0fa81c8f44, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -2837,6 +2845,14 @@ PrefabInstance:
     - target: {fileID: 7002027585050157396, guid: 48ad6317c03bf304e9a44d0fa81c8f44, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9044484009502832380, guid: 48ad6317c03bf304e9a44d0fa81c8f44, type: 3}
+      propertyPath: m_fontSize
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 9044484009502832380, guid: 48ad6317c03bf304e9a44d0fa81c8f44, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2931,7 +2947,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 617305272}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -4775,7 +4791,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1005041197}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -4884,6 +4900,10 @@ PrefabInstance:
     - target: {fileID: 3685953151804119026, guid: 192bea44f27300f409116b75f6eeb155, type: 3}
       propertyPath: m_Name
       value: UILabledButton_Shield
+      objectReference: {fileID: 0}
+    - target: {fileID: 3685953151804119026, guid: 192bea44f27300f409116b75f6eeb155, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5360795372884508904, guid: 192bea44f27300f409116b75f6eeb155, type: 3}
       propertyPath: m_Pivot.x
@@ -5269,7 +5289,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1227262210}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -5599,6 +5619,10 @@ PrefabInstance:
     - target: {fileID: 3685953151804119026, guid: 192bea44f27300f409116b75f6eeb155, type: 3}
       propertyPath: m_Name
       value: UILabledButton_Armor
+      objectReference: {fileID: 0}
+    - target: {fileID: 3685953151804119026, guid: 192bea44f27300f409116b75f6eeb155, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5360795372884508904, guid: 192bea44f27300f409116b75f6eeb155, type: 3}
       propertyPath: m_Pivot.x
@@ -5944,8 +5968,8 @@ MonoBehaviour:
   m_Padding:
     m_Left: 5
     m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
+    m_Top: 8
+    m_Bottom: 5
   m_ChildAlignment: 1
   m_Spacing: 2
   m_ChildForceExpandWidth: 1
@@ -5968,14 +5992,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 0.9098039, g: 0.8509804, b: 0.70980394, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 21300042, guid: 34ecf51bcd3f4424eafda7dafd885bd0, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -5984,7 +6008,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  m_PixelsPerUnitMultiplier: 2
 --- !u!222 &1330897160
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6394,14 +6418,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 0.9098039, g: 0.8509804, b: 0.70980394, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 21300042, guid: 34ecf51bcd3f4424eafda7dafd885bd0, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -6410,7 +6434,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  m_PixelsPerUnitMultiplier: 3
 --- !u!222 &1554521378
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7618,6 +7642,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: UIButton_AddUnit
       objectReference: {fileID: 0}
+    - target: {fileID: 8495948578610761067, guid: fcfeb81f2b5176d40988da30d184dae2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -7724,14 +7752,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 0.9098039, g: 0.8509804, b: 0.70980394, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 21300042, guid: 34ecf51bcd3f4424eafda7dafd885bd0, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -7740,7 +7768,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  m_PixelsPerUnitMultiplier: 3
 --- !u!222 &1872450959
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8309,6 +8337,10 @@ PrefabInstance:
     - target: {fileID: 3685953151804119026, guid: 192bea44f27300f409116b75f6eeb155, type: 3}
       propertyPath: m_Name
       value: UILabledButton_OffHandWeapon
+      objectReference: {fileID: 0}
+    - target: {fileID: 3685953151804119026, guid: 192bea44f27300f409116b75f6eeb155, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5360795372884508904, guid: 192bea44f27300f409116b75f6eeb155, type: 3}
       propertyPath: m_Pivot.x
@@ -8896,6 +8928,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: UIDropDown_AIStrategy
       objectReference: {fileID: 0}
+    - target: {fileID: 5609397480849666471, guid: 48ad6317c03bf304e9a44d0fa81c8f44, type: 3}
+      propertyPath: m_PixelsPerUnitMultiplier
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5962826169611182221, guid: 48ad6317c03bf304e9a44d0fa81c8f44, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 7002027585050157396, guid: 48ad6317c03bf304e9a44d0fa81c8f44, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -8975,6 +9015,14 @@ PrefabInstance:
     - target: {fileID: 7002027585050157396, guid: 48ad6317c03bf304e9a44d0fa81c8f44, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9044484009502832380, guid: 48ad6317c03bf304e9a44d0fa81c8f44, type: 3}
+      propertyPath: m_fontSize
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 9044484009502832380, guid: 48ad6317c03bf304e9a44d0fa81c8f44, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -9625,6 +9673,10 @@ PrefabInstance:
     - target: {fileID: 3685953151804119026, guid: 192bea44f27300f409116b75f6eeb155, type: 3}
       propertyPath: m_Name
       value: UILabledButton_MainWapon
+      objectReference: {fileID: 0}
+    - target: {fileID: 3685953151804119026, guid: 192bea44f27300f409116b75f6eeb155, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5360795372884508904, guid: 192bea44f27300f409116b75f6eeb155, type: 3}
       propertyPath: m_Pivot.x
