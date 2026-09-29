@@ -43,7 +43,9 @@ public class AggressiveMoveTowardEnemy : IUnitAIBehavior
         if (reachable.Count == 0)
             return;
 
-        Vector2Int bestTile = reachable.Keys
+        var safeCandidates = AIQueryUtility.PreferZocSafeTiles(unit, unit.GridCoord, reachable.Keys, gridManager);
+
+        Vector2Int bestTile = safeCandidates
             .OrderBy(coord => gridManager.GetDistance(coord, nearestEnemy.GridCoord))
             .First();
 

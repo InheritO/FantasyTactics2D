@@ -33,70 +33,73 @@ public class KeepDistanceAndShoot : IUnitAIBehavior
         if (tooClose)
         {
             Dictionary<Vector2Int, int> reachable =
-                MovementRangeCalculator.CalculateReachableTiles(gridManager, unit);
+        MovementRangeCalculator.CalculateReachableTiles(gridManager, unit);
 
             if (reachable.Count > 0)
             {
-                Vector2Int retreatTile = reachable.Keys
+                var candidates = AIQueryUtility.PreferZocSafeTiles(unit, unit.GridCoord, reachable.Keys, gridManager);
+                candidates = AIQueryUtility.PreferCoveredTiles(candidates, gridManager);
+
+                Vector2Int retreatTile = candidates
                     .OrderByDescending(coord => gridManager.GetDistance(coord, target.GridCoord))
                     .First();
 
                 unit.TryMoveTo(retreatTile);
+
+                // 재장전이 필요한 상태면 쏘는 대신 재장전한다.
+                // (TryAttack 자체가 이제 재장전 여부를 막아주지만, 아무것도 안 하는 것보단 재장전하는 게 낫다)
+                if (unit.MainHandWeapon != null && unit.MainHandWeapon.requiresReload && !unit.IsLoaded)
+                {
+                    unit.PerformReload();
+                    return;
+                }
+
+                // 후퇴 후(혹은 후퇴할 곳이 없어서 제자리든) 여전히 사거리 안이면 쏨
+                if (unit.IsInAttackRange(target))
+                    unit.TryAttack(target);
+
+                return;
             }
 
-            // 재장전이 필요한 상태면 쏘는 대신 재장전한다.
-            // (TryAttack 자체가 이제 재장전 여부를 막아주지만, 아무것도 안 하는 것보단 재장전하는 게 낫다)
+            // 재장전 확인
             if (unit.MainHandWeapon != null && unit.MainHandWeapon.requiresReload && !unit.IsLoaded)
             {
                 unit.PerformReload();
                 return;
             }
 
-            // 후퇴 후(혹은 후퇴할 곳이 없어서 제자리든) 여전히 사거리 안이면 쏨
+            // 여기 도달했다는 건 "너무 가깝지 않다" = 딱 맞거나 먼 거리
             if (unit.IsInAttackRange(target))
+            {
                 unit.TryAttack(target);
+                return;
+            }
 
-            return;
-        }
+            // 사거리 밖 → 접근
+            Dictionary<Vector2Int, int> approachReachable =
+                MovementRangeCalculator.CalculateReachableTiles(gridManager, unit);
 
-        // 재장전 확인
-        if (unit.MainHandWeapon != null && unit.MainHandWeapon.requiresReload && !unit.IsLoaded)
-        {
-            unit.PerformReload();
-            return;
-        }
+            if (approachReachable.Count == 0)
+                return;
 
-        // 여기 도달했다는 건 "너무 가깝지 않다" = 딱 맞거나 먼 거리
-        if (unit.IsInAttackRange(target))
-        {
-            unit.TryAttack(target);
-            return;
-        }
+            Vector2Int? idealTile = approachReachable.Keys
+                .Where(coord => gridManager.GetDistance(coord, target.GridCoord) <= unit.AttackRange)
+                .OrderByDescending(coord => gridManager.GetDistance(coord, target.GridCoord))
+                .Cast<Vector2Int?>()
+                .FirstOrDefault();
 
-        // 사거리 밖 → 접근
-        Dictionary<Vector2Int, int> approachReachable =
-            MovementRangeCalculator.CalculateReachableTiles(gridManager, unit);
+            Vector2Int bestTile = idealTile ?? approachReachable.Keys
+                .OrderBy(coord => gridManager.GetDistance(coord, target.GridCoord))
+                .First();
 
-        if (approachReachable.Count == 0)
-            return;
+            int bestDistance = gridManager.GetDistance(bestTile, target.GridCoord);
 
-        Vector2Int? idealTile = approachReachable.Keys
-            .Where(coord => gridManager.GetDistance(coord, target.GridCoord) <= unit.AttackRange)
-            .OrderByDescending(coord => gridManager.GetDistance(coord, target.GridCoord))
-            .Cast<Vector2Int?>()
-            .FirstOrDefault();
-
-        Vector2Int bestTile = idealTile ?? approachReachable.Keys
-            .OrderBy(coord => gridManager.GetDistance(coord, target.GridCoord))
-            .First();
-
-        int bestDistance = gridManager.GetDistance(bestTile, target.GridCoord);
-
-        if (bestDistance < distance)
-        {
-            unit.TryMoveTo(bestTile);
-            if (unit.IsInAttackRange(target))
-                unit.TryAttack(target);
+            if (bestDistance < distance)
+            {
+                unit.TryMoveTo(bestTile);
+                if (unit.IsInAttackRange(target))
+                    unit.TryAttack(target);
+            }
         }
     }
 }

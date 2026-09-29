@@ -181,15 +181,21 @@ public static class CombatResolver
 
     private static bool HasAdjacentCover(UnitBase defender)
     {
-        GridManager gridManager = defender.GridManager;
+        return HasCoverAt(defender.GridCoord, defender.GridManager);
+    }
+
+    public static bool HasCoverAt(Vector2Int coord, GridManager gridManager)
+    {
         if (gridManager == null)
             return false;
 
         foreach (var offset in AdjacentOffsets)
         {
-            TileInstance neighbor = gridManager.GetTile(defender.GridCoord + offset);
+            TileInstance neighbor = gridManager.GetTile(coord + offset);
+            if (neighbor == null)
+                continue;
 
-            if (neighbor != null && neighbor.ProvidesCover())
+            if (neighbor.ProvidesCover())
                 return true;
 
             if (neighbor.OccupyingUnit != null && neighbor.OccupyingUnit.ProvidesCover)
