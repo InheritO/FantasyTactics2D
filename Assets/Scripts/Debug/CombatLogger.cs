@@ -1,4 +1,8 @@
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+using System.Collections;
+using System.Collections.Generic;
 
 /// <summary>
 /// 전투 관련 이벤트를 구독해서 콘솔에 로그로 출력하는 디버그 도구.
@@ -6,6 +10,13 @@ using UnityEngine;
 /// </summary>
 public class CombatLogger : MonoBehaviour
 {
+    [Header("UI (비워두면 콘솔에만 출력)")]
+    public TMP_Text logText;
+    public ScrollRect scrollRect;
+
+    private const int MaxLines = 50;
+    private readonly List<string> lines = new List<string>();
+
     public void RegisterUnit(UnitBase unit)
     {
         unit.OnMoved += HandleMoved;
@@ -16,36 +27,44 @@ public class CombatLogger : MonoBehaviour
         unit.OnActionsExhausted += HandleActionsExhausted;
     }
 
-    private void HandleMoved(UnitBase unit, Vector2Int from, Vector2Int to)
+    private void AppendLine(string line)
     {
-        Debug.Log($"[{unit.name}] 이동: {from} → {to}");
+        Debug.Log(line);
+
+        lines.Add(line);
+        if (lines.Count > MaxLines)
+            lines.RemoveAt(0);
+
+        if (logText != null)
+        {
+            logText.text = string.Join("\n", lines);
+            StartCoroutine(ScrollToBottomNextFrame());
+        }
     }
 
-    private void HandleAttackPerformed(UnitBase attacker, UnitBase target)
+    private IEnumerator ScrollToBottomNextFrame()
     {
-        Debug.Log($"[{attacker.name}]이(가) {target.name}을(를) 공격합니다.");
+        yield return null; // 스크롤뷰 때와 같은 이유 - 레이아웃이 갱신될 시간을 줌
+        Canvas.ForceUpdateCanvases();
+        if (scrollRect != null)
+            scrollRect.verticalNormalizedPosition = 0f; // 0 = 맨 아래, 최신 로그가 보이게
     }
 
-    private void HandleAttackResult(UnitBase attacker, UnitBase target, CombatResult result)
-    {
-        if (result.IsHit)
-            Debug.Log($"  → 명중! {result.DamageDealt} 데미지.");
-        else
-            Debug.Log($"  → 빗나감.");
-    }
+    private void HandleMoved(UnitBase unit, Vector2Int from, Vector2Int to) =>
+        AppendLine($"[{unit.name}] 이동: {from} → {to}");
 
-    private void HandleDamaged(UnitBase unit, int amount)
-    {
-        Debug.Log($"[{unit.name}] {amount} 데미지 받음. 남은 체력: {unit.CurrentHealth}/{unit.MaxHealth}");
-    }
+    private void HandleAttackPerformed(UnitBase attacker, UnitBase target) =>
+        AppendLine($"[{attacker.name}]이(가) {target.name}을(를) 공격합니다.");
 
-    private void HandleDied(UnitBase unit)
-    {
-        Debug.Log($"[{unit.name}] 사망.");
-    }
+    private void HandleAttackResult(UnitBase attacker, UnitBase target, CombatResult result) =>
+        AppendLine(result.IsHit ? $"  → 명중! {result.DamageDealt} 데미지." : "  → 빗나감.");
 
-    private void HandleActionsExhausted(UnitBase unit)
-    {
-        Debug.Log($"[{unit.name}] 이번 턴에 더 이상 행동할 수 없습니다.");
-    }
+    private void HandleDamaged(UnitBase unit, int amount) =>
+        AppendLine($"[{unit.name}] {amount} 데미지 받음. 남은 체력: {unit.CurrentHealth}/{unit.MaxHealth}");
+
+    private void HandleDied(UnitBase unit) =>
+        AppendLine($"[{unit.name}] 사망.");
+
+    private void HandleActionsExhausted(UnitBase unit) =>
+        AppendLine($"[{unit.name}] 이번 턴에 더 이상 행동할 수 없습니다.");
 }
