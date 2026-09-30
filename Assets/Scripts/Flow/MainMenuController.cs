@@ -10,11 +10,13 @@ public class MainMenuController : MonoBehaviour
     [SerializeField] private Button optionsButton;
     [SerializeField] private Button guideButton;
     [SerializeField] private Button quitButton;
+    [SerializeField] private Button creditsButton;
 
     public GameObject mainMenuRoot;
     public SkirmishFlowController skirmishFlow;
     public UIPopup optionsPopup;
     public UIPopup howToPlayPopup;
+    public UIPopup creditsPopup;
 
     private void Awake()
     {
@@ -23,6 +25,7 @@ public class MainMenuController : MonoBehaviour
         startButton.onClick.AddListener(OnStartClicked);
         optionsButton.onClick.AddListener(OnOptionsClicked);
         guideButton.onClick.AddListener(OnGuideClicked);
+        creditsButton.onClick.AddListener(OnCreditsClicked);
         quitButton.onClick.AddListener(OnQuitClicked);
     }
 
@@ -44,6 +47,8 @@ public class MainMenuController : MonoBehaviour
     private void OnGuideClicked() => PopupCoordinator.Instance.Open(howToPlayPopup);
 
     public void Show() => mainMenuRoot.SetActive(true);
+
+    private void OnCreditsClicked() => PopupCoordinator.Instance.Open(creditsPopup);
 
     private void OnQuitClicked()
     {
