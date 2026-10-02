@@ -22,7 +22,22 @@ public class UnitVisualController : MonoBehaviour
 
     public Transform visualRoot;
 
-    void Awake() => unit = GetComponent<UnitBase>();
+    private AttackAnimationType currentAttackType;
+    private float overrideTimer;
+    private const float AttackAnimationDuration = 0.4f;
+
+    void Awake()
+    {
+        unit = GetComponent<UnitBase>();
+        unit.OnAttackAnimationCue += HandleAttackAnimationCue;
+    }
+
+    void OnDestroy()
+    {
+        if (unit != null)
+            unit.OnAttackAnimationCue -= HandleAttackAnimationCue;
+    }
+
 
     // 스폰 시점(Race/장비 확정 직후)에 UnitSpawner가 호출
     public void RefreshVisuals()
@@ -57,11 +72,38 @@ public class UnitVisualController : MonoBehaviour
     // 지금은 대기(idle)만 재생 — 공격 애니메이션 트리거는 다음 단계에서 추가
     private CharacterAnimationSet.DirectionalFrames CurrentAnimation(CharacterAnimationSet set)
     {
-        return set != null ? set.idle : null;
+        if (set == null)
+            return null;
+
+        if (overrideTimer > 0f)
+        {
+            return currentAttackType switch
+            {
+                AttackAnimationType.Slash => set.slash,
+                AttackAnimationType.Thrust => set.thrust,
+                AttackAnimationType.Shoot => set.shoot,
+                _ => set.idle
+            };
+        }
+
+        return set.idle;
+    }
+
+    private void HandleAttackAnimationCue(UnitBase attacker, WeaponAttack attack)
+    {
+        if (attack == null)
+            return;
+
+        currentAttackType = attack.animationType;
+        overrideTimer = AttackAnimationDuration;
+        frameIndex = 0;
     }
 
     void Update()
     {
+        if (overrideTimer > 0f)
+            overrideTimer -= Time.deltaTime;
+
         if (layers == null || layers.Length == 0)
             return;
 

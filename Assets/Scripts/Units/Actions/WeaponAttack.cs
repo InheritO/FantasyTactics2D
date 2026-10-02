@@ -1,5 +1,7 @@
 using UnityEngine;
 
+public enum AttackAnimationType { Slash, Thrust, Shoot }
+
 [CreateAssetMenu(fileName = "NewWeaponAttack", menuName = "Strategy/Equipment/Weapon Attack")]
 public class WeaponAttack : UnitAction
 {
@@ -16,6 +18,9 @@ public class WeaponAttack : UnitAction
 
     [Tooltip("무기의 기본 치명타 성향에 더해지는 보너스")]
     public int critRatingBonus;
+
+    [Header("Visual")]
+    public AttackAnimationType animationType;
 
     [Header("Status Effect (선택 사항)")]
     public StatusEffectType inflictedEffect = StatusEffectType.None;

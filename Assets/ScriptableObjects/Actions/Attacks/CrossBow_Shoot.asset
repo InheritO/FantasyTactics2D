@@ -17,6 +17,7 @@ MonoBehaviour:
   armorPenetrationBonus: 0
   accuracyBonusModifier: 0
   critRatingBonus: 0
+  animationType: 2
   inflictedEffect: 0
   disruption: 0
   effectDuration: 1

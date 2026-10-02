@@ -22,6 +22,7 @@ public abstract class UnitBase : MonoBehaviour
     public event Action<UnitBase, UnitBase, CombatResult> OnAttackResult;
     public event Action<UnitBase> OnActionsExhausted;
     public event Action<UnitBase> OnTurnReset;
+    public event Action<UnitBase, WeaponAttack> OnAttackAnimationCue;
 
     #endregion
 
@@ -422,6 +423,7 @@ public abstract class UnitBase : MonoBehaviour
 
         List<CombatResult> results = CombatResolver.ResolveFullAttack(this, target, attack);
         OnAttackPerformed?.Invoke(this, target);
+        OnAttackAnimationCue?.Invoke(this, chosenAttack);
 
         foreach (var result in results)
         {
