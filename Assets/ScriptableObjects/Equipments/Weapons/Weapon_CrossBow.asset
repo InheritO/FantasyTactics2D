@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc61bf8a40e02f64ca24985d6fff5a1c, type: 3}
   m_Name: Weapon_CrossBow
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
-  weaponName: Bow
+  weaponName: CrossBow
   icon: {fileID: 21300000, guid: 5d7061fc7da05ce44add317708ec7215, type: 3}
   visualSet: {fileID: 11400000, guid: c499211d3dd9b354b92f2a4806a892aa, type: 2}
   handedness: 1
@@ -25,7 +25,7 @@ MonoBehaviour:
   baseAccuracyBonus: 10
   baseCritRating: 10
   attacks:
-  - {fileID: 11400000, guid: ab2fdd6852d93924880fd4fe45acadff, type: 2}
+  - {fileID: 11400000, guid: 957782ffa9a6d634ba32636c52030782, type: 2}
   description: 
   cost: 6
   requiresReload: 1

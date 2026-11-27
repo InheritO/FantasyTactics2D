@@ -423,7 +423,7 @@ public abstract class UnitBase : MonoBehaviour
 
         List<CombatResult> results = CombatResolver.ResolveFullAttack(this, target, attack);
         OnAttackPerformed?.Invoke(this, target);
-        OnAttackAnimationCue?.Invoke(this, chosenAttack);
+        OnAttackAnimationCue?.Invoke(this, attack);
 
         foreach (var result in results)
         {

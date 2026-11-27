@@ -527,7 +527,7 @@ ScriptableObjects/
 
 ## 19. 알려진 제한사항 / 다음 세션 시작점
 
-1. **[버그] AI 공격 시 공격 애니메이션이 재생되지 않음** — `UnitBase.TryAttack()`이 `OnAttackAnimationCue`에 실제 사용한 `attack`이 아니라 `chosenAttack` 인자를 넘김. AI는 `TryAttack(target)`으로 `chosenAttack` 없이 호출하므로 `null`이 전달되고, `UnitVisualController.HandleAttackAnimationCue()`가 `null`이면 무시함. 큐에 `attack`(기본 공격으로 대체된 값)을 넘기면 해결될 것으로 보임
+1. ~~AI 공격 시 공격 애니메이션이 재생되지 않음~~ **(v6 해결)** — `UnitBase.TryAttack()`이 `OnAttackAnimationCue`에 `chosenAttack` 대신 실제 사용한 `attack`(기본 공격으로 대체된 값)을 넘기도록 수정. 함께 석궁(`Weapon_CrossBow`)의 공격을 잘못 연결된 `BasicWeaponAttack`(Slash) → `CrossBow_Shoot`(Shoot)으로 교체. **남은 문제**: `Animaion_CrossBow`는 idle/shoot 프레임이 비어 있어 석궁 그림이 평소와 사격 중 모두 안 보이고, Sword/LongSword 세트에는 thrust 프레임이 없어 찌르기 중 무기가 사라지며, HandAxe는 `visualSet`이 없음
 2. 반격/기회공격 애니메이션 — `Resolve()` 직접 호출 경로라 큐가 없음. 반응 공격도 연출할지 결정 필요
 3. `DefensiveHoldPosition`은 ZOC/엄폐를 고려하지 않음 — 현재는 이동 자체를 안 해서 문제는 없으나, "사거리 내 적에게 다가가 공격" 같은 이동이 추가되면 같은 필터 적용 필요
 4. 이동 보간(트윈) 구현 — walk 애니메이션 및 이동 연출의 전제조건

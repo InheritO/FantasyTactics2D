@@ -13,10 +13,18 @@ MonoBehaviour:
   m_Name: Animaion_CrossBow
   m_EditorClassIdentifier: Assembly-CSharp::CharacterAnimationSet
   idle:
-    up: []
-    down: []
-    left: []
-    right: []
+    up:
+    - {fileID: 1620860094, guid: 8cb49b892ac5b8a4d8a9ce3c6ae6d642, type: 3}
+    - {fileID: 1296043895, guid: 8cb49b892ac5b8a4d8a9ce3c6ae6d642, type: 3}
+    down:
+    - {fileID: 1614178185, guid: 8cb49b892ac5b8a4d8a9ce3c6ae6d642, type: 3}
+    - {fileID: 1076128904, guid: 8cb49b892ac5b8a4d8a9ce3c6ae6d642, type: 3}
+    left:
+    - {fileID: -1351816226, guid: 8cb49b892ac5b8a4d8a9ce3c6ae6d642, type: 3}
+    - {fileID: 424529363, guid: 8cb49b892ac5b8a4d8a9ce3c6ae6d642, type: 3}
+    right:
+    - {fileID: -232864929, guid: 8cb49b892ac5b8a4d8a9ce3c6ae6d642, type: 3}
+    - {fileID: -1944406216, guid: 8cb49b892ac5b8a4d8a9ce3c6ae6d642, type: 3}
   combatIdle:
     up: []
     down: []
@@ -106,7 +114,39 @@ MonoBehaviour:
     - {fileID: 1912129912, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
     - {fileID: 921815952, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
   shoot:
-    up: []
-    down: []
-    left: []
-    right: []
+    up:
+    - {fileID: -265175138, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    - {fileID: -1039255173, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    - {fileID: -1147371340, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    - {fileID: 691446314, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    - {fileID: 1449212028, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    - {fileID: -1192903514, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    - {fileID: -1888720522, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    - {fileID: 67773760, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    down:
+    - {fileID: -860977960, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    - {fileID: -341881935, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    - {fileID: -535882279, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    - {fileID: -1354458892, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    - {fileID: 2019618513, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    - {fileID: 652664877, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    - {fileID: -2025657923, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    - {fileID: -1861853735, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    left:
+    - {fileID: 2043872024, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    - {fileID: 1714530319, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    - {fileID: -1892836115, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    - {fileID: 1499735743, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    - {fileID: -441255490, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    - {fileID: -84513571, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    - {fileID: -822731131, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    - {fileID: -841332175, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    right:
+    - {fileID: -2018129172, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    - {fileID: -1835861328, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    - {fileID: 97275056, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    - {fileID: -2025463389, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    - {fileID: 527934763, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    - {fileID: 164179413, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    - {fileID: 1912129912, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
+    - {fileID: 921815952, guid: 447160e1319d9b144a3101bb0e75266e, type: 3}
