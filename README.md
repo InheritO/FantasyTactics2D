@@ -1,4 +1,4 @@
-# 타일 기반 턴제 전략 게임 — 역기획서 (v4)
+# 타일 기반 턴제 전략 게임 — 역기획서 (v5)
 ---
 
 ## 1. 게임 개요
@@ -14,6 +14,7 @@
 - 입력: 새 Input System (`GameControls`) — 액션 맵 `GamePlay`: `Click`, `Point`, `Move`, `Zoom`, `EndTurn`, `Cancel`, **`ToggleActions`(추가)**
 - UI: Unity UI(uGUI, Canvas/Button/TextMeshPro), **Screen Space - Overlay**
 - 키 리바인딩(`EndTurn`/`Cancel`/`ToggleActions`) 및 마스터 볼륨(AudioMixer) 설정 지원
+- 사운드: `AudioManager`(싱글톤) + `SfxLibrary`(SO) — UI/전투/결과 효과음, 볼륨은 `PlayerPrefs`에 저장 (16장 참고)
 
 ---
 
@@ -148,7 +149,11 @@ FactionMarker / UnitHealthBar — VisualRoot 밖(유닛 루트 직속), 종족 �
 
 `CharacterAnimationSet`(SO): `idle`/`combatIdle`/`walk`/`slash`/`thrust`/`shoot` × 4방향(Up/Left/Down/Right). `WeaponData`/`ArmorData`/`ShieldData`/`RaceData`에 각각 `visualSet` 필드.
 
-**현재 범위**: idle만 재생(4방향, 정지). walk/공격 애니메이션 트리거는 미착수(19장 참고). 보조무기 페이퍼돌은 LPC 에셋 한계로 미지원(양손 무기용 모션만 있어 쌍수 표현 불가) — 해당 종족의 보조무기 후보를 비워 선택 자체를 막아둠.
+**현재 범위**: idle(4방향) + **공격 애니메이션(slash/thrust/shoot)**. walk는 미착수(이동 보간이 전제, 19장 참고).
+
+**공격 애니메이션 흐름**: `WeaponAttack.animationType`(`AttackAnimationType`: Slash/Thrust/Shoot) → `UnitBase.TryAttack()`이 `OnAttackAnimationCue(attacker, attack)` 이벤트 발행 → `UnitVisualController`가 받아서 0.4초(`AttackAnimationDuration`) 동안 해당 애니메이션으로 덮어쓴 뒤 idle로 복귀. 모든 레이어(몸/머리/갑옷/무기)가 같은 프레임 인덱스로 동기 재생.
+- 반격/기회공격은 `CombatResolver.Resolve()`를 직접 호출하므로 애니메이션 큐가 발행되지 않음.
+- AI 공격은 현재 애니메이션이 재생되지 않음 — 19장 참고. 보조무기 페이퍼돌은 LPC 에셋 한계로 미지원(양손 무기용 모션만 있어 쌍수 표현 불가) — 해당 종족의 보조무기 후보를 비워 선택 자체를 막아둠.
 
 에셋 파이프라인은 두 에디터 도구(`BatchGridSlicer`, `AnimationSetBuilder`)로 자동화됨 — 17장 참고.
 
@@ -301,7 +306,24 @@ ShieldData: defenseBonus, blockSkillBonus, cost, visualSet(신규)
 | `DefensiveHoldPosition` | Defensive | 사거리 내 적에만 반응, 그 외 사수 |
 | `KeepDistanceAndShoot` | RangedKiting | 원거리 유닛만 거리유지, 근접유닛은 Defensive로 대체 |
 
-> **AI가 ZOC/엄폐를 전혀 인식하지 못함.** 반격 시스템까지는 AI도 자연스럽게 영향을 받지만(피격당하면 자동 발동이라 AI 행동 코드 수정 불필요), ZOC·엄폐는 AI가 "이동 경로/위치를 고를 때" 고려해야 하는 능동적 요소라 관련 AI 클래스 수정이 필요함. **다음 세션 최우선 후보** (검토 착수했으나 중단된 상태).
+### AI의 ZOC/엄폐 인식 (부분 완료)
+반격은 피격 시 자동 발동이라 AI 수정이 필요 없었지만, ZOC·엄폐는 "이동할 위치를 고를 때" 고려해야 하는 능동적 요소라 `AIQueryUtility`에 후보 필터를 추가함.
+
+| 메서드 | 역할 |
+|---|---|
+| `WouldTriggerOpportunityAttack(mover, from, to, grid)` | `ZoneOfControlResolver`로 해당 이동이 기회공격을 유발하는지 판정 |
+| `PreferZocSafeTiles(...)` | 후보 중 기회공격을 유발하지 않는 타일만 남김. 전부 위험하면 원래 후보 그대로 반환 |
+| `PreferCoveredTiles(...)` | 후보 중 엄폐가 제공되는 타일을 우선. 없으면 원래 후보 그대로 반환 |
+
+엄폐 판정은 `CombatResolver.HasCoverAt(coord, grid)`로 분리해 "임의 좌표의 엄폐 여부"를 AI가 미리 조회할 수 있게 함.
+
+| AI 클래스 | ZOC 회피 | 엄폐 선호 |
+|---|---|---|
+| `AggressiveMoveTowardEnemy` | O (접근 타일 선택 시) | - |
+| `KeepDistanceAndShoot` | O (후퇴 타일 선택 시) | O (후퇴 타일 선택 시) |
+| `DefensiveHoldPosition` | - (이동 안 함) | - |
+
+함께 정리: `KeepDistanceAndShoot`의 분기 구조를 "너무 가까움 → 후퇴 후 재장전/사격" / "사거리 안 → 재장전/사격" / "사거리 밖 → 접근"으로 재구성.
 
 AI 재장전 처리 로직은 `KeepDistanceAndShoot`에 반영 완료 확인됨(v2에서 미확인이었던 항목).
 
@@ -340,67 +362,72 @@ XCOM도 근접 유닛엔 잘 안 주는 기능이고, 이 게임 로스터가 �
 - **메인 메뉴 / 팝업 시스템**: `UIPopup`(CanvasGroup 기반 열기/닫기·애니메이션) + `PopupCoordinator`(싱글톤, 상호배제·백드롭·`IsAnyPopupOpen` 관리). 옵션(AudioMixer 볼륨, 3개 키 리바인딩), 플레이 방법(스크롤+고정 닫기 버튼) 팝업 구현
 - **`UnitActionVisual`**: 세력색 틴트 로직 제거(→ `UnitFactionMarker`로 이전), 행동완료 시 어두워짐/피격 시 흰색 플래시는 유지하되 대상 렌더러를 `UnitVisualController.bodyRenderer`로 변경
 - **SortingLayer 체계**: `Background - Terrain - Highlight - Units - UnitUI` 5단계(문자열은 `SortingLayers` 정적 클래스로 통일 관리)
-- **재사용 UI 컴포넌트**: `LabeledButton`(라벨+버튼 쌍), `RemovableListItem`(배경+텍스트+제거버튼)
+- **재사용 UI 컴포넌트**: `UILabledButton`(라벨+버튼 쌍), `RemovableListItem`(배경+텍스트+제거버튼), `UIButton`(`Button.onClick`을 C# 이벤트 `OnClicked`로 재노출 + 클릭음 자동 재생), `ScrollResetOnOpen`
+- **전투 로그 UI**: `CombatLogger`가 유닛 이벤트(이동/공격/명중·빗나감/피해/사망/행동 소진)를 구독해 화면 로그 패널(TMP + ScrollRect)에 최근 50줄 표시, 새 로그마다 맨 아래로 자동 스크롤. `logText`를 비워두면 콘솔에만 출력
+
+### 사운드
+- `AudioManager`(싱글톤, AudioSource 1개로 `PlayOneShot`) — 마스터 볼륨을 dB로 변환해 AudioMixer에 적용, `PlayerPrefs`(`MasterVolume`)에 저장. 옵션 팝업의 볼륨 슬라이더가 이 값을 사용
+- `SfxLibrary`(SO, `ScriptableObjects/Sound/`) — 클립 목록
+
+| 분류 | 클립 | 재생 위치 |
+|---|---|---|
+| UI | `buttonClick` / `popupOpen` / `popupClose` | `UIButton` / `UIPopup` |
+| 전투 | `hitLight` / `hitCritical` / `missWhiff` / `blockClang` | `CombatResolver` (명중·치명타·빗나감·막기 판정 시) |
+| 결과 | `victory` / `defeat` | `BattleResultPanel` |
 - **타일 비주얼**: 지형 아이콘 적용, 배치구역 틴트를 아이콘 위에도 적용하도록 수정, 격자선 전용 오버레이(`TileGridOverlay`) 분리, 서브픽셀 렌더링으로 인한 타일 틈 깜빡임을 타일 살짝 오버사이즈(1.02배)로 완화
 
 ---
 
-## 17. 폴더 구조 (v2 대비 추가/변경)
+## 17. 폴더 구조 (v5 — 실제 경로 기준으로 재작성)
 
-### 스크립트
+### 스크립트 (`Assets/Scripts/`)
 ```
-_Project/Scripts/
-├── Grid/
-│   ├── GridManager, TileInstance, TileTypeData, MapGenerator, DeploymentZone (기존)
-│   └── TileGridOverlay.cs                (신규)
-├── Units/
-│   ├── UnitBase, RaceData, FactionData, WeaponData, ArmorData, ShieldData,
-│   │   UnitEquipmentState, UnitStatusEffectTracker (기존, 필드 추가됨 - 11장 참고)
-│   ├── ObstacleUnit.cs                   (신규)
-│   ├── ZoneOfControlResolver.cs          (신규)
-│   ├── Actions/                          UnitAction, WeaponAttack, ReloadAction,
-│   │                                     StandGroundAction(완료), AttackOption, AttackOptionProvider
-│   ├── Traits/                           (기존, TerrainAdaptationTrait 클래스명 수정됨)
-│   └── AI/                               (기존, ZOC/엄폐 인식 못 함 - 14장 참고)
-├── Battle/                               BattlePhase(Manager), TurnManager, BattleOutcomeManager,
-│   │                                     CombatResolver(accuracyMultiplier 추가), CombatResult
-│   ├── Abilities/                        IWeaponAbility, ExtraAttackAbility(수정됨)
-│   └── UI/                               BattleUIController(옵션/전투중단 버튼 추가), BattleAttackPanel,
-│                                          UnitHealthBar, UnitActionVisual(수정), BattleResultPanel
-├── Roster/                               RosterEntry, RosterBuilder, RosterPhaseManager,
-│                                          RosterUIController(수정), SkirmishParticipant, AIRosterGenerator(수정)
-├── Flow/
-│   ├── SkirmishFlowController.cs         (CleanupBattle 등 추가)
-│   ├── MainMenuController.cs             (신규)
-│   ├── OptionsPanelController.cs         (신규)
-│   ├── KeyRebindController.cs            (신규)
-│   ├── ConfirmationPopup.cs              (신규)
-│   └── PopupCoordinator.cs               (신규)
-├── UI/ (공용 팝업/비주얼 컴포넌트, 신규 디렉토리)
-│   ├── UIPopup.cs
-│   ├── LabeledButton.cs
-│   ├── RemovableListItem.cs
-│   ├── UnitFactionMarker.cs
-│   └── UnitVisualController.cs
-├── Input/                                UnitSelectionController(가드 추가), PlayerDeploymentController,
-│                                          EnemyDeploymentController, SimpleCameraController(페이즈 가드 추가),
-│                                          GameControls, InputBindingUtility.cs(신규)
-├── Visualization/                        TileVisualizer(아이콘/틴트 수정), MovementRangeVisualizer(레이어 수정)
-├── Utility/                              UnitSpawner(수정), MovementRangeCalculator, InspectorFieldValidator,
-│                                          ObstaclePlacementCalculator.cs(신규), ProceduralSpriteUtility.cs(신규)
-├── Editor/                               (신규 디렉토리, 빌드 제외)
-│   ├── BatchGridSlicer.cs
-│   └── AnimationSetBuilder.cs
-└── Debug/                                CombatLogger, UnitStatusDebugDisplay
+Assets/Scripts/
+├── Animation/        CharacterAnimationSet
+├── Audio/            AudioManager, SfxLibrary
+├── Battle/           BattlePhaseManager(BattlePhase enum 포함), TurnManager, BattleOutcomeManager,
+│   │                 CombatResolver(accuracyMultiplier, HasCoverAt, 효과음), CombatResult
+│   ├── Abilities/    IWeaponAbility, ExtraAttackAbility
+│   ├── StatusEffect/ StatusEffectInstance, StatusEffectType
+│   └── UI/           BattleUIController, BattleAttackPanel, BattleResultPanel, UnitHealthBar,
+│                     UnitActionVisual, UnitFactionMarker, RemovableListItem
+├── Debug/            CombatLogger(전투 로그 UI 겸용), UnitStatusDebugDisplay
+├── Flow/             SkirmishFlowController, MainMenuController, OptionsPanelController, KeyRebindController
+├── Grid/             GridManager, MapGenerator, TileInstance, TilePosition, TileType, TileTypeData
+├── Input/            UnitSelectionController, PlayerDeploymentController, EnemyDeploymentController,
+│                     SimpleCameraController, InputBindingUtility
+├── Roster/           RosterEntry, RosterBuilder, RosterPhaseManager, RosterUIController,
+│                     SkirmishParticipant, AIRosterGenerator, UILabledButton
+├── Test/             TestUnitPlacer, UnitMoveTester, ReinforcementTestTrigger, PhaseTestTrigger, TestUnit
+├── Units/            UnitBase, RaceData, FactionData, WeaponData, ArmorData, ShieldData,
+│   │                 UnitEquipmentState, UnitStatusEffectTracker, ZoneOfControlResolver
+│   ├── Actions/      UnitAction, WeaponAttack(animationType), ReloadAction, StandGroundAction,
+│   │                 AttackOption, AttackOptionProvider
+│   ├── AI/           IUnitAIBehavior, EnemyAIController, AICombatDisposition, AIQueryUtility(ZOC/엄폐 필터),
+│   │                 AggressiveMoveTowardEnemy, DefensiveHoldPosition, KeepDistanceAndShoot
+│   ├── Traits/RacialTraits/  RacialTrait, TerrainAdaptationTrait, ExtraAttackTrait,
+│   │                         MeleeStrengthBonusTrait, VersatileTrait
+│   └── UnitS/        ObstacleUnit
+├── Utility/          UnitSpawner, ObstacleSpawner, ObstaclePlacementCalulator, MovementRangeCalculator,
+│                     InspectorFieldValidator, UIPopup, PopupCoordinator, ConfirmationPopup,
+│                     UIButton, ScrollResetOnOpen
+└── Visualization/    TileVisualizer, TileGridOverlay, MovementRangeVisualizer, UnitVisualController,
+                      ProceduralSpriteUtility, SortingLayers
+
+Assets/Editor/        BatchGridSlicer, AnimaitonSetBuilder (에디터 전용, 빌드 제외)
+Assets/InputActions/  GameControls.inputactions (+자동생성 GameControls.cs)
 ```
 
-### 에셋
+> 파일/폴더명 오타 정리 대상: `UILabledButton`(Labeled), `ObstaclePlacementCalulator`(Calculator), `AnimaitonSetBuilder`(Animation), `Units/UnitS/`. 19장 참고.
+
+### 에셋 (`Assets/ScriptableObjects/`)
 ```
 ScriptableObjects/
 ├── Races/, Traits/, Factions/, TileTypes/
-├── Equipment/{Weapons, Armors, Shields}/     (각 SO에 visualSet 참조 추가됨)
-├── Visuals/                                  CharacterAnimationSet 에셋들 (신규)
-└── Actions/{Attacks, Special}/
+├── Equipments/{Weapons, Armors, Shields}/    (각 SO에 visualSet 참조)
+├── Animations/                               CharacterAnimationSet 에셋들
+├── Sound/                                    SfxLibrary
+└── Actions/                                  Action_StandGround, Attacks/, Specials/
 ```
 
 ---
@@ -415,9 +442,10 @@ ScriptableObjects/
 | **절차적 장애물 배치** | 중 | 완료 (연결성 보장) |
 | **선공 몰살 방지(턴 구조 개편)** | 매우 큼 | 검토 완료 - **구조 유지, 착수 안 함**으로 결정 |
 | **오버워치/대기(Overwatch)** | 중 | 검토 완료 - **보류**로 결정(로스터 구성상 수혜 좁음) |
-| AI의 ZOC/엄폐 인식 | 중~대 | 검토 중단, **다음 세션 최우선 후보** |
+| AI의 ZOC/엄폐 인식 | 중~대 | **부분 완료** — 이동 타일 선택 시 ZOC 회피/엄폐 선호 (14장) |
 | 이동 보간(트윈) | 중 | 미착수. walk 애니메이션 활성화의 전제조건 |
-| 공격 애니메이션 트리거 | 중 | 미착수 |
+| 공격 애니메이션 트리거 | 중 | **완료** (플레이어 공격 기준, AI/반격 미재생 — 19장) |
+| 효과음 / 전투 로그 UI | 소 | **완료** |
 | 시야/차단(LoS) 자체(엄폐와 별개) | 대 | 미착수, 낮은 우선순위 유지 |
 | 방향성/측면 공격(Flanking) | 대 | 전제조건(`FacingDirection`) 갖춰짐, 판정 로직은 미착수 |
 | 고저차(Height) | 매우 큼 | 미착수, 낮은 우선순위 유지 |
@@ -427,13 +455,16 @@ ScriptableObjects/
 
 ## 19. 알려진 제한사항 / 다음 세션 시작점
 
-1. **[최우선] AI가 ZOC/엄폐를 인식하도록 수정** — `AggressiveMoveTowardEnemy`/`DefensiveHoldPosition`/`KeepDistanceAndShoot`가 이 시스템들 도입 전 로직 그대로라, 사람 플레이어만 활용 가능한 비대칭 상태
-2. 이동 보간(트윈) 구현 — walk 애니메이션 및 이동 연출의 전제조건
-3. 공격 애니메이션(slash/thrust/shoot) 트리거 설계 및 구현
-4. Flanking(측면 공격) 판정 로직 — `FacingDirection`은 준비됨
-5. 지형 방어 보너스(`TileTypeData.defenseBonus`) `CombatResolver` 반영 — 실제로 쓰는 지형 타입이 생기면 착수
-6. 엘프-활/드워프-석궁 종족별 무기 접근 제한 — 데이터만 수정하면 되는 작업, 보류 중
-7. 보조무기 페이퍼돌 미지원 — LPC 에셋 한계. "그림 없이 게임 규칙만 살리는" 절충안 검토 가능
-8. 남은 자잘한 정리 — 인코딩(CP949) 일부 파일 잔존 여부 재확인
-9. 월드맵↔배틀맵 전환, 캠페인 모드 — 전부 미착수, 우선순위 낮음 재확인
-10. 정교한 경로탐색(우선순위 큐) 미적용, 근사치로 대체 중 (v2에서 이어짐, 미해결)
+1. **[버그] AI 공격 시 공격 애니메이션이 재생되지 않음** — `UnitBase.TryAttack()`이 `OnAttackAnimationCue`에 실제 사용한 `attack`이 아니라 `chosenAttack` 인자를 넘김. AI는 `TryAttack(target)`으로 `chosenAttack` 없이 호출하므로 `null`이 전달되고, `UnitVisualController.HandleAttackAnimationCue()`가 `null`이면 무시함. 큐에 `attack`(기본 공격으로 대체된 값)을 넘기면 해결될 것으로 보임
+2. 반격/기회공격 애니메이션 — `Resolve()` 직접 호출 경로라 큐가 없음. 반응 공격도 연출할지 결정 필요
+3. `DefensiveHoldPosition`은 ZOC/엄폐를 고려하지 않음 — 현재는 이동 자체를 안 해서 문제는 없으나, "사거리 내 적에게 다가가 공격" 같은 이동이 추가되면 같은 필터 적용 필요
+4. 이동 보간(트윈) 구현 — walk 애니메이션 및 이동 연출의 전제조건
+5. Flanking(측면 공격) 판정 로직 — `FacingDirection`은 준비됨. 현재 엄폐 판정도 공격 방향을 보지 않는 간이 판정(인접 4칸 중 하나라도 엄폐물이면 적용)이라 함께 재검토 가능
+6. 지형 방어 보너스(`TileTypeData.defenseBonus`) `CombatResolver` 반영 — 실제로 쓰는 지형 타입이 생기면 착수
+7. 엘프-활/드워프-석궁 종족별 무기 접근 제한 — 데이터만 수정하면 되는 작업, 보류 중
+8. 보조무기 페이퍼돌 미지원 — LPC 에셋 한계. "그림 없이 게임 규칙만 살리는" 절충안 검토 가능
+9. **파일 인코딩** — `Assets/Scripts` 내 `.cs` 47개가 아직 CP949(UTF-8 아님). `AudioManager`, `UIButton` 등 **최근 새로 만든 파일도 CP949로 저장되고 있어**, 남은 파일 정리 전에 에디터/IDE 기본 인코딩을 UTF-8로 바꾸는 게 우선
+10. 파일/폴더명 오타 정리 — `UILabledButton`, `ObstaclePlacementCalulator`, `AnimaitonSetBuilder`, `Units/UnitS/`. MonoBehaviour/SO 클래스명 변경 시 `.meta`의 GUID는 유지되지만 클래스명과 파일명이 일치해야 하므로 함께 변경할 것
+11. AI 후보 필터 성능 — `AIQueryUtility.WouldTriggerOpportunityAttack()`이 후보 타일마다 `FindObjectsByType<UnitBase>()`를 호출. 현재 맵 크기에선 문제없으나 유닛 목록을 한 번만 조회해 재사용하도록 개선 여지 있음
+12. 월드맵↔배틀맵 전환, 캠페인 모드 — 전부 미착수, 우선순위 낮음 재확인
+13. 정교한 경로탐색(우선순위 큐) 미적용, 근사치로 대체 중 (v2에서 이어짐, 미해결)
