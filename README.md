@@ -1,4 +1,44 @@
-# 타일 기반 턴제 전략 게임 — 역기획서 (v5)
+# Fantasy Tactics
+
+인간 · 엘프 · 드워프 · 오크 중 한 종족을 골라 부대를 꾸리고, 타일 위에서 상대 AI와 맞붙는 **턴제 전략 게임**입니다. (Unity 6)
+
+**[⬇ 최신 버전 다운로드 (Releases)](https://github.com/InheritO/FantasyTactics2D/releases/latest)** — `FantasyTactics_Setup.exe` 설치 파일 (Windows)
+
+<!-- 스크린샷: 메인 메뉴 / 부대 편성 / 전투 화면 이미지를 저장소에 올린 뒤 아래 주석을 풀어 경로를 맞춰 주세요.
+![메인 메뉴](Docs/Screenshots/main.png)
+![부대 편성](Docs/Screenshots/roster.png)
+![전투](Docs/Screenshots/battle.png)
+-->
+
+### 주요 특징
+- **포인트 편성** — 정해진 포인트 안에서 유닛 수와 무기 · 방패 · 방어구를 직접 조합
+- **종족별 개성** — 종족마다 기본 능력치, 종족 특성, 쓸 수 있는 장비가 다름
+- **판정 중심 전투** — 명중/회피, 방패 막기, 방어력, 엄폐, 반격, ZOC/기회공격
+- **공격 방식 선택** — 무기에 따라 베기 · 찌르기 같은 공격 방식과 방어 태세 선택
+- **적 AI 설정** — 적 종족과 성향(공격적, 원거리 위주 등) 지정
+
+### 조작법
+| 동작 | 키 |
+|---|---|
+| 유닛 선택 / 이동 / 공격 | 마우스 왼쪽 클릭 |
+| 카메라 이동 | W A S D |
+| 확대 / 축소 | 마우스 휠 |
+| 행동 패널 열기 / 닫기 | R |
+| 공격 방식 선택 | 숫자 1 ~ 9 |
+| 선택 취소 | Esc |
+| 턴 종료 | Space |
+
+### 크레딧
+- 캐릭터 스프라이트: [Liberated Pixel Cup (LPC)](https://opengameart.org/) 에셋 — 개별 작가와 라이선스는 게임 메인 메뉴의 **Credit** 참고
+- UI 스프라이트: Free UI build package
+- 폰트: 마루 부리 (MaruBuri)
+
+---
+
+# 개발 문서 — 역기획서 (v6)
+
+> v6 변경: UI 테마 적용(메인 메뉴 · 편성 · 전투 · 팝업), 편성 화면 네 단 배치, 전투 로그 열기/닫기, 빌드 설정(창모드 · 앱 아이콘 · 설치 파일). 1 · 15 · 16 · 17 · 19장 갱신.
+
 ---
 
 ## 1. 게임 개요
@@ -13,7 +53,10 @@
 - Unity 6 (6000.x)
 - 입력: 새 Input System (`GameControls`) — 액션 맵 `GamePlay`: `Click`, `Point`, `Move`, `Zoom`, `EndTurn`, `Cancel`, **`ToggleActions`(추가)**
 - UI: Unity UI(uGUI, Canvas/Button/TextMeshPro), **Screen Space - Overlay**
-- 키 리바인딩(`EndTurn`/`Cancel`/`ToggleActions`) 및 마스터 볼륨(AudioMixer) 설정 지원
+  - Canvas Scaler: Scale With Screen Size, 기준 해상도 800×600, 너비 기준(Match 0)
+  - 테마: Free UI build package 스프라이트(양피지 · 가죽 · 금테), 폰트 마루 부리 SDF — 에디터 도구 `UIThemeApplier`로 적용 (16장)
+- 키 리바인딩(`EndTurn`/`Cancel`/`ToggleActions`) 코드 및 마스터 볼륨(AudioMixer) 설정 지원 — **키 리바인딩은 현재 씬에 미연결** (19장)
+- 빌드: Windows, 1280×720 **창모드**(Alt+Enter로 전체 화면 전환), 창 크기 조절 불가, 앱 아이콘 `Assets/Art/Icon/AppIcon.png`, Inno Setup 설치 파일(`FantasyTactics_Setup.exe`)로 배포
 - 사운드: `AudioManager`(싱글톤) + `SfxLibrary`(SO) — UI/전투/결과 효과음, 볼륨은 `PlayerPrefs`에 저장 (16장 참고)
 
 ---
@@ -338,12 +381,15 @@ XCOM도 근접 유닛엔 잘 안 주는 기능이고, 이 게임 로스터가 �
 메인 메뉴 (신규)
   -> 시작 / 옵션 / 가이드 / 종료
 부대 편성 (RosterPhaseManager + RosterUIController)
+  -> 화면 구성: [종족] | [유닛 구성] | [편성 목록] | [적 설정] 네 단 + 상단 포인트 바
   -> 종족/적종족/AI전략/AI성향 선택, 포인트 슬라이더로 총량 조정, 장비 순환 선택, 확정
   -> [메인 메뉴로] 버튼 (신규, 로스터 유지된 채로 돌아감)
 그리드 배치
   -> PlayerDeploymentController(클릭), EnemyDeploymentController(자동)
 전투 (Battle)
-  -> [옵션] [전투 중단](확인 후, 신규 — 로스터 리셋되고 메인 메뉴로) 버튼 추가
+  -> 상단 가운데 [Start](배치 단계) / [End Turn](플레이어 턴)
+  -> 오른쪽 위 [Log](전투 로그 다시 열기) [Option] [Abandon](확인 후 — 로스터 리셋되고 메인 메뉴로)
+  -> 하단 행동 받침: 공용 행동/공격 방식 버튼 (숫자키 단축)
 결과 화면 (승/패) -> 부대 편성 복귀
 ```
 
@@ -356,14 +402,38 @@ XCOM도 근접 유닛엔 잘 안 주는 기능이고, 이 게임 로스터가 �
 ### 기존 (v2, 변경 없음)
 - 유닛 머리 위 체력바 (`UnitHealthBar`)
 - 공격 시 `UnitAction` 후보 개수만큼 옵션 버튼, 숫자키 단축
-- 부대 편성 화면: 좌(Draft+목록)/우(적 설정+포인트) 좌우 분할
 
 ### 신규
-- **메인 메뉴 / 팝업 시스템**: `UIPopup`(CanvasGroup 기반 열기/닫기·애니메이션) + `PopupCoordinator`(싱글톤, 상호배제·백드롭·`IsAnyPopupOpen` 관리). 옵션(AudioMixer 볼륨, 3개 키 리바인딩), 플레이 방법(스크롤+고정 닫기 버튼) 팝업 구현
+- **메인 메뉴 / 팝업 시스템**: `UIPopup`(CanvasGroup 기반 열기/닫기·애니메이션) + `PopupCoordinator`(싱글톤, 상호배제·백드롭·`IsAnyPopupOpen` 관리). 옵션(AudioMixer 볼륨), 플레이 방법(스크롤+고정 닫기 버튼) 팝업 구현. 키 리바인딩 UI는 `KeyRebindController` 코드만 있고 씬에 미연결
 - **`UnitActionVisual`**: 세력색 틴트 로직 제거(→ `UnitFactionMarker`로 이전), 행동완료 시 어두워짐/피격 시 흰색 플래시는 유지하되 대상 렌더러를 `UnitVisualController.bodyRenderer`로 변경
 - **SortingLayer 체계**: `Background - Terrain - Highlight - Units - UnitUI` 5단계(문자열은 `SortingLayers` 정적 클래스로 통일 관리)
 - **재사용 UI 컴포넌트**: `UILabledButton`(라벨+버튼 쌍), `RemovableListItem`(배경+텍스트+제거버튼), `UIButton`(`Button.onClick`을 C# 이벤트 `OnClicked`로 재노출 + 클릭음 자동 재생), `ScrollResetOnOpen`
-- **전투 로그 UI**: `CombatLogger`가 유닛 이벤트(이동/공격/명중·빗나감/피해/사망/행동 소진)를 구독해 화면 로그 패널(TMP + ScrollRect)에 최근 50줄 표시, 새 로그마다 맨 아래로 자동 스크롤. `logText`를 비워두면 콘솔에만 출력
+- **전투 로그 UI**: `CombatLogger`가 유닛 이벤트(이동/공격/명중·빗나감/피해/사망/행동 소진)를 구독해 화면 로그 패널(TMP + ScrollRect)에 최근 50줄 표시, 새 로그마다 맨 아래로 자동 스크롤. `logText`를 비워두면 콘솔에만 출력. 로그 창의 X 버튼으로 닫고 오른쪽 위 **Log** 버튼으로 다시 열기 — 런타임 코드 없이 씬의 `Button.onClick`에 `GameObject.SetActive`를 연결. 로그 창이 꺼져 있어도 `CombatLogger`(BattleRoot)는 계속 기록
+
+### UI 테마 (v6 신규)
+시안(메인 · 가이드 · 옵션 · 편성)을 기준으로 양피지 · 가죽 · 금테 테마를 적용. 런타임 스크립트는 건드리지 않고, 에디터 전용 도구 `Assets/Editor/UIThemeApplier.cs`가 Image/TMP 속성 변경과 장식(`Deco_` 접두사) 오브젝트 추가로 처리한다. 장식은 이름으로 찾아 재사용하므로 같은 메뉴를 여러 번 실행해도 결과가 같다.
+
+| 메뉴 (`Tools > UI Theme`) | 대상 | 내용 |
+|---|---|---|
+| 1. Apply to Prefabs | `Prefabs/UI` 프리팹 | 버튼(가죽+금테), 팝업(양피지+모서리 장식), 드롭다운(알약형), 목록 항목. **프리팹 저장은 Undo 불가** |
+| 2. Apply to Open Scene | 열린 씬 | 메인 메뉴(어두운 배경, 타이틀, 종족 초상화 라인업), 주요 버튼 빨간 강조, 편성 슬라이더 |
+| 3. Apply Polish | 프리팹 3개 + 씬 | 팝업 본문 여백, 드롭다운 라벨, 편성 화면 금테 · 포인트 라벨 · 슬라이더 손잡이 |
+| 4. Roster Layout | 열린 씬 | 편성 화면 네 단 배치(종족 2 : 유닛 구성 3 : 편성 목록 3 : 적 설정 2), 편성 목록 가로 스크롤 제거 · 세로로 늘어나는 Content |
+| 5. Battle UI | 열린 씬 | 아래 "전투 화면" 참고 |
+
+- 씬 메뉴(2~5)는 Undo 한 번으로 되돌릴 수 있고, 저장(Ctrl+S)은 직접 한다.
+- 색 · 크기 · 문구는 파일 맨 위 상수 구역에서 조정.
+- **주의**: 메뉴 1 · 2를 다시 실행하면 메인 메뉴 `ButtonRoot` 위치 등이 처음 값으로 돌아간다.
+- 편성 화면 재배치는 `RosterUIController`가 직접 오브젝트 참조만 쓰고 경로 검색(`Find`)을 하지 않아서 부모를 옮겨도 안전하다. 비게 된 `LeftColumn`은 지우지 않고 비활성화만 했다.
+
+**전투 화면 (메뉴 5)**
+- 상단 가운데 Start / End Turn — 빨간 강조 버튼 (턴 종료 버튼 라벨이 "Start"로 잘못 되어 있던 것 수정)
+- 오른쪽 위 Log / Option / Abandon — 같은 크기로 정렬 (Abadon 오타 수정)
+- 하단 행동 패널 — 화면 폭 전체의 회색 띠 → 버튼 수에 맞춰 늘어나는 가죽 받침 + 금테(`ContentSizeFitter`)
+- 전투 로그 — 210×270 양피지 카드, "전투 기록" 제목, 11pt 글자, 내용에 맞춰 늘어나는 스크롤 Content
+- 결과 창 · 팝업 — 흰 반투명 막 → 어두운 막, 결과는 양피지 카드 + 빨간 Menu 버튼
+- 옵션 창 — "소리" 제목 + 구분선, 알약형 볼륨 슬라이더(Content의 레이아웃을 가로 → 세로로 교체)
+- 카메라 배경 — 기본 파란색 → 메인 메뉴와 같은 어두운 갈색(#17120E)
 
 ### 사운드
 - `AudioManager`(싱글톤, AudioSource 1개로 `PlayOneShot`) — 마스터 볼륨을 dB로 변환해 AudioMixer에 적용, `PlayerPrefs`(`MasterVolume`)에 저장. 옵션 팝업의 볼륨 슬라이더가 이 값을 사용
@@ -414,7 +484,9 @@ Assets/Scripts/
 └── Visualization/    TileVisualizer, TileGridOverlay, MovementRangeVisualizer, UnitVisualController,
                       ProceduralSpriteUtility, SortingLayers
 
-Assets/Editor/        BatchGridSlicer, AnimaitonSetBuilder (에디터 전용, 빌드 제외)
+Assets/Editor/        BatchGridSlicer, AnimaitonSetBuilder, UIThemeApplier (에디터 전용, 빌드 제외)
+Assets/Art/UI/Portraits/  Portrait_{human,elf,dwarf,orc}.png (메인 메뉴 종족 라인업)
+Assets/Art/Icon/      AppIcon.png (앱 아이콘)
 Assets/InputActions/  GameControls.inputactions (+자동생성 GameControls.cs)
 ```
 
@@ -468,3 +540,8 @@ ScriptableObjects/
 11. AI 후보 필터 성능 — `AIQueryUtility.WouldTriggerOpportunityAttack()`이 후보 타일마다 `FindObjectsByType<UnitBase>()`를 호출. 현재 맵 크기에선 문제없으나 유닛 목록을 한 번만 조회해 재사용하도록 개선 여지 있음
 12. 월드맵↔배틀맵 전환, 캠페인 모드 — 전부 미착수, 우선순위 낮음 재확인
 13. 정교한 경로탐색(우선순위 큐) 미적용, 근사치로 대체 중 (v2에서 이어짐, 미해결)
+14. **키 리바인딩 UI 미연결** — `KeyRebindController`가 PlayScene에 없어서 옵션 창에 볼륨만 표시됨. 컴포넌트 추가 후 `rows`(액션 이름 `EndTurn`/`Cancel`/`ToggleActions` + 버튼 + 현재 키 라벨)를 연결해야 함
+15. **유닛 정보 창이 디버그용** — 선택 유닛의 장비/스탯을 `UnitStatusDebugDisplay`(IMGUI `GUI.Box`)로 표시 중. 테마에 맞는 uGUI 패널로 교체 필요
+16. 체력바(`UnitHealthBar`) / 진영 표시(`UnitFactionMarker`)는 아직 UI 테마 미적용 (코드에서 사각형 스프라이트 생성)
+17. 옵션 창 볼륨 수치(%) 표시 없음
+18. Log 버튼이 배치 단계에도 보임 (Option/Abandon은 전투 단계에서만) — 맞추려면 `BattleUIController`에서 함께 제어
